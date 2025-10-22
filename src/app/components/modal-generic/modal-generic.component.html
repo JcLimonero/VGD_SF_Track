@@ -1,0 +1,67 @@
+<h2 mat-dialog-title>Detalles de la Factura</h2>
+
+<mat-dialog-content class="mat-typography">
+  <div class="invoice-details">
+    <div class="detail-row">
+      <strong>ID:</strong> {{ data?.Id }}
+    </div>
+    <div class="detail-row">
+      <strong>ID Agencia:</strong> {{ data?.idAgency }}
+    </div>
+    <div class="detail-row">
+      <strong>Nombre de Agencia:</strong> {{ data?.agencyName }}
+    </div>
+    <div class="detail-row">
+      <strong>Número de Pedido DMS:</strong> {{ data?.order_dms }}
+    </div>
+    <div class="detail-row">
+      <strong>Estado:</strong> {{ data?.state }}
+    </div>
+    <div class="detail-row">
+      <strong>VIN:</strong> {{ data?.vin }}
+    </div>
+    <div class="detail-row">
+      <strong>Fecha de Inicio de Garantía:</strong> {{ data?.warranty_init_date || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Placas:</strong> {{ data?.plates || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Método de Pago:</strong> {{ data?.payment_method }}
+    </div>
+    <div class="detail-row">
+      <strong>Referencia de Factura:</strong> {{ data?.invoice_reference }}
+    </div>
+    <div class="detail-row">
+      <strong>Fecha de Entrega:</strong> {{ data?.delivery_date || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Fecha de Facturación:</strong> {{ data?.billing_date }}
+    </div>
+    <div class="detail-row">
+      <strong>Enviado a SalesForce:</strong> {{ data?.sendedSalesForce }}
+    </div>
+    <div class="detail-row">
+      <strong>ID SalesForce:</strong> {{ data?.idSalesForce || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Resultado SF:</strong> {{ data?.resultSF }}
+    </div>
+    <div class="detail-row">
+      <strong>Intentos SF:</strong> {{ data?.sf_attempts }}
+    </div>
+    <div class="detail-row">
+      <strong>Timestamp DMS:</strong> {{ data?.timestamp_dms }}
+    </div>
+    <div class="detail-row">
+      <strong>Timestamp:</strong> {{ data?.timestamp }}
+    </div>
+    <div class="detail-row">
+      <strong>Timestamp SalesForce:</strong> {{ data?.timestamp_sales_force }}
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onNoClick()">Cerrar</button>
+</mat-dialog-actions>
