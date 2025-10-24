@@ -1,1 +1,19 @@
-<p>invoice-filter works!</p>
+<div>
+    <div class="py-5">
+        <h1>Filtros</h1>
+        <form [formGroup]="filterForm" (ngSubmit)="onFilter()">
+            <div class="">
+                <label for="order_dms">Numero de venta</label>
+                <input type="text" placeholder="Numero venta" class="border border-black" name="order_dms">
+          
+                <label for="vin">VIN</label>
+                <input type="text" placeholder="VIN" class="border border-black" name="vin">
+    
+                <label for="referencia">Referencia de venta</label>
+                <input type="text" placeholder="Referencia de venta" class="border border-black" name="referencia">
+    
+                <button type="submit">Filtrar</button>
+            </div>
+        </form>
+    </div>
+</div>

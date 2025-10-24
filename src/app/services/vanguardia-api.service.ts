@@ -74,6 +74,51 @@ export class VanguardiaApiService {
     );
   }
 
+  getInvoicesbyOrder_dms(order_dms:string): Observable<any[]> {
+    const url = `${this.baseUrl}/vgd/invoice?order_dms=${order_dms}`;
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+
+    return this.http.get<any>(url, { headers }).pipe(
+      map(res => {
+        console.log('Respuesta completa de la API Order:', res);
+        return res?.data?.data ?? []; //devolver solo array
+      })
+    );
+  }
+
+  getInvoicesbyVin(vin:string): Observable<any[]> {
+    const url = `${this.baseUrl}/vgd/invoice?vin=${vin}`;
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+
+    return this.http.get<any>(url, { headers }).pipe(
+      map(res => {
+        console.log('Respuesta completa de la API VIN:', res);
+        return res?.data?.data ?? []; //devolver solo array
+      })
+    );
+  }
+
+  getInvoicesbyReference(reference:string): Observable<any[]> {
+    const url = `${this.baseUrl}/vgd/invoice?invoice_reference=${reference}`;
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+
+    return this.http.get<any>(url, { headers }).pipe(
+      map(res => {
+        console.log('Respuesta completa de la API Rerence:', res);
+        return res?.data?.data ?? []; //devolver solo array
+      })
+    );
+  }
+
 /**
  * Login automático (invisible) desde /vgd/auth/login
  * usando el "code" del Postman original

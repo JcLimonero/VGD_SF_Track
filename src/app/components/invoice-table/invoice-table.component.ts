@@ -62,6 +62,37 @@ private loadInvoices(): void {
   });
 }
 
+applyFilter(filters: { order_dms?: string; vin?: string; reference?: string }): void {
+  this.loading = true;
+  this.error = null;
+
+  let request$;
+
+  if (filters.order_dms) {
+    request$ = this.vanguardiaApi.getInvoicesbyOrder_dms(filters.order_dms);
+  } else if (filters.vin) {
+    request$ = this.vanguardiaApi.getInvoicesbyVin(filters.vin);
+  } else if (filters.reference) {
+    request$ = this.vanguardiaApi.getInvoicesbyReference(filters.reference);
+  } else {
+    // Si no hay filtros, obtener todo
+    request$ = this.vanguardiaApi.getInvoices();
+  }
+
+  request$.subscribe({
+    next: (data: any[]) => {
+      this.data = data;
+      this.loading = false;
+      console.log(' Datos filtrados cargados:', this.data.length);
+    },
+    error: (err: any) => {
+      console.error(' Error al filtrar datos:', err);
+      this.error = 'Error al filtrar datos';
+      this.data = [];
+      this.loading = false;
+    }
+  });
+}
 
 // private loadInventory(): void {
 //   this.loading = true;

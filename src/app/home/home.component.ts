@@ -1,12 +1,9 @@
 import { Component } from '@angular/core';
 import { VexPageLayoutComponent } from '@vex/components/vex-page-layout/vex-page-layout.component';
-import { VexBreadcrumbsComponent } from '@vex/components/vex-breadcrumbs/vex-breadcrumbs.component';
-import { VexChartComponent } from '@vex/components/vex-chart/vex-chart.component';
-import { VexProgressBarComponent } from '@vex/components/vex-progress-bar/vex-progress-bar.component';
-import { VexShowdownComponent } from '@vex/components/vex-showdown/vex-showdown.component';
 import { MenuComponent } from '../components/menu/menu.component';
 import { CommonModule } from '@angular/common';
 import { InvoiceTableComponent } from '../components/invoice-table/invoice-table.component';
+import { InvoiceFilterComponent } from "../components/invoice-filter/invoice-filter.component";
 
 
 @Component({
@@ -16,8 +13,9 @@ import { InvoiceTableComponent } from '../components/invoice-table/invoice-table
     VexPageLayoutComponent,
     MenuComponent,
     CommonModule,
-    InvoiceTableComponent
-  ],
+    InvoiceTableComponent,
+    InvoiceFilterComponent
+],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
