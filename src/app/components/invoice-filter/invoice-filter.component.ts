@@ -25,6 +25,7 @@ export class InvoiceFilterComponent {
 
   onFilter(): void {
     const filters = this.filterForm.value;
+    console.log('InvoiceFilter -> onFilter(), emitiendo:', filters);
     this.filterChange.emit(filters);
   }
 
