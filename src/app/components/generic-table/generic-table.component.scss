@@ -4,9 +4,173 @@ table.mat-table {
 
 th.mat-header-cell {
   font-weight: 600;
+  
+  &.sortable {
+    cursor: pointer;
+    user-select: none;
+    
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
 }
 
-/* Simple default header styling. Global theme / Material styles will apply unless
-   you explicitly override them in a higher-level stylesheet. */
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+}
 
-/* no forced header background here */
+.sort-indicator {
+  font-size: 12px;
+  opacity: 0.7;
+  min-width: 16px;
+  text-align: center;
+  
+  .sort-inactive {
+    opacity: 0.3;
+  }
+}
+
+td.mat-cell, th.mat-header-cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 8px;
+}
+
+// Columnas con anchos mínimos para texto completo
+td.mat-column-agencyName,
+th.mat-column-agencyName {
+  min-width: 120px;
+  max-width: 150px;
+}
+
+td.mat-column-timestamp_sales_force,
+th.mat-column-timestamp_sales_force {
+  min-width: 100px;
+  max-width: 120px;
+}
+
+// Truncar columnas largas
+td.mat-column-resultSF,
+th.mat-column-resultSF {
+  max-width: 190px;
+  min-width: 120px;
+}
+
+td.mat-column-vin,
+th.mat-column-vin {
+  min-width: 110px;
+  max-width: 120px;
+}
+
+td.mat-column-order_dms,
+th.mat-column-order_dms {
+  min-width: 70px;
+  max-width: 80px;
+}
+
+td.mat-column-invoice_reference,
+th.mat-column-invoice_reference {
+  min-width: 100px;
+  max-width: 120px;
+}
+
+td.mat-column-sendedSalesForce,
+th.mat-column-sendedSalesForce {
+  min-width: 50px;
+  max-width: 60px;
+  text-align: center;
+}
+
+td.mat-column-actions,
+th.mat-column-actions {
+  width: 70px;
+  text-align: center;
+}
+
+td.mat-column-sf_jsonRequest,
+th.mat-column-sf_jsonRequest {
+  width: 70px;
+  text-align: center;
+}
+
+.btn-info{
+  background-color: #FF5C20;
+  border-radius: 1rem;
+  cursor: pointer;
+  border: none;
+  padding: 4px;
+}
+
+.btn-json{
+  cursor: pointer;
+  border: none;
+}
+
+/* Salesforce status badge icons */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.status-badge .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+  font-size: 25px;
+  line-height: 1;
+}
+.status-badge.sent .material-symbols-outlined { color: #16a34a; } /* green */
+.status-badge.not-sent .material-symbols-outlined { color: #dc2626; } /* red */
+
+/* Custom pagination styles */
+.custom-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  margin-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.pagination-info {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pagination-btn {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background-color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  
+  &:hover:not(:disabled) {
+    background-color: #f5f5f5;
+    border-color: rgba(0, 0, 0, 0.25);
+  }
+  
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.page-indicator {
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87);
+}

@@ -1,1 +1,87 @@
-<p>invoice-filter works!</p>
+<div class="filter-bar-wrapper px-[5rem] py-5">
+  <form [formGroup]="filterForm" (ngSubmit)="onFilter()" >
+    <div class="filter-bar">
+        <div class="filter-field">
+          <label for="order_dms">No.Orden</label>
+          <input
+            id="order_dms"
+            type="text"
+            placeholder="Número de orden"
+            formControlName="order_dms"
+          />
+        </div>
+        <div class="filter-field">
+          <label for="vin">VIN</label>
+          <input
+            id="vin"
+            type="text"
+            placeholder="VIN"
+            formControlName="vin"
+          />
+        </div>
+        <div class="filter-field">
+          <label for="reference">No.Factura</label>
+          <input
+            id="reference"
+            type="text"
+            placeholder="Número de factura"
+            formControlName="reference"
+          />
+        </div>
+
+        <!-- Dropdown: Salesforce status -->
+        <details class="dropdown">
+          <summary class="dropdown-trigger">Salesforce <span class="material-symbols-outlined">keyboard_arrow_down</span>
+          </summary>
+          <div class="dropdown-panel">
+            <label class="checkbox">
+                <input id="enviadoSF" type="checkbox"
+                  [checked]="filterForm.get('sendedSalesForce')?.value === '1'"
+                  (change)="onSfToggle('1', $event); closeDropdown($event)" />
+              Enviado
+            </label>
+            <label class="checkbox">
+                <input id="noenviadoSF" type="checkbox"
+                  [checked]="filterForm.get('sendedSalesForce')?.value === '0'"
+                  (change)="onSfToggle('0', $event); closeDropdown($event)" />
+              No enviado
+            </label>
+          </div>
+        </details>
+
+        <!-- Dropdown: Inserción status -->
+        <details class="dropdown">
+          <summary class="dropdown-trigger">Estado SF<span class="material-symbols-outlined">keyboard_arrow_down</span>
+          </summary>
+          <div class="dropdown-panel">
+            <label class="checkbox">
+              <input
+                id="insertado"
+                type="checkbox"
+                formControlName="insertado"
+                (change)="onInsertToggle('insertado', $event); closeDropdown($event)"
+              />
+              Insertado
+            </label>
+            <label class="checkbox">
+              <input
+                id="error"
+                type="checkbox"
+                formControlName="error"
+                (change)="onInsertToggle('error', $event); closeDropdown($event)"
+              />
+              Error
+            </label>
+          </div>
+        </details>
+    </div>
+    <div class="flex justify-end mt-2 w-full">
+      <button type="submit" class="filter-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+      </button>
+    </div>
+  </form>
+</div>
