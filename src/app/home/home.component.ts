@@ -4,6 +4,7 @@ import { MenuComponent } from '../components/menu/menu.component';
 import { CommonModule } from '@angular/common';
 import { InvoiceTableComponent } from '../components/invoice-table/invoice-table.component';
 import { InvoiceFilterComponent } from "../components/invoice-filter/invoice-filter.component";
+import { TabsComponent } from '../components/tabs/tabs.component';
 
 
 @Component({
@@ -14,7 +15,8 @@ import { InvoiceFilterComponent } from "../components/invoice-filter/invoice-fil
     MenuComponent,
     CommonModule,
     InvoiceTableComponent,
-    InvoiceFilterComponent
+    InvoiceFilterComponent,
+    TabsComponent
 ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'

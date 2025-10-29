@@ -1,6 +1,6 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, Inject } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, Inject, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TableColumn } from '../../../@vex/interfaces/table-column.interface';
@@ -13,22 +13,127 @@ import { TableColumn } from '../../../@vex/interfaces/table-column.interface';
   styleUrls: ['./generic-table.component.scss']
 })
 
-
 export class GenericTableComponent implements OnInit, OnChanges {
   @Input() columns: TableColumn<any>[] = [];
   @Input() displayedColumns: string[] = [];
   @Input() data: any[] = [];
-  // optional callback invoked when a row is clicked; parent can pass a function
+  @Input() total: number | null = null;
+  @Input() initialPageSize: number = 10;
   @Input() onRow: ((row: any) => void) | null = null;
+  @Output() pageChanged = new EventEmitter<{ pageIndex: number; pageSize: number }>();
+  @Output() sortChanged = new EventEmitter<{ column: string; direction: 'asc' | 'desc' }>();
+  
+  dataSource = new MatTableDataSource<any>([]);
+  
+  // Paginación personalizada
+  currentPage = 0;
+  pageSize = 5;
+  totalPages = 0;
+  Math = Math; // Para usar Math.min en el template
+  
+  // Ordenamiento
+  sortColumn: string | null = null;
+  sortDirection: 'asc' | 'desc' | null = null;
   
   constructor(public dialog: MatDialog) {}
   
   ngOnInit() {
-    console.log('GenericTable - onRow function:', this.onRow);
+    this.dataSource.data = this.data || [];
+    this.updatePagination();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    // Handle input changes if needed
+    if ('data' in changes) {
+      this.dataSource.data = this.data || [];
+    }
+    if ('total' in changes) {
+      this.updatePagination();
+    }
+  }
+
+  updatePagination() {
+    if (this.total !== null && this.total > 0) {
+      this.totalPages = Math.ceil(this.total / this.pageSize);
+    } else {
+      this.totalPages = 0;
+    }
+  }
+
+  get canGoPrevious(): boolean {
+    return this.currentPage > 0;
+  }
+
+  get canGoNext(): boolean {
+    return this.currentPage < this.totalPages - 1;
+  }
+
+  goToFirstPage() {
+    if (this.currentPage !== 0) {
+      this.currentPage = 0;
+      this.emitPageChange();
+    }
+  }
+
+  goToPreviousPage() {
+    if (this.canGoPrevious) {
+      this.currentPage--;
+      this.emitPageChange();
+    }
+  }
+
+  goToNextPage() {
+    if (this.canGoNext) {
+      this.currentPage++;
+      this.emitPageChange();
+    }
+  }
+
+  goToLastPage() {
+    const lastPage = this.totalPages - 1;
+    if (this.currentPage !== lastPage) {
+      this.currentPage = lastPage;
+      this.emitPageChange();
+    }
+  }
+
+  emitPageChange() {
+    this.pageChanged.emit({
+      pageIndex: this.currentPage,
+      pageSize: this.pageSize
+    });
+  }
+
+  toggleSort(column: string) {
+    if (this.sortColumn === column) {
+      // Cambiar dirección: asc -> desc -> null
+      if (this.sortDirection === 'asc') {
+        this.sortDirection = 'desc';
+      } else if (this.sortDirection === 'desc') {
+        this.sortDirection = null;
+        this.sortColumn = null;
+      }
+    } else {
+      // Nueva columna, empezar con asc
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+
+    if (this.sortColumn && this.sortDirection) {
+      this.sortChanged.emit({
+        column: this.sortColumn,
+        direction: this.sortDirection
+      });
+    } else {
+      // Resetear ordenamiento
+      this.sortChanged.emit({
+        column: '',
+        direction: 'asc'
+      });
+    }
+  }
+
+  isSortable(column: string): boolean {
+    return column === 'order_dms' || column === 'timestamp_sales_force';
   }
 
   cellValue(row: any, property: string) {
@@ -53,6 +158,20 @@ export class GenericTableComponent implements OnInit, OnChanges {
       console.log('Modal closed with result:', result);
     });
   }
+
+  openJsonModal(rowData: any) {
+    console.log('Opening JSON modal with data:', rowData);
+    const dialogRef = this.dialog.open(JsonModalComponent, {
+      data: rowData.sf_jsonRequest,
+      width: '90%',
+      maxWidth: '900px',
+      maxHeight: '80vh'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('JSON Modal closed');
+    });
+  }
 }
 
 // Modal component defined in the same file
@@ -61,21 +180,16 @@ export class GenericTableComponent implements OnInit, OnChanges {
   standalone: true,
   imports: [MatDialogModule, MatButtonModule, CommonModule],
   template: `
-    <h2 mat-dialog-title>Detalles de la Factura</h2>
+    <h2 mat-dialog-title class="title text-xl">Detalles de la orden</h2>
 
-    <mat-dialog-content class="mat-typography">
+    <mat-dialog-content >
       <div class="invoice-details">
-        <div class="detail-row">
-          <strong>ID:</strong> {{ data?.Id }}
-        </div>
-        <div class="detail-row">
-          <strong>ID Agencia:</strong> {{ data?.idAgency }}
-        </div>
+      
         <div class="detail-row">
           <strong>Nombre de Agencia:</strong> {{ data?.agencyName }}
         </div>
         <div class="detail-row">
-          <strong>Número de Pedido DMS:</strong> {{ data?.order_dms }}
+          <strong>Número de Orden:</strong> {{ data?.order_dms }}
         </div>
         <div class="detail-row">
           <strong>Estado:</strong> {{ data?.state }}
@@ -93,7 +207,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
           <strong>Método de Pago:</strong> {{ data?.payment_method }}
         </div>
         <div class="detail-row">
-          <strong>Referencia de Factura:</strong> {{ data?.invoice_reference }}
+          <strong>Número de Factura:</strong> {{ data?.invoice_reference }}
         </div>
         <div class="detail-row">
           <strong>Fecha de Entrega:</strong> {{ data?.delivery_date || 'N/A' }}
@@ -111,13 +225,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
           <strong>Resultado SF:</strong> {{ data?.resultSF }}
         </div>
         <div class="detail-row">
-          <strong>Intentos SF:</strong> {{ data?.sf_attempts }}
-        </div>
-        <div class="detail-row">
           <strong>Timestamp DMS:</strong> {{ data?.timestamp_dms }}
-        </div>
-        <div class="detail-row">
-          <strong>Timestamp:</strong> {{ data?.timestamp }}
         </div>
         <div class="detail-row">
           <strong>Timestamp SalesForce:</strong> {{ data?.timestamp_sales_force }}
@@ -130,14 +238,22 @@ export class GenericTableComponent implements OnInit, OnChanges {
     </mat-dialog-actions>
   `,
   styles: [`
+
+    .title{
+      text-decoration: underline;
+      text-decoration-color: #FF5C20;
+      text-decoration-thickness: 3px;
+      align-self: center;
+    }
+
     .invoice-details {
       max-height: 400px;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
 
     .detail-row {
-      margin-bottom: 12px;
-      padding: 8px;
       border-bottom: 1px solid #e0e0e0;
     }
 
@@ -146,12 +262,12 @@ export class GenericTableComponent implements OnInit, OnChanges {
     }
 
     .detail-row strong {
-      color: #1976d2;
+      color: #1b1a1aff;
       margin-right: 8px;
     }
 
     mat-dialog-content {
-      max-height: 500px;
+      max-height: 550px;
       overflow-y: auto;
     }
   `]
@@ -166,3 +282,99 @@ export class ModalDialogComponent {
     this.dialogRef.close();
   }
 }
+
+// JSON Modal component
+@Component({
+  selector: 'json-modal',
+  standalone: true,
+  imports: [MatDialogModule, MatButtonModule, CommonModule],
+  template: `
+    <h2 mat-dialog-title>JSON Request - SalesForce</h2>
+
+    <mat-dialog-content class="mat-typography">
+      <div class="json-container">
+        <pre class="json-content">{{ formattedJson }}</pre>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+      <button (click)="copyToClipboard()" class="flex flex-row items-center bg-black text-white p-[0.45rem] rounded-2xl">
+        <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#ffffff"  class="mr-[0.2rem]">
+          <path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z"/>
+        </svg>
+        {{ copyButtonText }}
+      </button>
+      <button mat-button (click)="onNoClick()">Cerrar</button>
+    </mat-dialog-actions>
+  `,
+  styles: [`
+    .json-container {
+      background-color: #f5f5f5;
+      border-radius: 4px;
+      padding: 16px;
+      overflow: auto;
+      max-height: 500px;
+    }
+
+    .json-content {
+      margin: 0;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #333;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    mat-dialog-content {
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    mat-dialog-actions button {
+      margin-left: 8px;
+    }
+  `]
+})
+export class JsonModalComponent {
+  formattedJson: string;
+  copyButtonText = 'Copiar';
+
+  constructor(
+    public dialogRef: MatDialogRef<JsonModalComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {
+    // Format JSON with proper indentation
+    try {
+      if (typeof data === 'string') {
+        // If it's a string, try to parse and re-stringify
+        this.formattedJson = JSON.stringify(JSON.parse(data), null, 2);
+      } else {
+        this.formattedJson = JSON.stringify(data, null, 2);
+      }
+    } catch (e) {
+      // If parsing fails, show as-is
+      this.formattedJson = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+    }
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+
+  copyToClipboard(): void {
+    navigator.clipboard.writeText(this.formattedJson).then(() => {
+      this.copyButtonText = 'Copiado';
+      setTimeout(() => {
+        this.copyButtonText = 'Copiar';
+      }, 2000);
+    }).catch(err => {
+      console.error('Error al copiar al portapapeles:', err);
+      this.copyButtonText = '✗ Error';
+      setTimeout(() => {
+        this.copyButtonText = 'Copiar';
+      }, 2000);
+    });
+  }
+}
+

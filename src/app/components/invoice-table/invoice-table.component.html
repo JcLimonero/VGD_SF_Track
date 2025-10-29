@@ -2,4 +2,7 @@
 	[columns]="columns"
 	[displayedColumns]="displayedColumns"
 	[data]="data"
+	[total]="total"
+	(pageChanged)="loadPage($event.pageIndex, $event.pageSize)"
+	(sortChanged)="onSortChange($event)"
 ></vex-generic-table>
