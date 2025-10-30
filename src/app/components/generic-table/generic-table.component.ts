@@ -19,6 +19,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
   @Input() data: any[] = [];
   @Input() total: number | null = null;
   @Input() initialPageSize: number = 10;
+  @Input() currentPageIndex: number = 0; // Página actual desde el componente padre
   @Input() onRow: ((row: any) => void) | null = null;
   @Output() pageChanged = new EventEmitter<{ pageIndex: number; pageSize: number }>();
   @Output() sortChanged = new EventEmitter<{ column: string; direction: 'asc' | 'desc' }>();
@@ -48,6 +49,9 @@ export class GenericTableComponent implements OnInit, OnChanges {
     }
     if ('total' in changes) {
       this.updatePagination();
+    }
+    if ('currentPageIndex' in changes) {
+      this.currentPage = this.currentPageIndex || 0;
     }
   }
 
@@ -144,6 +148,13 @@ export class GenericTableComponent implements OnInit, OnChanges {
       v = v ? v[p] : undefined;
     }
     return v;
+  }
+
+  truncateToWords(text: string, wordLimit: number = 5): string {
+    if (!text || typeof text !== 'string') return '';
+    const words = text.trim().split(/\s+/);
+    if (words.length <= wordLimit) return text;
+    return words.slice(0, wordLimit).join(' ') + '...';
   }
 
   openModal(rowData: any) {

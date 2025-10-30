@@ -55,6 +55,41 @@ export class InvoiceFilterComponent {
 
     console.log('InvoiceFilter -> onFilter(), emitiendo:', payload);
     this.filterChange.emit(payload);
+
+    // Limpiar todos los campos después de enviar el filtro
+    this.filterForm.reset({
+      order_dms: '',
+      vin: '',
+      reference: '',
+      sendedSalesForce: '',
+      insertado: false,
+      error: false
+    });
+  }
+
+  onClearFilters(): void {
+    // Resetear el formulario a valores vacíos
+    this.filterForm.reset({
+      order_dms: '',
+      vin: '',
+      reference: '',
+      sendedSalesForce: '',
+      insertado: false,
+      error: false
+    });
+
+    // Emitir filtros vacíos para que la tabla se resetee
+    const emptyPayload = {
+      order_dms: undefined,
+      vin: undefined,
+      reference: undefined,
+      sendedSalesForce: undefined,
+      insertado: false,
+      error: false,
+    };
+
+    console.log('InvoiceFilter -> onClearFilters(), emitiendo filtros vacíos:', emptyPayload);
+    this.filterChange.emit(emptyPayload);
   }
 
   closeDropdown(event: Event): void {

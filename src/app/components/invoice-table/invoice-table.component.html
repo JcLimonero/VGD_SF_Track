@@ -3,6 +3,7 @@
 	[displayedColumns]="displayedColumns"
 	[data]="data"
 	[total]="total"
+	[currentPageIndex]="pageIndex"
 	(pageChanged)="loadPage($event.pageIndex, $event.pageSize)"
 	(sortChanged)="onSortChange($event)"
 ></vex-generic-table>

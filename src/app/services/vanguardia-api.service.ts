@@ -120,12 +120,10 @@ export class VanguardiaApiService {
   }
   
   getInvoicesbyInsert(status:string): Observable<any[]> {
-    // status: 'true' => Insertado (resultSF == 'Insert Correct')
-    // status: 'false' => Error (resultSF != 'Insert Correct')
-    const url = (status === 'true')
-      ? `${this.baseUrl}/vgd/invoice?resultSF=Insert Correct`
-      : `${this.baseUrl}/vgd/invoice?resultSF_ne=Insert Correct`;
-    
+    // status: 'true' => Insertado correctamente (insertCorrect == '1')
+    // status: 'false' => Error (insertCorrect == '0')
+    const insertCorrectValue = (status === 'true') ? '1' : '0';
+    const url = `${this.baseUrl}/vgd/invoice?insertCorrect=${insertCorrectValue}`;
 
     const headers = new HttpHeaders()
       .set('Content-Type', 'application/json')
@@ -164,10 +162,9 @@ export class VanguardiaApiService {
     vin?: string;
     invoice_reference?: string;
     sendedSalesForce?: string; // '1' | '0'
-    resultSF?: string;
-    resultSF_ne?: string;
-    _sort?: string;
-    _order?: string;
+    insertCorrect?: string; // '0' | '1'
+    orderby?: string;
+    ordertype?: string;
   }): Observable<{ items: any[]; total: number; per_page: number; page: number }> {
     const url = `${this.baseUrl}/vgd/invoice`;
 
@@ -175,7 +172,7 @@ export class VanguardiaApiService {
     const p = params || {};
     
     // Core filters
-    ['order_dms','vin','invoice_reference','sendedSalesForce','resultSF','resultSF_ne']
+    ['order_dms','vin','invoice_reference','sendedSalesForce','insertCorrect']
       .forEach((k) => {
         const v = (p as any)[k];
         if (v !== undefined && v !== null && v !== '') {
@@ -188,16 +185,15 @@ export class VanguardiaApiService {
     httpParams = httpParams.set('page', String(page));
 
     // Agregar ordenamiento si existe
-    if (p._sort && p._order) {
-      httpParams = httpParams.set('_sort', p._sort);
-      httpParams = httpParams.set('_order', p._order);
+    if (p.orderby && p.ordertype) {
+      httpParams = httpParams.set('orderby', p.orderby);
+      httpParams = httpParams.set('ordertype', p.ordertype);
     }
 
     const headers = new HttpHeaders()
       .set('Content-Type', 'application/json')
       .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
 
-    console.log('[VanguardiaApi] GET', url, httpParams.toString());
 
     return this.http.get<any>(url, { headers, params: httpParams }).pipe(
       map(res => {
