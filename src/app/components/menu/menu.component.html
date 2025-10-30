@@ -1,9 +1,22 @@
 <div class="w-full">
-    <nav class="bg-black flex text-white ps-8 sm:pe-[8rem] py-5 justify-between">
+    <nav class="bg-black flex text-white ps-8 sm:pe-[8rem] py-5 justify-between items-center">
         <a href="#" class="text-[1.2rem] font-semibold">Grupo Vanguardia</a>
-        <ul class="flex justify-center gap-[6rem] text-center text-[1rem]">
-            <li>Dashboard</li>
-            <li>Consulta</li>
+        <ul class="flex justify-center gap-[6rem] text-center text-[1rem] items-center">
+            <li class="cursor-pointer hover:text-gray-300 transition-colors">Dashboard</li>
+            <li class="cursor-pointer hover:text-gray-300 transition-colors">Consulta</li>
+            <li>
+                <button 
+                    (click)="logout()" 
+                    class="bg-white hover:bg-[#FBFBFB] text-black px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2 text-sm"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16,17 21,12 16,7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Cerrar Sesión
+                </button>
+            </li>
         </ul>
     </nav>
 </div>
