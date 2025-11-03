@@ -57,10 +57,10 @@ export class VanguardiaApiService {
   }
 
   /**
-   * Obtiene el inventario desde /vgd/inventoryfilter
+   * Obtiene el inventario desde /vgd/invoice con ordenamiento por defecto por fecha de facturación
    */
   getInvoices(): Observable<any[]> {
-    const url = `${this.baseUrl}/vgd/invoice`;
+    const url = `${this.baseUrl}/vgd/invoice?ordertype=desc&orderby=billing_date`;
 
     const headers = new HttpHeaders()
       .set('Content-Type', 'application/json')
@@ -152,15 +152,31 @@ export class VanguardiaApiService {
     );
   }
 
+  getInvoicesbyAgencies(agencie:string): Observable<any[]> {
+    const url = `${this.baseUrl}/vgd/invoice?agencyName=${agencie}`;
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+
+    return this.http.get<any>(url, { headers }).pipe(
+      map(res => {
+        console.log('Respuesta completa de la API por Agencia:', res);
+        return res?.data?.data ?? []; //devolver solo array
+      })
+    );
+  }
+
   /**
    * Paginación y filtros combinados: retorna items y metadatos (total, per_page, page)
    */
   getInvoicesPaged(params: {
     page?: number;
-    per_page?: number;
+    perpage?: number; // Cambio de per_page a perpage
     order_dms?: string;
     vin?: string;
     invoice_reference?: string;
+    agencyName?: string; // Agregar agencyName
     sendedSalesForce?: string; // '1' | '0'
     insertCorrect?: string; // '0' | '1'
     orderby?: string;
@@ -172,7 +188,7 @@ export class VanguardiaApiService {
     const p = params || {};
     
     // Core filters
-    ['order_dms','vin','invoice_reference','sendedSalesForce','insertCorrect']
+    ['order_dms','vin','invoice_reference','agencyName','sendedSalesForce','insertCorrect']
       .forEach((k) => {
         const v = (p as any)[k];
         if (v !== undefined && v !== null && v !== '') {
@@ -180,9 +196,11 @@ export class VanguardiaApiService {
         }
       });
 
-    // API solo soporta 'page' (siempre devuelve 5 por página)
+    // Paginación con page y perpage
     const page = Number(p.page || 1);
+    const perpage = Number(p.perpage || 5);
     httpParams = httpParams.set('page', String(page));
+    httpParams = httpParams.set('perpage', String(perpage));
 
     // Agregar ordenamiento si existe
     if (p.orderby && p.ordertype) {
@@ -194,6 +212,8 @@ export class VanguardiaApiService {
       .set('Content-Type', 'application/json')
       .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
 
+    console.log('🌐 getInvoicesPaged - URL:', url);
+    console.log('🌐 getInvoicesPaged - Params enviados:', httpParams.toString());
 
     return this.http.get<any>(url, { headers, params: httpParams }).pipe(
       map(res => {
@@ -208,24 +228,21 @@ export class VanguardiaApiService {
     );
   }
 
-/**
- * Login automático (invisible) desde /vgd/auth/login
- * usando el "code" del Postman original
- */
-// loginInvisible():any {
-//   const url = `${this.baseUrl}/vgd/inventoryfilter`;
-//   const body = {};
+  getAgencies(): Observable<any[]> {
+    // Solicitar todas las agencias usando un perpage alto
+    const url = `${this.baseUrl}/vgd/agenciesfilter?perpage=100`;
 
-//   const headers = new HttpHeaders()
-//     .set('Content-Type', 'application/json')
-//     .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
 
-//   console.log('Enviando login invisible a:', url);
-
-//   return this.http.get(url,{headers:headers}
-//   );
-
-// }
+    return this.http.get<any>(url, { headers }).pipe(
+      map(res => {
+        console.log('Respuesta completa de la API Agencias:', res);
+        return res?.data?.data ?? []; //devolver solo array
+      })
+    );
+  }
 
   /**
    * Refresca el token desde /auth/refresh

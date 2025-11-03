@@ -53,6 +53,12 @@ th.mat-column-timestamp_sales_force {
   max-width: 120px;
 }
 
+td.mat-column-billing_date,
+th.mat-column-billing_date {
+  min-width: 100px;
+  max-width: 120px;
+}
+
 // Truncar columnas largas
 td.mat-column-resultSF,
 th.mat-column-resultSF {
@@ -173,4 +179,43 @@ th.mat-column-sf_jsonRequest {
   font-size: 14px;
   font-weight: 500;
   color: rgba(0, 0, 0, 0.87);
+}
+
+/* Estilos para el selector de registros por página */
+.pagination-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.records-per-page {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  label {
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.87);
+  }
+}
+
+.page-size-select {
+  padding: 4px 8px;
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  border-radius: 4px;
+  background-color: white;
+  font-size: 14px;
+  cursor: pointer;
+  
+  &:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+  }
+}
+
+.showing-info {
+  margin-top: 4px;
 }

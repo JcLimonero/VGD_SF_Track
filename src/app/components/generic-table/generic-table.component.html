@@ -51,7 +51,22 @@
   <!-- Paginación personalizada -->
   <div class="custom-pagination" *ngIf="total && total > 0">
     <div class="pagination-info">
-      Mostrando {{ (currentPage * pageSize) + 1 }} - {{ Math.min((currentPage + 1) * pageSize, total) }} de {{ total }} registros
+      <div class="records-per-page">
+        <label for="pageSize">Mostrar:</label>
+        <select 
+          id="pageSize" 
+          [ngModel]="pageSize" 
+          (ngModelChange)="onPageSizeChange($event)"
+          class="page-size-select">
+          <option *ngFor="let option of pageSizeOptions" [value]="option">
+            {{ option }}
+          </option>
+        </select>
+        <span>registros por página</span>
+      </div>
+      <div class="showing-info">
+        Mostrando {{ (currentPage * pageSize) + 1 }} - {{ Math.min((currentPage + 1) * pageSize, total) }} de {{ total }} registros
+      </div>
     </div>
     
     <div class="pagination-controls">

@@ -3,12 +3,35 @@
   <!-- Menu component -->
   <div class="mb-6">
     <vex-menu></vex-menu>
-  
   </div>
-  <vex-tabs></vex-tabs>
-  <div>
+  
+  <vex-tabs (tabChanged)="onTabChanged($event)"></vex-tabs>
+  
+  <!-- Contenido de Ordenes (visible por defecto) -->
+  <div *ngIf="activeTab === 'orders'">
    <vex-invoice-filter (filterChange)="handleFilter($event)"></vex-invoice-filter>
     <vex-invoice-table #invoiceTable></vex-invoice-table>
+  </div>
+
+  <!-- Contenido de otros tabs (placeholders por ahora) -->
+  <div *ngIf="activeTab === 'inventory'" class="p-8 text-center">
+    <h2 class="text-2xl font-bold text-gray-600">Sección de Inventario</h2>
+    <p class="text-gray-500 mt-4">Funcionalidad próximamente...</p>
+  </div>
+
+  <div *ngIf="activeTab === 'services'" class="p-8 text-center">
+    <h2 class="text-2xl font-bold text-gray-600">Sección de Servicios</h2>
+    <p class="text-gray-500 mt-4">Funcionalidad próximamente...</p>
+  </div>
+
+  <div *ngIf="activeTab === 'clients'" class="p-8 text-center">
+    <h2 class="text-2xl font-bold text-gray-600">Sección de Clientes</h2>
+    <p class="text-gray-500 mt-4">Funcionalidad próximamente...</p>
+  </div>
+
+  <div *ngIf="activeTab === 'dwh'" class="p-8 text-center">
+    <h2 class="text-2xl font-bold text-gray-600">Sección de DWH</h2>
+    <p class="text-gray-500 mt-4">Funcionalidad próximamente...</p>
   </div>
 
 </vex-page-layout>

@@ -1,0 +1,46 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>Vanguardia Login</h1>
+      <p>Ingresa tu contraseña para continuar</p>
+    </div>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input 
+          type="password" 
+          id="password"
+          formControlName="password"
+          class="form-input"
+          [class.error]="passwordControl?.invalid && passwordControl?.touched"
+          placeholder="Ingresa tu contraseña"
+          autocomplete="current-password"
+        />
+        <div class="error-message" *ngIf="passwordControl?.invalid && passwordControl?.touched">
+          La contraseña es requerida
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button 
+        type="submit" 
+        class="login-btn"
+        [disabled]="isLoading"
+        [class.loading]="isLoading"
+      >
+        <span *ngIf="!isLoading">Ingresar</span>
+        <span *ngIf="isLoading" class="loading-text">
+          <svg class="spinner" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" opacity="0.25"/>
+            <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" opacity="0.75"/>
+          </svg>
+          Verificando...
+        </span>
+      </button>
+    </form>
+  </div>
+</div>
