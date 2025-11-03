@@ -29,6 +29,23 @@
           />
         </div>
 
+        <!-- Dropdown: Agencias -->
+        <details class="dropdown">
+          <summary class="dropdown-trigger">
+            {{ selectedAgency || 'Agencia' }} 
+            <span class="material-symbols-outlined">keyboard_arrow_down</span>
+          </summary>
+          <div class="dropdown-panel">
+            <label class="checkbox" *ngFor="let agency of agencies">
+              <input 
+                type="checkbox"
+                [checked]="selectedAgency === agency.name"
+                (change)="onAgencySelect(agency.name, $event); closeDropdown($event)" />
+              {{ agency.name }}
+            </label>
+          </div>
+        </details>
+
         <!-- Dropdown: Salesforce status -->
         <details class="dropdown">
           <summary class="dropdown-trigger">Salesforce <span class="material-symbols-outlined">keyboard_arrow_down</span>
@@ -74,9 +91,8 @@
             </label>
           </div>
         </details>
-    </div>
-    <div class="flex justify-end mt-2 w-full">
-      <button type="submit" class="filter-btn">
+
+        <button type="submit" class="filter-btn">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"></circle>
           <path d="m21 21-4.35-4.35"></path>

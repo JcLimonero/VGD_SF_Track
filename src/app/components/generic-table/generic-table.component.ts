@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, Inject, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -8,7 +9,7 @@ import { TableColumn } from '../../../@vex/interfaces/table-column.interface';
 @Component({
   selector: 'vex-generic-table',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatButtonModule, MatDialogModule],
+  imports: [CommonModule, FormsModule, MatTableModule, MatButtonModule, MatDialogModule],
   templateUrl: './generic-table.component.html',
   styleUrls: ['./generic-table.component.scss']
 })
@@ -20,6 +21,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
   @Input() total: number | null = null;
   @Input() initialPageSize: number = 10;
   @Input() currentPageIndex: number = 0; // Página actual desde el componente padre
+  @Input() initialSort: { column: string; direction: 'asc' | 'desc' } | null = null; // Estado inicial de ordenamiento
   @Input() onRow: ((row: any) => void) | null = null;
   @Output() pageChanged = new EventEmitter<{ pageIndex: number; pageSize: number }>();
   @Output() sortChanged = new EventEmitter<{ column: string; direction: 'asc' | 'desc' }>();
@@ -31,6 +33,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
   pageSize = 5;
   totalPages = 0;
   Math = Math; // Para usar Math.min en el template
+  pageSizeOptions = [5, 10, 25, 50, 100];
   
   // Ordenamiento
   sortColumn: string | null = null;
@@ -41,6 +44,12 @@ export class GenericTableComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.dataSource.data = this.data || [];
     this.updatePagination();
+    
+    // Inicializar estado de ordenamiento si se proporciona
+    if (this.initialSort) {
+      this.sortColumn = this.initialSort.column;
+      this.sortDirection = this.initialSort.direction;
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -107,6 +116,13 @@ export class GenericTableComponent implements OnInit, OnChanges {
     });
   }
 
+  onPageSizeChange(newSize: number) {
+    this.pageSize = newSize;
+    this.currentPage = 0; // Resetear a la primera página
+    this.updatePagination();
+    this.emitPageChange();
+  }
+
   toggleSort(column: string) {
     if (this.sortColumn === column) {
       // Cambiar dirección: asc -> desc -> null
@@ -137,7 +153,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
   }
 
   isSortable(column: string): boolean {
-    return column === 'order_dms' || column === 'timestamp_sales_force';
+    return column === 'order_dms' || column === 'timestamp_sales_force' || column === 'billing_date';
   }
 
   cellValue(row: any, property: string) {

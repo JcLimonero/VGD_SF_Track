@@ -4,6 +4,7 @@
 	[data]="data"
 	[total]="total"
 	[currentPageIndex]="pageIndex"
+	[initialSort]="currentSort"
 	(pageChanged)="loadPage($event.pageIndex, $event.pageSize)"
 	(sortChanged)="onSortChange($event)"
 ></vex-generic-table>

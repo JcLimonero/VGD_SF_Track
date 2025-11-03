@@ -21,6 +21,21 @@ li:hover .icon-tab {
 li:hover span:last-child {
   color: black;
 }
+
+/* Estilos para tab activo */
+li.active-tab {
+  border-bottom: 3px solid #FF5C20;
+}
+
+li.active-tab .icon-tab {
+  color: #FF5C20;
+}
+
+li.active-tab span:last-child {
+  color: black;
+  font-weight: 600;
+}
+
 .tab{
   border-bottom: 1px solid #888888;
   border-right: 3px solid black;

@@ -24,6 +24,13 @@ import { TabsComponent } from '../components/tabs/tabs.component';
 
 export class HomeComponent {
   @ViewChild('invoiceTable') invoiceTable!: InvoiceTableComponent;
+  
+  activeTab = 'orders'; // Tab activo por defecto: Ordenes
+
+  onTabChanged(tabId: string): void {
+    this.activeTab = tabId;
+    console.log('🏠 Home - Tab cambiado a:', tabId);
+  }
 
   handleFilter(filters: any) {
     console.log('Home -> filter recibido:', filters); // <-- debug

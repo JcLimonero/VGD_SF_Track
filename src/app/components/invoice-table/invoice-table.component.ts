@@ -19,16 +19,17 @@ export class InvoiceTableComponent implements OnInit {
   loading = false;
   error: string | null = null;
   total = 0;
-  serverPageSize = 5; // El API siempre devuelve 5 registros por página
+  defaultPageSize = 5; // Tamaño por defecto
   pageIndex = 0;
-  currentFilters: { order_dms?: string; vin?: string; reference?: string; sendedSalesForce?: '1'|'0'; insertado?: boolean; error?: boolean } = {};
-  currentSort: { column: string; direction: 'asc' | 'desc' } | null = null;
+  currentFilters: { order_dms?: string; vin?: string; reference?: string; agencyName?: string; sendedSalesForce?: '1'|'0'; insertado?: boolean; error?: boolean } = {};
+  currentSort: { column: string; direction: 'asc' | 'desc' } | null = { column: 'billing_date', direction: 'desc' };
 
   // Columnas para mostrar datos del inventario (basadas en los datos del mock)
   columns: TableColumn<any>[] = [
     { label: 'Agencia', property: 'agencyName', type: 'text' },
     { label: 'Número de venta', property: 'order_dms', type: 'text' },
     { label: 'VIN', property: 'vin', type: 'text' },
+    { label: 'Fecha Facturación', property: 'billing_date', type: 'text' },
     { label: 'Referencia de venta', property: 'invoice_reference', type: 'text' },
     { label: 'Envio SF', property: 'sendedSalesForce', type: 'text' },
     { label: 'Fecha SF', property: 'timestamp_sales_force', type: 'text' },
@@ -37,12 +38,12 @@ export class InvoiceTableComponent implements OnInit {
     { label: 'Detalles', property: 'actions', type: 'button' }
   ];
 
-  displayedColumns: string[] = ['agencyName','order_dms', 'vin','invoice_reference', 'sendedSalesForce', 'timestamp_sales_force', 'resultSF','sf_jsonRequest', 'actions'];
+  displayedColumns: string[] = ['agencyName','order_dms', 'vin','billing_date','invoice_reference', 'sendedSalesForce', 'timestamp_sales_force', 'resultSF','sf_jsonRequest', 'actions'];
 
   constructor(private vanguardiaApi: VanguardiaApiService) {}
 
   ngOnInit(): void {
-    this.loadPage(this.pageIndex, this.serverPageSize);
+    this.loadPage(this.pageIndex, this.defaultPageSize);
   }
 
   /**
@@ -53,15 +54,19 @@ loadPage(pageIndex: number, pageSize: number): void {
   this.loading = true;
   this.error = null;
 
-  // El API solo acepta 'page' y siempre devuelve 5 registros
+  console.log('📋 Cargando página con filtros actuales:', this.currentFilters);
+
+  // Ahora la API acepta 'page' y 'perpage'
   const params: any = {
-    page: pageIndex + 1  // API usa 1-indexed
+    page: pageIndex + 1,  // API usa 1-indexed
+    perpage: pageSize     // Agregar el tamaño de página
   };
 
   // Map current filters to params
   if (this.currentFilters.order_dms) params.order_dms = this.currentFilters.order_dms;
   if (this.currentFilters.vin) params.vin = this.currentFilters.vin;
   if (this.currentFilters.reference) params.invoice_reference = this.currentFilters.reference;
+  if (this.currentFilters.agencyName) params.agencyName = this.currentFilters.agencyName;
   if (this.currentFilters.sendedSalesForce) params.sendedSalesForce = this.currentFilters.sendedSalesForce;
   if (this.currentFilters.insertado && !this.currentFilters.error) params.insertCorrect = '1';
   if (this.currentFilters.error && !this.currentFilters.insertado) params.insertCorrect = '0';
@@ -71,6 +76,8 @@ loadPage(pageIndex: number, pageSize: number): void {
     params.orderby = this.currentSort.column;
     params.ordertype = this.currentSort.direction;
   }
+
+  console.log('📋 Parámetros enviados a la API:', params);
 
   this.vanguardiaApi.getInvoicesPaged(params).subscribe({
     next: (res) => {
@@ -88,11 +95,12 @@ loadPage(pageIndex: number, pageSize: number): void {
   });
 }
 
-applyFilter(filters: { order_dms?: string; vin?: string; reference?: string; sendedSalesForce?: '1' | '0'; insertado?: boolean; error?: boolean }): void {
+applyFilter(filters: { order_dms?: string; vin?: string; reference?: string; agencyName?: string; sendedSalesForce?: '1' | '0'; insertado?: boolean; error?: boolean }): void {
+  console.log('📋 ApplyFilter recibido:', filters);
   // Guardar filtros y reiniciar a primera página
   this.currentFilters = { ...filters };
   this.pageIndex = 0;
-  this.loadPage(this.pageIndex, this.serverPageSize);
+  this.loadPage(this.pageIndex, this.defaultPageSize);
 }
 
 onSortChange(sort: { column: string; direction: 'asc' | 'desc' }): void {
@@ -105,14 +113,14 @@ onSortChange(sort: { column: string; direction: 'asc' | 'desc' }): void {
   }
   // Siempre ir a página 1 al cambiar o resetear ordenamiento
   this.pageIndex = 0;
-  this.loadPage(this.pageIndex, this.serverPageSize);
+  this.loadPage(this.pageIndex, this.defaultPageSize);
 }
 
   /**
    * Recarga los datos del inventario
    */
   refreshData(): void {
-    this.loadPage(this.pageIndex, this.serverPageSize);
+    this.loadPage(this.pageIndex, this.defaultPageSize);
   }
 
   /**
