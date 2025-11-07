@@ -5,6 +5,7 @@
 	[total]="total"
 	[currentPageIndex]="pageIndex"
 	[initialSort]="currentSort"
+	[hasActiveFilters]="hasActiveFilters"
 	(pageChanged)="loadPage($event.pageIndex, $event.pageSize)"
 	(sortChanged)="onSortChange($event)"
 ></vex-generic-table>

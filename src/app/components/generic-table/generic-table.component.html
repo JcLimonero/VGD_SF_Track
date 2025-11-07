@@ -18,13 +18,15 @@
         <ng-container *ngIf="col.property==='sendedSalesForce'">
           <span class="status-badge" [ngClass]="cellValue(element, col.property) === '1' ? 'sent' : 'not-sent'">
             <span class="material-symbols-outlined">
-              {{ cellValue(element, col.property) === '1' ? 'check_circle' : 'error' }}
+              {{ cellValue(element, col.property) === '1' ? 'send' : 'cancel_schedule_send' }}
             </span>
           </span>
         </ng-container>
         <ng-container *ngIf="col.type === 'button' &&col.property==='actions'">
           <button class="btn-info" (click)="openModal(element)">
-            <svg xmlns="http://www.w3.org/2000/svg" height="25px" viewBox="0 -960 960 960" width="40px" fill="#ffffff"><path d="m600-200-47-46.67 200-200H80v-66.66h673l-199.67-200L600-760l280 280-280 280Z"/></svg>
+            <span class="material-symbols-outlined">
+              visibility
+            </span>
           </button>
         </ng-container>
         <ng-container *ngIf="col.property === 'sf_jsonRequest' && col.type === 'button'">
@@ -32,9 +34,24 @@
             <svg xmlns="http://www.w3.org/2000/svg" height="25px" viewBox="0 -960 960 960" width="40px" fill="#FF5C20"><path d="M320-213.33q-27 0-46.83-19.84Q253.33-253 253.33-280v-533.33q0-27 19.84-46.84Q293-880 320-880h413.33q27 0 46.84 19.83Q800-840.33 800-813.33V-280q0 27-19.83 46.83-19.84 19.84-46.84 19.84H320Zm0-66.67h413.33v-533.33H320V-280ZM186.67-80q-27 0-46.84-19.83Q120-119.67 120-146.67v-600h66.67v600h480V-80h-480ZM320-280v-533.33V-280Z"/></svg>
           </button>
         </ng-container>
+        <ng-container *ngIf="col.property === 'sf_link' && col.type === 'button'">
+          <button 
+            class="btn-sf-link" 
+            [disabled]="!isSalesForceAvailable(element)"
+            (click)="openSalesForceLink(element)"
+            [title]="isSalesForceAvailable(element) ? 'Ver en Salesforce' : 'No disponible en Salesforce'">
+            <span class="material-symbols-outlined">
+              open_in_new
+            </span>
+          </button>
+        </ng-container>
         <ng-container *ngIf="col.property === 'resultSF'">
-          <span [title]="cellValue(element, col.property)">
-            {{ truncateToWords(cellValue(element, col.property), 5) }}
+          <span class="status-badge" 
+                [ngClass]="isResultSFSuccess(element) ? 'sent' : 'not-sent'"
+                [title]="cellValue(element, col.property)">
+            <span class="material-symbols-outlined">
+              {{ isResultSFSuccess(element) ? 'check_circle' : 'error' }}
+            </span>
           </span>
         </ng-container>
         <ng-container *ngIf="col.type !== 'button' && col.property !== 'sendedSalesForce' && col.property !== 'resultSF'">
@@ -47,6 +64,20 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="onRow ? onRow(row) : null"></tr>
   
   </table>
+
+  <!-- Mensaje de no datos encontrados -->
+  <div *ngIf="(!data || data.length === 0) && hasActiveFilters" class="no-data-message">
+    <div class="no-data-content">
+      <span class="material-symbols-outlined no-data-icon">
+        search_off
+      </span>
+      <h3 class="no-data-title">No se encontraron datos</h3>
+      <p class="no-data-subtitle">
+        No hay registros que coincidan con los filtros aplicados.
+        <br>Intenta modificar los criterios de búsqueda.
+      </p>
+    </div>
+  </div>
   
   <!-- Paginación personalizada -->
   <div class="custom-pagination" *ngIf="total && total > 0">
