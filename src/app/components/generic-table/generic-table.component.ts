@@ -22,6 +22,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
   @Input() initialPageSize: number = 10;
   @Input() currentPageIndex: number = 0; // Página actual desde el componente padre
   @Input() initialSort: { column: string; direction: 'asc' | 'desc' } | null = null; // Estado inicial de ordenamiento
+  @Input() hasActiveFilters: boolean = false; // Indica si hay filtros activos
   @Input() onRow: ((row: any) => void) | null = null;
   @Output() pageChanged = new EventEmitter<{ pageIndex: number; pageSize: number }>();
   @Output() sortChanged = new EventEmitter<{ column: string; direction: 'asc' | 'desc' }>();
@@ -171,6 +172,49 @@ export class GenericTableComponent implements OnInit, OnChanges {
     const words = text.trim().split(/\s+/);
     if (words.length <= wordLimit) return text;
     return words.slice(0, wordLimit).join(' ') + '...';
+  }
+
+  isResultSFSuccess(element: any): boolean {
+    // Verificar el campo insertCorrect para determinar éxito/error
+    const insertCorrectValue = this.cellValue(element, 'insertCorrect');
+    
+    // insertCorrect = '1' o 1 = éxito (ícono verde)
+    // insertCorrect = '0' o 0 = error (ícono rojo)
+    if (insertCorrectValue === '1' || insertCorrectValue === 1) {
+      return true;
+    }
+    
+    if (insertCorrectValue === '0' || insertCorrectValue === 0) {
+      return false;
+    }
+    
+    // Fallback: si no existe insertCorrect, usar valor truthy del resultSF
+    const resultValue = this.cellValue(element, 'resultSF');
+    return !!resultValue;
+  }
+
+  isSalesForceAvailable(element: any): boolean {
+    // Solo habilitado si insertCorrect = 1 y tiene idSalesForce
+    const insertCorrectValue = this.cellValue(element, 'insertCorrect');
+    const idSalesForce = this.cellValue(element, 'idSalesForce');
+    
+    const isSuccess = insertCorrectValue === '1' || insertCorrectValue === 1;
+    const hasIdSalesForce = idSalesForce && idSalesForce !== null && idSalesForce !== '';
+    
+    return isSuccess && hasIdSalesForce;
+  }
+
+  openSalesForceLink(element: any): void {
+    if (!this.isSalesForceAvailable(element)) {
+      console.warn('Salesforce link not available for this element');
+      return;
+    }
+    
+    const idSalesForce = this.cellValue(element, 'idSalesForce');
+    const url = `https://grupovanguardiamx.lightning.force.com/lightning/r/Opportunity/${idSalesForce}/view`;
+    
+    console.log('Opening Salesforce URL:', url);
+    window.open(url, '_blank');
   }
 
   openModal(rowData: any) {

@@ -27,7 +27,7 @@ export class InvoiceTableComponent implements OnInit {
   // Columnas para mostrar datos del inventario (basadas en los datos del mock)
   columns: TableColumn<any>[] = [
     { label: 'Agencia', property: 'agencyName', type: 'text' },
-    { label: 'Número de venta', property: 'order_dms', type: 'text' },
+    { label: 'Número de orden', property: 'order_dms', type: 'text' },
     { label: 'VIN', property: 'vin', type: 'text' },
     { label: 'Fecha Facturación', property: 'billing_date', type: 'text' },
     { label: 'Referencia de venta', property: 'invoice_reference', type: 'text' },
@@ -35,12 +35,25 @@ export class InvoiceTableComponent implements OnInit {
     { label: 'Fecha SF', property: 'timestamp_sales_force', type: 'text' },
     { label: 'Estado SF', property: 'resultSF', type: 'text' },
     { label: 'Datos', property: 'sf_jsonRequest', type: 'button' },
+    { label: 'Ver SF', property: 'sf_link', type: 'button' },
     { label: 'Detalles', property: 'actions', type: 'button' }
   ];
 
-  displayedColumns: string[] = ['agencyName','order_dms', 'vin','billing_date','invoice_reference', 'sendedSalesForce', 'timestamp_sales_force', 'resultSF','sf_jsonRequest', 'actions'];
+  displayedColumns: string[] = ['agencyName','order_dms', 'vin','billing_date','invoice_reference', 'sendedSalesForce', 'timestamp_sales_force', 'resultSF','sf_jsonRequest', 'sf_link', 'actions'];
 
   constructor(private vanguardiaApi: VanguardiaApiService) {}
+
+  get hasActiveFilters(): boolean {
+    return !!(
+      this.currentFilters.order_dms ||
+      this.currentFilters.vin ||
+      this.currentFilters.reference ||
+      this.currentFilters.agencyName ||
+      this.currentFilters.sendedSalesForce ||
+      this.currentFilters.insertado ||
+      this.currentFilters.error
+    );
+  }
 
   ngOnInit(): void {
     this.loadPage(this.pageIndex, this.defaultPageSize);
