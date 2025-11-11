@@ -212,9 +212,7 @@ export class VanguardiaApiService {
       .set('Content-Type', 'application/json')
       .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
 
-    console.log('🌐 getInvoicesPaged - URL:', url);
-    console.log('🌐 getInvoicesPaged - Params enviados:', httpParams.toString());
-
+    
     return this.http.get<any>(url, { headers, params: httpParams }).pipe(
       map(res => {
         const d = res?.data ?? {};
@@ -238,11 +236,12 @@ export class VanguardiaApiService {
 
     return this.http.get<any>(url, { headers }).pipe(
       map(res => {
-        console.log('Respuesta completa de la API Agencias:', res);
         return res?.data?.data ?? []; //devolver solo array
       })
     );
   }
+
+
 
   /**
    * Refresca el token desde /auth/refresh
