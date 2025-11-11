@@ -206,8 +206,6 @@ onSortChange(sort: { column: string; direction: 'asc' | 'desc' }): void {
             // Preparar los datos para Excel con TODOS los campos disponibles
             const excelData = allData.map(item => ({
               // Campos básicos de identificación
-              'ID': item.Id || item.id || '',
-              'ID Agencia': item.idAgency || '',
               'Agencia': item.agencyName || '',
               'Número de Orden': item.order_dms || '',
               'Estado': item.state || '',
