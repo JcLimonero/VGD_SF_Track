@@ -1,0 +1,42 @@
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0 5rem;
+
+  h3 {
+    margin: 0;
+    color: #374151;
+    font-weight: 600;
+  }
+}
+
+.excel-btn {
+  background: #10b981; /* green-500 */
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s;
+  min-width: 140px;
+  justify-content: center;
+
+  &:hover:not(:disabled) {
+    background: #059669; /* green-600 */
+  }
+
+  &:disabled {
+    background: #9ca3af; /* gray-400 */
+    cursor: not-allowed;
+  }
+
+  .material-symbols-outlined {
+    font-size: 18px;
+  }
+}

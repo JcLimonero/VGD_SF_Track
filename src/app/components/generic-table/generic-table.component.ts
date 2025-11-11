@@ -301,6 +301,9 @@ export class GenericTableComponent implements OnInit, OnChanges {
         <div class="detail-row">
           <strong>Timestamp SalesForce:</strong> {{ data?.timestamp_sales_force }}
         </div>
+        <div class="detail-row">
+          <strong>Envío a SalesForce cada:</strong> 30 minutos
+        </div>
       </div>
     </mat-dialog-content>
 

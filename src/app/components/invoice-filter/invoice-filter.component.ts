@@ -46,7 +46,6 @@ export class InvoiceFilterComponent implements OnInit {
     this.vanguardiaApi.getAgencies().subscribe({
       next: (agencies) => {
         this.agencies = agencies;
-        console.log('Agencias cargadas:', agencies);
       },
       error: (error) => {
         console.error('Error al cargar agencias:', error);
@@ -58,22 +57,22 @@ export class InvoiceFilterComponent implements OnInit {
     const input = event.target as HTMLInputElement | null;
     if (!input) return;
     
-    console.log('🏢 Agencia seleccionada:', agencyName, 'checked:', input.checked);
+    console.log('Agencia seleccionada:', agencyName, 'checked:', input.checked);
     
     if (input.checked) {
       this.selectedAgency = agencyName;
       this.filterForm.patchValue({ agencyName }, { emitEvent: false });
-      console.log('🏢 Agencia guardada en formulario:', this.filterForm.get('agencyName')?.value);
+      console.log('Agencia guardada en formulario:', this.filterForm.get('agencyName')?.value);
     } else if (this.selectedAgency === agencyName) {
       this.selectedAgency = '';
       this.filterForm.patchValue({ agencyName: '' }, { emitEvent: false });
-      console.log('🏢 Agencia deseleccionada');
+      console.log('Agencia deseleccionada');
     }
   }
 
   onFilter(): void {
-    console.log('🔍 Filtro activado - valores del formulario:', this.filterForm.value);
-    console.log('🔍 selectedAgency actual:', this.selectedAgency);
+    console.log('Filtro activado - valores del formulario:', this.filterForm.value);
+    console.log('🔍selectedAgency actual:', this.selectedAgency);
     
     const { order_dms, vin, reference, agencyName, sendedSalesForce, insertado, error } = this.filterForm
       .value as {
@@ -96,7 +95,7 @@ export class InvoiceFilterComponent implements OnInit {
       error,
     };
 
-    console.log('🔍 InvoiceFilter -> onFilter(), emitiendo payload:', payload);
+    console.log('InvoiceFilter -> onFilter(), emitiendo payload:', payload);
     this.filterChange.emit(payload);
 
     // Limpiar todos los campos después de enviar el filtro
