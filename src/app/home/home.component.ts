@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { InvoiceTableComponent } from '../components/invoice-table/invoice-table.component';
 import { InvoiceFilterComponent } from "../components/invoice-filter/invoice-filter.component";
 import { TabsComponent } from '../components/tabs/tabs.component';
+import { InventoryTableComponent } from '../components/inventory/inventory-table/inventory-table.component';
 
 
 @Component({
@@ -16,7 +17,8 @@ import { TabsComponent } from '../components/tabs/tabs.component';
     CommonModule,
     InvoiceTableComponent,
     InvoiceFilterComponent,
-    TabsComponent
+    TabsComponent,
+    InventoryTableComponent
 ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
@@ -38,6 +40,14 @@ export class HomeComponent {
       this.invoiceTable.applyFilter(filters);
     } else {
       console.warn('invoiceTable no disponible aún o no tiene applyFilter');
+    }
+  }
+
+  handleDownload(): void {
+    if (this.invoiceTable && this.invoiceTable.downloadExcel) {
+      this.invoiceTable.downloadExcel();
+    } else {
+      console.warn('invoiceTable no disponible aún o no tiene downloadExcel');
     }
   }
 }

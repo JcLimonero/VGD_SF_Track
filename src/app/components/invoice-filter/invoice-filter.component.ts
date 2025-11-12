@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, Input } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { VanguardiaApiService } from '../../services/vanguardia-api.service';
@@ -21,6 +21,12 @@ export class InvoiceFilterComponent implements OnInit {
     insertado?: boolean;
     error?: boolean;
   }>();
+
+  /** Emitted when the user requests to download the Excel file */
+  @Output() downloadRequested = new EventEmitter<void>();
+
+  /** Parent can pass whether an Excel generation is in progress */
+  @Input() isDownloadingExcel = false;
 
   filterForm: FormGroup;
   agencies: any[] = [];

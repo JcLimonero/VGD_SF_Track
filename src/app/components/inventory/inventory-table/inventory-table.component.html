@@ -1,0 +1,24 @@
+<!-- Header exacto como invoice-table -->
+<div class="table-header">
+  <h3>Inventario ({{ total }} registros)</h3>
+  <!-- Mensaje de error si existe -->
+  <div *ngIf="error" class="text-red-600 text-sm">
+    {{ error }}
+    <button class="ml-2 px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700" 
+            (click)="loadPage(0, defaultPageSize)">
+      Reintentar
+    </button>
+  </div>
+</div>
+
+
+<vex-generic-table
+  [columns]="columns"
+  [displayedColumns]="displayedColumns"
+  [data]="data"
+  [total]="total"
+  [currentPageIndex]="pageIndex"
+  [initialPageSize]="currentPageSize"
+  [hasActiveFilters]="false"
+  (pageChanged)="loadPage($event.pageIndex, $event.pageSize)">
+</vex-generic-table>

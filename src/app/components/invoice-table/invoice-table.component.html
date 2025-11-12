@@ -1,14 +1,5 @@
 <div class="table-header">
   <h3>Facturas ({{ total }} registros)</h3>
-  <button 
-    type="button" 
-    class="excel-btn" 
-    (click)="downloadExcel()" 
-    [disabled]="loading || isDownloadingExcel"
-  >
-    <span class="material-symbols-outlined">download</span>
-    <span>{{ isDownloadingExcel ? 'Generando...' : 'Descargar Excel' }}</span>
-  </button>
 </div>
 
 <vex-generic-table
