@@ -56,8 +56,57 @@ export class VanguardiaApiService {
     return headers;
   }
 
+  // Método para paginación client-side - trae TODOS los datos
+  getInventoryAll(): Observable<any[]>{
+    const url = `${this.baseUrl}/vgd/inventoryfilter`;
+
+    const headers= new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+
+    return this.http.get<any>(url, { headers }).pipe(
+      map(res => {
+        return res?.data?.data ?? []; //devolver solo array como getInvoices
+      })
+    );
+  }
+
+  // Método para paginación server-side (por si se necesita después)
+  getInventory(params?: any): Observable<{items: any[], total: number}>{
+    const url = `${this.baseUrl}/vgd/inventoryfilter`;
+
+    const headers= new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+
+    // Construir parámetros de consulta si se proporcionan
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== null && params[key] !== undefined) {
+          httpParams = httpParams.set(key, params[key].toString());
+        }
+      });
+    }
+
+    return this.http.get<any>(url, { headers, params: httpParams }).pipe(
+      map(res => {
+        const items = res?.data?.data ?? [];
+        const total = res?.data?.total_rows ?? items.length; // Usar total_rows de la API
+        console.log('🔧 API getInventory respuesta:', {
+          items: items.length,
+          total_rows: res?.data?.total_rows,
+          per_page: res?.data?.per_page,
+          page: res?.data?.page,
+          total_pages: res?.data?.total_pages
+        });
+        return { items, total };
+      })
+    );
+  }
+
   /**
-   * Obtiene el inventario desde /vgd/invoice con ordenamiento por defecto por fecha de facturación
+   * Obtiene las ordenes de venta desde /vgd/invoice con ordenamiento por defecto por fecha de facturación
    */
   getInvoices(): Observable<any[]> {
     const url = `${this.baseUrl}/vgd/invoice?ordertype=desc&orderby=billing_date`;

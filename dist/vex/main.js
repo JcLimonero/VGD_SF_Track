@@ -2774,6 +2774,49 @@ class JsonModalComponent {
 
 /***/ }),
 
+/***/ 3085:
+/*!********************************************************************!*\
+  !*** ./src/app/components/inventory/inventory-simple.component.ts ***!
+  \********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   InventorySimpleComponent: () => (/* binding */ InventorySimpleComponent)
+/* harmony export */ });
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/common */ 6575);
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ 1699);
+
+
+class InventorySimpleComponent {
+  static #_ = this.ɵfac = function InventorySimpleComponent_Factory(t) {
+    return new (t || InventorySimpleComponent)();
+  };
+  static #_2 = this.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({
+    type: InventorySimpleComponent,
+    selectors: [["vex-inventory-simple"]],
+    standalone: true,
+    features: [_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵStandaloneFeature"]],
+    decls: 5,
+    vars: 0,
+    consts: [[1, "p-8", "text-center"], [1, "text-2xl", "font-bold", "text-gray-600"], [1, "text-gray-500", "mt-4"]],
+    template: function InventorySimpleComponent_Template(rf, ctx) {
+      if (rf & 1) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 0)(1, "h2", 1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](2, "Inventario Simple");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](3, "p", 2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](4, "Componente de prueba funcionando correctamente");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]()();
+      }
+    },
+    dependencies: [_angular_common__WEBPACK_IMPORTED_MODULE_1__.CommonModule],
+    encapsulation: 2
+  });
+}
+
+/***/ }),
+
 /***/ 5697:
 /*!***********************************************************************!*\
   !*** ./src/app/components/invoice-filter/invoice-filter.component.ts ***!
@@ -2843,7 +2886,6 @@ class InvoiceFilterComponent {
     this.vanguardiaApi.getAgencies().subscribe({
       next: agencies => {
         this.agencies = agencies;
-        console.log('Agencias cargadas:', agencies);
       },
       error: error => {
         console.error('Error al cargar agencias:', error);
@@ -2853,7 +2895,7 @@ class InvoiceFilterComponent {
   onAgencySelect(agencyName, event) {
     const input = event.target;
     if (!input) return;
-    console.log('🏢 Agencia seleccionada:', agencyName, 'checked:', input.checked);
+    console.log('Agencia seleccionada:', agencyName, 'checked:', input.checked);
     if (input.checked) {
       this.selectedAgency = agencyName;
       this.filterForm.patchValue({
@@ -2861,7 +2903,7 @@ class InvoiceFilterComponent {
       }, {
         emitEvent: false
       });
-      console.log('🏢 Agencia guardada en formulario:', this.filterForm.get('agencyName')?.value);
+      console.log('Agencia guardada en formulario:', this.filterForm.get('agencyName')?.value);
     } else if (this.selectedAgency === agencyName) {
       this.selectedAgency = '';
       this.filterForm.patchValue({
@@ -2869,12 +2911,12 @@ class InvoiceFilterComponent {
       }, {
         emitEvent: false
       });
-      console.log('🏢 Agencia deseleccionada');
+      console.log('Agencia deseleccionada');
     }
   }
   onFilter() {
-    console.log('🔍 Filtro activado - valores del formulario:', this.filterForm.value);
-    console.log('🔍 selectedAgency actual:', this.selectedAgency);
+    console.log('Filtro activado - valores del formulario:', this.filterForm.value);
+    console.log('🔍selectedAgency actual:', this.selectedAgency);
     const {
       order_dms,
       vin,
@@ -2893,7 +2935,7 @@ class InvoiceFilterComponent {
       insertado,
       error
     };
-    console.log('🔍 InvoiceFilter -> onFilter(), emitiendo payload:', payload);
+    console.log('InvoiceFilter -> onFilter(), emitiendo payload:', payload);
     this.filterChange.emit(payload);
     // Limpiar todos los campos después de enviar el filtro
     this.selectedAgency = '';
@@ -3184,11 +3226,10 @@ class InvoiceTableComponent {
   loadPage(pageIndex, pageSize) {
     this.loading = true;
     this.error = null;
-    console.log('📋 Cargando página con filtros actuales:', this.currentFilters);
     // Ahora la API acepta 'page' y 'perpage'
     const params = {
       page: pageIndex + 1,
-      perpage: pageSize // Agregar el tamaño de página
+      perpage: pageSize // Agregar el tamaño de pagina
     };
     // Map current filters to params
     if (this.currentFilters.order_dms) params.order_dms = this.currentFilters.order_dms;
@@ -3203,7 +3244,7 @@ class InvoiceTableComponent {
       params.orderby = this.currentSort.column;
       params.ordertype = this.currentSort.direction;
     }
-    console.log('📋 Parámetros enviados a la API:', params);
+    //enviar parametros para carga de datos inicial ordenada
     this.vanguardiaApi.getInvoicesPaged(params).subscribe({
       next: res => {
         this.data = res.items;
@@ -3220,7 +3261,7 @@ class InvoiceTableComponent {
     });
   }
   applyFilter(filters) {
-    console.log('📋 ApplyFilter recibido:', filters);
+    console.log('ApplyFilter recibido:', filters);
     // Guardar filtros y reiniciar a primera página
     this.currentFilters = {
       ...filters
@@ -3229,7 +3270,7 @@ class InvoiceTableComponent {
     this.loadPage(this.pageIndex, this.defaultPageSize);
   }
   onSortChange(sort) {
-    console.log('🔄 Ordenamiento cambiado:', sort);
+    console.log('Ordenamiento cambiado:', sort);
     // Si column está vacío, resetear ordenamiento
     if (!sort.column) {
       this.currentSort = null;
@@ -3259,7 +3300,7 @@ class InvoiceTableComponent {
    */
   downloadExcel() {
     if (this.total === 0) {
-      console.warn('⚠️ No hay datos para descargar');
+      console.warn('No hay datos para descargar');
       return;
     }
     this.isDownloadingExcel = true;
@@ -3302,12 +3343,10 @@ class InvoiceTableComponent {
           responses.forEach(response => {
             allData.push(...response.items);
           });
-          console.log(`📊 Datos obtenidos para Excel: ${allData.length} registros de ${this.total} esperados`);
+          console.log(`Datos obtenidos para Excel: ${allData.length} registros de ${this.total} esperados`);
           // Preparar los datos para Excel con TODOS los campos disponibles
           const excelData = allData.map(item => ({
             // Campos básicos de identificación
-            'ID': item.Id || item.id || '',
-            'ID Agencia': item.idAgency || '',
             'Agencia': item.agencyName || '',
             'Número de Orden': item.order_dms || '',
             'Estado': item.state || '',
@@ -3332,8 +3371,8 @@ class InvoiceTableComponent {
             'Timestamp': item.timestamp || '',
             'Timestamp SalesForce': item.timestamp_sales_force || '',
             // JSON y datos técnicos (truncados para Excel)
-            'JSON Request SF': item.sf_jsonRequest ? 'Disponible' : 'No disponible',
-            'JSON Response SF': item.sf_jsonResponse ? 'Disponible' : 'No disponible'
+            'JSON Request SF': item.sf_jsonRequest || '',
+            'JSON Response SF': item.sf_jsonResponse || ''
           }));
           // Crear libro de Excel
           const worksheet = xlsx__WEBPACK_IMPORTED_MODULE_3__.utils.json_to_sheet(excelData);
@@ -3350,16 +3389,16 @@ class InvoiceTableComponent {
           const fileName = `facturas_${allData.length}_registros_${timestamp}.xlsx`;
           // Descargar el archivo
           xlsx__WEBPACK_IMPORTED_MODULE_3__.writeFile(workbook, fileName);
-          console.log(`✅ Excel generado exitosamente: ${fileName}`);
-          console.log(`📊 ${excelData.length} registros exportados con todos los campos`);
+          console.log(`Excel generado exitosamente: ${fileName}`);
+          console.log(`${excelData.length} registros exportados con todos los campos`);
         } catch (error) {
-          console.error('❌ Error al generar Excel:', error);
+          console.error(' Error al generar Excel:', error);
         } finally {
           this.isDownloadingExcel = false;
         }
       },
       error: error => {
-        console.error('❌ Error al obtener datos para Excel:', error);
+        console.error(' Error al obtener datos para Excel:', error);
         this.isDownloadingExcel = false;
       }
     });
@@ -3410,7 +3449,7 @@ class InvoiceTableComponent {
       }
     },
     dependencies: [_angular_common__WEBPACK_IMPORTED_MODULE_5__.CommonModule, _generic_table_generic_table_component__WEBPACK_IMPORTED_MODULE_0__.GenericTableComponent],
-    styles: [".table-header[_ngcontent-%COMP%] {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  margin-bottom: 1rem;\n  padding: 0 0.5rem;\n}\n.table-header[_ngcontent-%COMP%]   h3[_ngcontent-%COMP%] {\n  margin: 0;\n  color: #374151;\n  font-weight: 600;\n}\n\n.excel-btn[_ngcontent-%COMP%] {\n  background: #10b981; \n\n  color: #fff;\n  border: none;\n  padding: 0.5rem 1rem;\n  border-radius: 6px;\n  font-weight: 500;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  gap: 0.5rem;\n  transition: background-color 0.2s;\n  min-width: 140px;\n  justify-content: center;\n}\n.excel-btn[_ngcontent-%COMP%]:hover:not(:disabled) {\n  background: #059669; \n\n}\n.excel-btn[_ngcontent-%COMP%]:disabled {\n  background: #9ca3af; \n\n  cursor: not-allowed;\n}\n.excel-btn[_ngcontent-%COMP%]   .material-symbols-outlined[_ngcontent-%COMP%] {\n  font-size: 18px;\n}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8uL3NyYy9hcHAvY29tcG9uZW50cy9pbnZvaWNlLXRhYmxlL2ludm9pY2UtdGFibGUuY29tcG9uZW50LnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRSxhQUFBO0VBQ0EsOEJBQUE7RUFDQSxtQkFBQTtFQUNBLG1CQUFBO0VBQ0EsaUJBQUE7QUFDRjtBQUNFO0VBQ0UsU0FBQTtFQUNBLGNBQUE7RUFDQSxnQkFBQTtBQUNKOztBQUdBO0VBQ0UsbUJBQUEsRUFBQSxjQUFBO0VBQ0EsV0FBQTtFQUNBLFlBQUE7RUFDQSxvQkFBQTtFQUNBLGtCQUFBO0VBQ0EsZ0JBQUE7RUFDQSxlQUFBO0VBQ0EsYUFBQTtFQUNBLG1CQUFBO0VBQ0EsV0FBQTtFQUNBLGlDQUFBO0VBQ0EsZ0JBQUE7RUFDQSx1QkFBQTtBQUFGO0FBRUU7RUFDRSxtQkFBQSxFQUFBLGNBQUE7QUFBSjtBQUdFO0VBQ0UsbUJBQUEsRUFBQSxhQUFBO0VBQ0EsbUJBQUE7QUFESjtBQUlFO0VBQ0UsZUFBQTtBQUZKIiwic291cmNlc0NvbnRlbnQiOlsiLnRhYmxlLWhlYWRlciB7XHJcbiAgZGlzcGxheTogZmxleDtcclxuICBqdXN0aWZ5LWNvbnRlbnQ6IHNwYWNlLWJldHdlZW47XHJcbiAgYWxpZ24taXRlbXM6IGNlbnRlcjtcclxuICBtYXJnaW4tYm90dG9tOiAxcmVtO1xyXG4gIHBhZGRpbmc6IDAgMC41cmVtO1xyXG5cclxuICBoMyB7XHJcbiAgICBtYXJnaW46IDA7XHJcbiAgICBjb2xvcjogIzM3NDE1MTtcclxuICAgIGZvbnQtd2VpZ2h0OiA2MDA7XHJcbiAgfVxyXG59XHJcblxyXG4uZXhjZWwtYnRuIHtcclxuICBiYWNrZ3JvdW5kOiAjMTBiOTgxOyAvKiBncmVlbi01MDAgKi9cclxuICBjb2xvcjogI2ZmZjtcclxuICBib3JkZXI6IG5vbmU7XHJcbiAgcGFkZGluZzogMC41cmVtIDFyZW07XHJcbiAgYm9yZGVyLXJhZGl1czogNnB4O1xyXG4gIGZvbnQtd2VpZ2h0OiA1MDA7XHJcbiAgY3Vyc29yOiBwb2ludGVyO1xyXG4gIGRpc3BsYXk6IGZsZXg7XHJcbiAgYWxpZ24taXRlbXM6IGNlbnRlcjtcclxuICBnYXA6IDAuNXJlbTtcclxuICB0cmFuc2l0aW9uOiBiYWNrZ3JvdW5kLWNvbG9yIDAuMnM7XHJcbiAgbWluLXdpZHRoOiAxNDBweDtcclxuICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcclxuXHJcbiAgJjpob3Zlcjpub3QoOmRpc2FibGVkKSB7XHJcbiAgICBiYWNrZ3JvdW5kOiAjMDU5NjY5OyAvKiBncmVlbi02MDAgKi9cclxuICB9XHJcblxyXG4gICY6ZGlzYWJsZWQge1xyXG4gICAgYmFja2dyb3VuZDogIzljYTNhZjsgLyogZ3JheS00MDAgKi9cclxuICAgIGN1cnNvcjogbm90LWFsbG93ZWQ7XHJcbiAgfVxyXG5cclxuICAubWF0ZXJpYWwtc3ltYm9scy1vdXRsaW5lZCB7XHJcbiAgICBmb250LXNpemU6IDE4cHg7XHJcbiAgfVxyXG59Il0sInNvdXJjZVJvb3QiOiIifQ== */"]
+    styles: [".table-header[_ngcontent-%COMP%] {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  margin-bottom: 1rem;\n  padding: 0 5rem;\n}\n.table-header[_ngcontent-%COMP%]   h3[_ngcontent-%COMP%] {\n  margin: 0;\n  color: #374151;\n  font-weight: 600;\n}\n\n.excel-btn[_ngcontent-%COMP%] {\n  background: #10b981; \n\n  color: #fff;\n  border: none;\n  padding: 0.5rem 1rem;\n  border-radius: 6px;\n  font-weight: 500;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  gap: 0.5rem;\n  transition: background-color 0.2s;\n  min-width: 140px;\n  justify-content: center;\n}\n.excel-btn[_ngcontent-%COMP%]:hover:not(:disabled) {\n  background: #059669; \n\n}\n.excel-btn[_ngcontent-%COMP%]:disabled {\n  background: #9ca3af; \n\n  cursor: not-allowed;\n}\n.excel-btn[_ngcontent-%COMP%]   .material-symbols-outlined[_ngcontent-%COMP%] {\n  font-size: 18px;\n}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8uL3NyYy9hcHAvY29tcG9uZW50cy9pbnZvaWNlLXRhYmxlL2ludm9pY2UtdGFibGUuY29tcG9uZW50LnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRSxhQUFBO0VBQ0EsOEJBQUE7RUFDQSxtQkFBQTtFQUNBLG1CQUFBO0VBQ0EsZUFBQTtBQUNGO0FBQ0U7RUFDRSxTQUFBO0VBQ0EsY0FBQTtFQUNBLGdCQUFBO0FBQ0o7O0FBR0E7RUFDRSxtQkFBQSxFQUFBLGNBQUE7RUFDQSxXQUFBO0VBQ0EsWUFBQTtFQUNBLG9CQUFBO0VBQ0Esa0JBQUE7RUFDQSxnQkFBQTtFQUNBLGVBQUE7RUFDQSxhQUFBO0VBQ0EsbUJBQUE7RUFDQSxXQUFBO0VBQ0EsaUNBQUE7RUFDQSxnQkFBQTtFQUNBLHVCQUFBO0FBQUY7QUFFRTtFQUNFLG1CQUFBLEVBQUEsY0FBQTtBQUFKO0FBR0U7RUFDRSxtQkFBQSxFQUFBLGFBQUE7RUFDQSxtQkFBQTtBQURKO0FBSUU7RUFDRSxlQUFBO0FBRkoiLCJzb3VyY2VzQ29udGVudCI6WyIudGFibGUtaGVhZGVyIHtcclxuICBkaXNwbGF5OiBmbGV4O1xyXG4gIGp1c3RpZnktY29udGVudDogc3BhY2UtYmV0d2VlbjtcclxuICBhbGlnbi1pdGVtczogY2VudGVyO1xyXG4gIG1hcmdpbi1ib3R0b206IDFyZW07XHJcbiAgcGFkZGluZzogMCA1cmVtO1xyXG5cclxuICBoMyB7XHJcbiAgICBtYXJnaW46IDA7XHJcbiAgICBjb2xvcjogIzM3NDE1MTtcclxuICAgIGZvbnQtd2VpZ2h0OiA2MDA7XHJcbiAgfVxyXG59XHJcblxyXG4uZXhjZWwtYnRuIHtcclxuICBiYWNrZ3JvdW5kOiAjMTBiOTgxOyAvKiBncmVlbi01MDAgKi9cclxuICBjb2xvcjogI2ZmZjtcclxuICBib3JkZXI6IG5vbmU7XHJcbiAgcGFkZGluZzogMC41cmVtIDFyZW07XHJcbiAgYm9yZGVyLXJhZGl1czogNnB4O1xyXG4gIGZvbnQtd2VpZ2h0OiA1MDA7XHJcbiAgY3Vyc29yOiBwb2ludGVyO1xyXG4gIGRpc3BsYXk6IGZsZXg7XHJcbiAgYWxpZ24taXRlbXM6IGNlbnRlcjtcclxuICBnYXA6IDAuNXJlbTtcclxuICB0cmFuc2l0aW9uOiBiYWNrZ3JvdW5kLWNvbG9yIDAuMnM7XHJcbiAgbWluLXdpZHRoOiAxNDBweDtcclxuICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcclxuXHJcbiAgJjpob3Zlcjpub3QoOmRpc2FibGVkKSB7XHJcbiAgICBiYWNrZ3JvdW5kOiAjMDU5NjY5OyAvKiBncmVlbi02MDAgKi9cclxuICB9XHJcblxyXG4gICY6ZGlzYWJsZWQge1xyXG4gICAgYmFja2dyb3VuZDogIzljYTNhZjsgLyogZ3JheS00MDAgKi9cclxuICAgIGN1cnNvcjogbm90LWFsbG93ZWQ7XHJcbiAgfVxyXG5cclxuICAubWF0ZXJpYWwtc3ltYm9scy1vdXRsaW5lZCB7XHJcbiAgICBmb250LXNpemU6IDE4cHg7XHJcbiAgfVxyXG59Il0sInNvdXJjZVJvb3QiOiIifQ== */"]
   });
 }
 
@@ -3709,7 +3748,6 @@ class TabsComponent {
   selectTab(tabId) {
     this.activeTab = tabId;
     this.tabChanged.emit(tabId);
-    console.log('🔄 Tab seleccionado:', tabId);
   }
   isActive(tabId) {
     return this.activeTab === tabId;
@@ -4064,11 +4102,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _vex_components_vex_page_layout_vex_page_layout_component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @vex/components/vex-page-layout/vex-page-layout.component */ 306);
 /* harmony import */ var _components_menu_menu_component__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/menu/menu.component */ 6075);
-/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @angular/common */ 6575);
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @angular/common */ 6575);
 /* harmony import */ var _components_invoice_table_invoice_table_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/invoice-table/invoice-table.component */ 3973);
 /* harmony import */ var _components_invoice_filter_invoice_filter_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/invoice-filter/invoice-filter.component */ 5697);
 /* harmony import */ var _components_tabs_tabs_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../components/tabs/tabs.component */ 6384);
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @angular/core */ 1699);
+/* harmony import */ var _components_inventory_inventory_simple_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../components/inventory/inventory-simple.component */ 3085);
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @angular/core */ 1699);
+
 
 
 
@@ -4080,58 +4120,56 @@ __webpack_require__.r(__webpack_exports__);
 const _c0 = ["invoiceTable"];
 function HomeComponent_div_4_Template(rf, ctx) {
   if (rf & 1) {
-    const _r7 = _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵgetCurrentView"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](0, "div")(1, "vex-invoice-filter", 5);
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵlistener"]("filterChange", function HomeComponent_div_4_Template_vex_invoice_filter_filterChange_1_listener($event) {
-      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵrestoreView"](_r7);
-      const ctx_r6 = _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵnextContext"]();
-      return _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵresetView"](ctx_r6.handleFilter($event));
+    const _r7 = _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementStart"](0, "div")(1, "vex-invoice-filter", 5);
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵlistener"]("filterChange", function HomeComponent_div_4_Template_vex_invoice_filter_filterChange_1_listener($event) {
+      _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵrestoreView"](_r7);
+      const ctx_r6 = _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵnextContext"]();
+      return _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵresetView"](ctx_r6.handleFilter($event));
     });
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelement"](2, "vex-invoice-table", null, 6);
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelement"](2, "vex-invoice-table", null, 6);
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementEnd"]();
   }
 }
 function HomeComponent_div_5_Template(rf, ctx) {
   if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](0, "div", 7)(1, "h2", 8);
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](2, "Secci\u00F3n de Inventario");
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](3, "p", 9);
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](4, "Funcionalidad pr\u00F3ximamente...");
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()();
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementStart"](0, "div");
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelement"](1, "vex-inventory-simple");
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementEnd"]();
   }
 }
 function HomeComponent_div_6_Template(rf, ctx) {
   if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](0, "div", 7)(1, "h2", 8);
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](2, "Secci\u00F3n de Servicios");
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](3, "p", 9);
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](4, "Funcionalidad pr\u00F3ximamente...");
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()();
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementStart"](0, "div", 7)(1, "h2", 8);
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵtext"](2, "Secci\u00F3n de Servicios");
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementStart"](3, "p", 9);
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵtext"](4, "Funcionalidad pr\u00F3ximamente...");
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementEnd"]()();
   }
 }
 function HomeComponent_div_7_Template(rf, ctx) {
   if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](0, "div", 7)(1, "h2", 8);
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](2, "Secci\u00F3n de Clientes");
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](3, "p", 9);
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](4, "Funcionalidad pr\u00F3ximamente...");
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()();
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementStart"](0, "div", 7)(1, "h2", 8);
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵtext"](2, "Secci\u00F3n de Clientes");
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementStart"](3, "p", 9);
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵtext"](4, "Funcionalidad pr\u00F3ximamente...");
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementEnd"]()();
   }
 }
 function HomeComponent_div_8_Template(rf, ctx) {
   if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](0, "div", 7)(1, "h2", 8);
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](2, "Secci\u00F3n de DWH");
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](3, "p", 9);
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](4, "Funcionalidad pr\u00F3ximamente...");
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()();
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementStart"](0, "div", 7)(1, "h2", 8);
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵtext"](2, "Secci\u00F3n de DWH");
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementStart"](3, "p", 9);
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵtext"](4, "Funcionalidad pr\u00F3ximamente...");
+    _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementEnd"]()();
   }
 }
+// import { InventoryTableComponent } from '../components/inventory/inventory-table/inventory-table.component';
 class HomeComponent {
   constructor() {
     this.activeTab = 'orders'; // Tab activo por defecto: Ordenes
@@ -4152,50 +4190,52 @@ class HomeComponent {
   static #_ = this.ɵfac = function HomeComponent_Factory(t) {
     return new (t || HomeComponent)();
   };
-  static #_2 = this.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdefineComponent"]({
+  static #_2 = this.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵdefineComponent"]({
     type: HomeComponent,
     selectors: [["vex-home"]],
     viewQuery: function HomeComponent_Query(rf, ctx) {
       if (rf & 1) {
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵviewQuery"](_c0, 5);
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵviewQuery"](_c0, 5);
       }
       if (rf & 2) {
         let _t;
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵqueryRefresh"](_t = _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵloadQuery"]()) && (ctx.invoiceTable = _t.first);
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵqueryRefresh"](_t = _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵloadQuery"]()) && (ctx.invoiceTable = _t.first);
       }
     },
     standalone: true,
-    features: [_angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵStandaloneFeature"]],
+    features: [_angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵStandaloneFeature"]],
     decls: 9,
     vars: 5,
     consts: [["mode", "card", 1, "m-0", "p-0"], [1, "mb-6"], [3, "tabChanged"], [4, "ngIf"], ["class", "p-8 text-center", 4, "ngIf"], [3, "filterChange"], ["invoiceTable", ""], [1, "p-8", "text-center"], [1, "text-2xl", "font-bold", "text-gray-600"], [1, "text-gray-500", "mt-4"]],
     template: function HomeComponent_Template(rf, ctx) {
       if (rf & 1) {
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](0, "vex-page-layout", 0)(1, "div", 1);
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelement"](2, "vex-menu");
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](3, "vex-tabs", 2);
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵlistener"]("tabChanged", function HomeComponent_Template_vex_tabs_tabChanged_3_listener($event) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementStart"](0, "vex-page-layout", 0)(1, "div", 1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelement"](2, "vex-menu");
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementStart"](3, "vex-tabs", 2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵlistener"]("tabChanged", function HomeComponent_Template_vex_tabs_tabChanged_3_listener($event) {
           return ctx.onTabChanged($event);
         });
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtemplate"](4, HomeComponent_div_4_Template, 4, 0, "div", 3)(5, HomeComponent_div_5_Template, 5, 0, "div", 4)(6, HomeComponent_div_6_Template, 5, 0, "div", 4)(7, HomeComponent_div_7_Template, 5, 0, "div", 4)(8, HomeComponent_div_8_Template, 5, 0, "div", 4);
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵtemplate"](4, HomeComponent_div_4_Template, 4, 0, "div", 3)(5, HomeComponent_div_5_Template, 2, 0, "div", 3)(6, HomeComponent_div_6_Template, 5, 0, "div", 4)(7, HomeComponent_div_7_Template, 5, 0, "div", 4)(8, HomeComponent_div_8_Template, 5, 0, "div", 4);
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementEnd"]();
       }
       if (rf & 2) {
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵadvance"](4);
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵproperty"]("ngIf", ctx.activeTab === "orders");
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵadvance"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵproperty"]("ngIf", ctx.activeTab === "inventory");
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵadvance"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵproperty"]("ngIf", ctx.activeTab === "services");
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵadvance"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵproperty"]("ngIf", ctx.activeTab === "clients");
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵadvance"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵproperty"]("ngIf", ctx.activeTab === "dwh");
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵadvance"](4);
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵproperty"]("ngIf", ctx.activeTab === "orders");
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵadvance"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵproperty"]("ngIf", ctx.activeTab === "inventory");
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵadvance"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵproperty"]("ngIf", ctx.activeTab === "services");
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵadvance"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵproperty"]("ngIf", ctx.activeTab === "clients");
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵadvance"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵproperty"]("ngIf", ctx.activeTab === "dwh");
       }
     },
-    dependencies: [_vex_components_vex_page_layout_vex_page_layout_component__WEBPACK_IMPORTED_MODULE_0__.VexPageLayoutComponent, _components_menu_menu_component__WEBPACK_IMPORTED_MODULE_1__.MenuComponent, _angular_common__WEBPACK_IMPORTED_MODULE_6__.CommonModule, _angular_common__WEBPACK_IMPORTED_MODULE_6__.NgIf, _components_invoice_table_invoice_table_component__WEBPACK_IMPORTED_MODULE_2__.InvoiceTableComponent, _components_invoice_filter_invoice_filter_component__WEBPACK_IMPORTED_MODULE_3__.InvoiceFilterComponent, _components_tabs_tabs_component__WEBPACK_IMPORTED_MODULE_4__.TabsComponent],
+    dependencies: [_vex_components_vex_page_layout_vex_page_layout_component__WEBPACK_IMPORTED_MODULE_0__.VexPageLayoutComponent, _components_menu_menu_component__WEBPACK_IMPORTED_MODULE_1__.MenuComponent, _angular_common__WEBPACK_IMPORTED_MODULE_7__.CommonModule, _angular_common__WEBPACK_IMPORTED_MODULE_7__.NgIf, _components_invoice_table_invoice_table_component__WEBPACK_IMPORTED_MODULE_2__.InvoiceTableComponent, _components_invoice_filter_invoice_filter_component__WEBPACK_IMPORTED_MODULE_3__.InvoiceFilterComponent, _components_tabs_tabs_component__WEBPACK_IMPORTED_MODULE_4__.TabsComponent, _components_inventory_inventory_simple_component__WEBPACK_IMPORTED_MODULE_5__.InventorySimpleComponent
+    // InventoryTableComponent
+    ],
     styles: ["[_nghost-%COMP%] {\n  display: block;\n  height: 100vh;\n  overflow-y: auto;\n  overflow-x: hidden;\n}\n\n.vex-page-layout[_ngcontent-%COMP%] {\n  min-height: 100vh;\n}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8uL3NyYy9hcHAvaG9tZS9ob21lLmNvbXBvbmVudC5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsY0FBQTtFQUNBLGFBQUE7RUFDQSxnQkFBQTtFQUNBLGtCQUFBO0FBQ0Y7O0FBRUE7RUFDRSxpQkFBQTtBQUNGIiwic291cmNlc0NvbnRlbnQiOlsiOmhvc3Qge1xyXG4gIGRpc3BsYXk6IGJsb2NrO1xyXG4gIGhlaWdodDogMTAwdmg7XHJcbiAgb3ZlcmZsb3cteTogYXV0bztcclxuICBvdmVyZmxvdy14OiBoaWRkZW47XHJcbn1cclxuXHJcbi52ZXgtcGFnZS1sYXlvdXQge1xyXG4gIG1pbi1oZWlnaHQ6IDEwMHZoO1xyXG59XHJcblxyXG4iXSwic291cmNlUm9vdCI6IiJ9 */"]
   });
 }
@@ -8103,8 +8143,32 @@ class VanguardiaApiService {
     }
     return headers;
   }
+  getInventory(params) {
+    const url = `${this.baseUrl}/vgd/inventoryfilter`;
+    const headers = new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__.HttpHeaders().set('Content-Type', 'application/json').set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+    // Construir parámetros de consulta si se proporcionan
+    let httpParams = new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__.HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== null && params[key] !== undefined) {
+          httpParams = httpParams.set(key, params[key].toString());
+        }
+      });
+    }
+    return this.http.get(url, {
+      headers,
+      params: httpParams
+    }).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_2__.map)(res => {
+      const items = res?.data?.data ?? [];
+      const total = res?.data?.total ?? items.length;
+      return {
+        items,
+        total
+      };
+    }));
+  }
   /**
-   * Obtiene el inventario desde /vgd/invoice con ordenamiento por defecto por fecha de facturación
+   * Obtiene las ordenes de venta desde /vgd/invoice con ordenamiento por defecto por fecha de facturación
    */
   getInvoices() {
     const url = `${this.baseUrl}/vgd/invoice?ordertype=desc&orderby=billing_date`;
@@ -8210,8 +8274,6 @@ class VanguardiaApiService {
       httpParams = httpParams.set('ordertype', p.ordertype);
     }
     const headers = new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__.HttpHeaders().set('Content-Type', 'application/json').set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
-    console.log('🌐 getInvoicesPaged - URL:', url);
-    console.log('🌐 getInvoicesPaged - Params enviados:', httpParams.toString());
     return this.http.get(url, {
       headers,
       params: httpParams
@@ -8232,7 +8294,6 @@ class VanguardiaApiService {
     return this.http.get(url, {
       headers
     }).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_2__.map)(res => {
-      console.log('Respuesta completa de la API Agencias:', res);
       return res?.data?.data ?? []; //devolver solo array
     }));
   }

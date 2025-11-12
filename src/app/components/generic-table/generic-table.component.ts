@@ -63,6 +63,10 @@ export class GenericTableComponent implements OnInit, OnChanges {
     if ('currentPageIndex' in changes) {
       this.currentPage = this.currentPageIndex || 0;
     }
+    if ('initialPageSize' in changes) {
+      this.pageSize = this.initialPageSize;
+      this.updatePagination();
+    }
   }
 
   updatePagination() {

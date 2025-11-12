@@ -30,7 +30,6 @@ export class TabsComponent {
   selectTab(tabId: string): void {
     this.activeTab = tabId;
     this.tabChanged.emit(tabId);
-    console.log('🔄 Tab seleccionado:', tabId);
   }
 
   isActive(tabId: string): boolean {
