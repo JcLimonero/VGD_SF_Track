@@ -1,0 +1,128 @@
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    width: 100%;
+    column-gap: 0.5rem;
+    row-gap: 0.5rem;		
+    align-items: center;
+}
+.filter-field {
+    display: flex;
+    flex-direction: row;
+    gap:0.3rem;
+    align-items: center;
+}
+
+.filter-field input {
+    border: solid 0.1rem #d1d5db;
+    border-radius: 0.4rem;
+    padding: 0.4rem;
+    width: 10rem;
+}
+
+.filter-field input:focus {
+    outline: none;
+    border-color: #111827;
+}
+
+.filter-btn {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+.filter-btn:hover {
+    background: #374151;
+}
+
+.clear-btn {
+    background: #ef4444; /* red-500 */
+    color: #fff;
+    border: none;
+    padding: 0.45rem;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    width: 36px;
+    height: 36px;
+}
+.clear-btn:hover {
+    background: #dc2626; /* red-600 */
+}
+
+.excel-icon-btn {
+    background: #10b981; /* green-500 */
+    border: none;
+    padding: 0.45rem;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    width: 36px;
+    height: 36px;
+}
+.excel-icon-btn:hover:not(:disabled) {
+    background: #059669; /* green-600 */
+}
+.excel-icon-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.9;
+}
+
+/* Dropdown styles */
+.dropdown {
+    position: relative;
+    min-width: 160px;
+}
+.dropdown > summary {
+  list-style: none;
+}
+.dropdown-trigger {
+    background: #fff;
+    border: 1px solid #d1d5db; /* gray-300 */
+    border-radius: 6px;
+    padding: 0.45rem 0.75rem;
+    min-width: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+}
+.dropdown[open] .dropdown-trigger {
+    border-color: #111827; /* gray-900 */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.dropdown-panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: #fff;
+    border: 1px solid #e5e7eb; /* gray-200 */
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    padding: 0.6rem 0.75rem;
+    display: grid;
+    gap: 0.5rem;
+    z-index: 30;
+    min-width: 220px;
+}
+.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+/* Hide native marker on summary */
+summary::-webkit-details-marker { display: none; }

@@ -34,7 +34,7 @@ export class InvoiceTableComponent implements OnInit {
     { label: 'Número de orden', property: 'order_dms', type: 'text' },
     { label: 'VIN', property: 'vin', type: 'text' },
     { label: 'Fecha Facturación', property: 'billing_date', type: 'text' },
-    { label: 'Número de factura', property: 'invoice_reference', type: 'text' },
+    { label: 'Referencia de venta', property: 'invoice_reference', type: 'text' },
     { label: 'Envio SF', property: 'sendedSalesForce', type: 'text' },
     { label: 'Fecha SF', property: 'timestamp_sales_force', type: 'text' },
     { label: 'Estado SF', property: 'resultSF', type: 'text' },

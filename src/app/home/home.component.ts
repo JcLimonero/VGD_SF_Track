@@ -6,6 +6,7 @@ import { InvoiceTableComponent } from '../components/invoice-table/invoice-table
 import { InvoiceFilterComponent } from "../components/invoice-filter/invoice-filter.component";
 import { TabsComponent } from '../components/tabs/tabs.component';
 import { InventoryTableComponent } from '../components/inventory/inventory-table/inventory-table.component';
+import { InventoryFilterComponent } from "../components/inventory/inventory-filter/inventory-filter.component";
 
 
 @Component({
@@ -18,7 +19,8 @@ import { InventoryTableComponent } from '../components/inventory/inventory-table
     InvoiceTableComponent,
     InvoiceFilterComponent,
     TabsComponent,
-    InventoryTableComponent
+    InventoryTableComponent,
+    InventoryFilterComponent
 ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
@@ -26,6 +28,7 @@ import { InventoryTableComponent } from '../components/inventory/inventory-table
 
 export class HomeComponent {
   @ViewChild('invoiceTable') invoiceTable!: InvoiceTableComponent;
+  @ViewChild('inventoryTable') inventoryTable!: InventoryTableComponent;
   
   activeTab = 'orders'; // Tab activo por defecto: Ordenes
 
@@ -48,6 +51,23 @@ export class HomeComponent {
       this.invoiceTable.downloadExcel();
     } else {
       console.warn('invoiceTable no disponible aún o no tiene downloadExcel');
+    }
+  }
+
+  handleInventoryFilter(filters: any) {
+    console.log('Home -> inventory filter recibido:', filters);
+    if (this.inventoryTable && this.inventoryTable.applyFilter) {
+      this.inventoryTable.applyFilter(filters);
+    } else {
+      console.warn('inventoryTable no disponible aún o no tiene applyFilter');
+    }
+  }
+
+  handleInventoryDownload(): void {
+    if (this.inventoryTable && this.inventoryTable.downloadExcel) {
+      this.inventoryTable.downloadExcel();
+    } else {
+      console.warn('inventoryTable no disponible aún o no tiene downloadExcel');
     }
   }
 }

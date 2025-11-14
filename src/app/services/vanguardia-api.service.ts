@@ -56,6 +56,7 @@ export class VanguardiaApiService {
     return headers;
   }
 
+  // INVENTARIO 
   // Método para paginación client-side - trae TODOS los datos
   getInventoryAll(): Observable<any[]>{
     const url = `${this.baseUrl}/vgd/inventoryfilter`;
@@ -105,6 +106,65 @@ export class VanguardiaApiService {
     );
   }
 
+  getInventorybyVin(vin:string): Observable<any[]> {
+    const url = `${this.baseUrl}/vgd/inventoryfilter?vin=${vin}`;
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+
+    return this.http.get<any>(url, { headers }).pipe(
+      map(res => {
+        return res?.data?.data ?? []; //devolver solo array
+      })
+    );
+  }
+
+  getInventorybyAgencies(agencie:string): Observable<any[]> {
+    const url = `${this.baseUrl}/vgd/inventoryfilter?agencyName=${agencie}`;
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+
+    return this.http.get<any>(url, { headers }).pipe(
+      map(res => {
+        return res?.data?.data ?? []; //devolver solo array
+      })
+    );
+  }
+
+  getInventorybySendSF(send:string): Observable<any[]> {
+    const url = `${this.baseUrl}/vgd/inventoryfilter?sendedSalesForce=${send}`;
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+
+    return this.http.get<any>(url, { headers }).pipe(
+      map(res => {
+        return res?.data?.data ?? []; //devolver solo array
+      })
+    );
+  }
+  
+  getInventorybyInsert(status:string): Observable<any[]> {
+    // status: 'true' => Insertado correctamente (insertCorrect == '1')
+    // status: 'false' => Error (insertCorrect == '0')
+    const insertCorrectValue = (status === 'true') ? '1' : '0';
+    const url = `${this.baseUrl}/vgd/inventoryfilter?insertCorrect=${insertCorrectValue}`;
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+
+    return this.http.get<any>(url, { headers }).pipe(
+      map(res => {
+        return res?.data?.data ?? []; //devolver solo array
+      })
+    );
+  }
+
   /**
    * Obtiene las ordenes de venta desde /vgd/invoice con ordenamiento por defecto por fecha de facturación
    */
@@ -117,7 +177,6 @@ export class VanguardiaApiService {
 
     return this.http.get<any>(url, { headers }).pipe(
       map(res => {
-        console.log('Respuesta completa de la API:', res);
         return res?.data?.data ?? []; //devolver solo array
       })
     );
@@ -132,7 +191,6 @@ export class VanguardiaApiService {
 
     return this.http.get<any>(url, { headers }).pipe(
       map(res => {
-        console.log('Respuesta completa de la API Order:', res);
         return res?.data?.data ?? []; //devolver solo array
       })
     );
@@ -162,7 +220,6 @@ export class VanguardiaApiService {
 
     return this.http.get<any>(url, { headers }).pipe(
       map(res => {
-        console.log('Respuesta completa de la API Send:', res);
         return res?.data?.data ?? []; //devolver solo array
       })
     );
@@ -180,7 +237,6 @@ export class VanguardiaApiService {
 
     return this.http.get<any>(url, { headers }).pipe(
       map(res => {
-        console.log('Respuesta completa de la API Insert:', res);
         return res?.data?.data ?? []; //devolver solo array
       })
     );
@@ -195,7 +251,6 @@ export class VanguardiaApiService {
 
     return this.http.get<any>(url, { headers }).pipe(
       map(res => {
-        console.log('Respuesta completa de la API Rerence:', res);
         return res?.data?.data ?? []; //devolver solo array
       })
     );
@@ -210,7 +265,6 @@ export class VanguardiaApiService {
 
     return this.http.get<any>(url, { headers }).pipe(
       map(res => {
-        console.log('Respuesta completa de la API por Agencia:', res);
         return res?.data?.data ?? []; //devolver solo array
       })
     );
