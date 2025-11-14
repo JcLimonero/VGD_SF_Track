@@ -5,6 +5,7 @@ import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TableColumn } from '../../../@vex/interfaces/table-column.interface';
+import { InventoryModalComponent } from '../inventory/inventory-modal/inventory-modal.component';
 
 @Component({
   selector: 'vex-generic-table',
@@ -221,9 +222,13 @@ export class GenericTableComponent implements OnInit, OnChanges {
     window.open(url, '_blank');
   }
 
-  openModal(rowData: any) {
-    console.log('Opening modal with data:', rowData);
-    const dialogRef = this.dialog.open(ModalDialogComponent, {
+  openModal(rowData: any) {    
+    // Detectar si es datos de inventario por la presencia de campos específicos
+    const isInventoryData = this.isInventoryData(rowData);
+    
+    const modalComponent = isInventoryData ? InventoryModalComponent : ModalDialogComponent;
+    
+    const dialogRef = this.dialog.open(modalComponent, {
       data: rowData,
       width: '80%',
       maxWidth: '800px'
@@ -233,9 +238,15 @@ export class GenericTableComponent implements OnInit, OnChanges {
       console.log('Modal closed with result:', result);
     });
   }
+  
+  // Método para detectar si los datos son de inventario
+  private isInventoryData(data: any): boolean {
+    // Los datos de inventario tienen campos específicos como statusDescription, typeDescription, etc.
+    return !!(data?.statusDescription || data?.typeDescription || 
+             (data?.brand && data?.model && !data?.order_dms));
+  }
 
   openJsonModal(rowData: any) {
-    console.log('Opening JSON modal with data:', rowData);
     const dialogRef = this.dialog.open(JsonModalComponent, {
       data: rowData.sf_jsonRequest,
       width: '90%',

@@ -104,17 +104,7 @@ export class InvoiceFilterComponent implements OnInit {
     console.log('InvoiceFilter -> onFilter(), emitiendo payload:', payload);
     this.filterChange.emit(payload);
 
-    // Limpiar todos los campos después de enviar el filtro
-    this.selectedAgency = '';
-    this.filterForm.reset({
-      order_dms: '',
-      vin: '',
-      reference: '',
-      agencyName: '',
-      sendedSalesForce: '',
-      insertado: false,
-      error: false
-    });
+    // YA NO limpiar campos - mantener filtros activos para múltiples filtros
   }
 
   onClearFilters(): void {

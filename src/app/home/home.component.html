@@ -18,7 +18,11 @@
 
   <!-- Contenido de Inventario -->
   <div *ngIf="activeTab === 'inventory'">
-    <vex-inventory-table></vex-inventory-table>
+    <vex-inventory-filter (filterChange)="handleInventoryFilter($event)"
+                         (downloadRequested)="handleInventoryDownload()"
+                         [isDownloadingExcel]="inventoryTable?.isDownloadingExcel || false">
+    </vex-inventory-filter>
+    <vex-inventory-table #inventoryTable></vex-inventory-table>
   </div>
 
   <div *ngIf="activeTab === 'services'" class="p-8 text-center">

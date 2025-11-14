@@ -1,0 +1,70 @@
+<h2 mat-dialog-title class="title text-xl">Detalles del Inventario</h2>
+
+<mat-dialog-content class="mat-typography">
+  <div class="inventory-details">
+    <!-- Información básica -->
+    <div class="detail-row">
+      <strong>Agencia:</strong> {{ data?.agencyName || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>VIN:</strong> {{ data?.vin || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Estado:</strong> {{ data?.statusDescription || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Tipo:</strong> {{ data?.typeDescription || 'N/A' }}
+    </div>
+    
+    <!-- Información del vehículo -->
+    <div class="detail-row">
+      <strong>Marca:</strong> {{ data?.brand || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Año:</strong> {{ data?.year || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Modelo:</strong> {{ data?.model || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Versión:</strong> {{ data?.version || 'N/A' }}
+    </div>
+    
+    <!-- Características del vehículo -->
+    <div class="detail-row">
+      <strong>Color Exterior:</strong> {{ data?.exterior_color || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Color Interior:</strong> {{ data?.interior_color || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Kilometraje:</strong> {{ data?.km || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Cantidad:</strong> {{ data?.amount || 'N/A' }}
+    </div>
+    
+    <!-- Información de Salesforce -->
+    <div class="detail-row">
+      <strong>Enviado a SalesForce:</strong> {{ getSalesForceStatus() }}
+    </div>
+    <div class="detail-row">
+      <strong>ID SalesForce:</strong> {{ data?.idSalesForce || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Resultado SF:</strong> {{ data?.resultSF || 'N/A' }}
+    </div>
+    
+    <!-- Timestamps -->
+    <div class="detail-row">
+      <strong>Timestamp DMS:</strong> {{ data?.timestamp_dms }}
+    </div>
+    <div class="detail-row">
+      <strong>Timestamp SalesForce:</strong> {{ data?.timestamp_sales_force }}
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onNoClick()">Cerrar</button>
+</mat-dialog-actions>
