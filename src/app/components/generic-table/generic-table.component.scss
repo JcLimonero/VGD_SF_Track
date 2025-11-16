@@ -51,6 +51,9 @@ td.mat-column-timestamp_sales_force,
 th.mat-column-timestamp_sales_force {
   min-width: 100px;
   max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 td.mat-column-billing_date,

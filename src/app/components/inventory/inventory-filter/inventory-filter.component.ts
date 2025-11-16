@@ -14,7 +14,7 @@ export class InventoryFilterComponent implements OnInit {
 
   @Output() filterChange = new EventEmitter<{
     vin?: string;
-    agencyName?: string;
+    idAgency?: string;
     sendedSalesForce?: '1' | '0';
     insertado?: boolean;
     error?: boolean;
@@ -28,12 +28,13 @@ export class InventoryFilterComponent implements OnInit {
 
   filterForm: FormGroup;
   agencies: any[] = [];
-  selectedAgency: string = '';
+  selectedAgency: string = ''; // Nombre mostrado en UI
+  selectedAgencyId: string = ''; // ID para enviar a la API
 
   constructor(private fb: FormBuilder, private vanguardiaApi: VanguardiaApiService) {
     this.filterForm = this.fb.group({
       vin: [''],
-      agencyName: [''],
+      idAgency: [''],
       sendedSalesForce: [''],
       insertado: [false],
       error: [false]
@@ -55,31 +56,33 @@ export class InventoryFilterComponent implements OnInit {
     });
   }
 
-  onAgencySelect(agencyName: string, event: Event): void {
+  onAgencySelect(agency: any, event: Event): void {
     const input = event.target as HTMLInputElement | null;
     if (!input) return;
     
-    console.log('Agencia seleccionada:', agencyName, 'checked:', input.checked);
+    console.log('Agencia seleccionada:', agency.name, 'ID:', agency.idAgency, 'checked:', input.checked);
     
     if (input.checked) {
-      this.selectedAgency = agencyName;
-      this.filterForm.patchValue({ agencyName }, { emitEvent: false });
-      console.log('Agencia guardada en formulario:', this.filterForm.get('agencyName')?.value);
-    } else if (this.selectedAgency === agencyName) {
+      this.selectedAgency = agency.name;
+      this.selectedAgencyId = agency.idAgency;
+      this.filterForm.patchValue({ idAgency: agency.idAgency }, { emitEvent: false });
+      console.log('Agencia guardada en formulario - ID:', this.filterForm.get('idAgency')?.value);
+    } else if (this.selectedAgency === agency.name) {
       this.selectedAgency = '';
-      this.filterForm.patchValue({ agencyName: '' }, { emitEvent: false });
+      this.selectedAgencyId = '';
+      this.filterForm.patchValue({ idAgency: '' }, { emitEvent: false });
       console.log('Agencia deseleccionada');
     }
   }
 
   onFilter(): void {
     console.log('Filtro activado - valores del formulario:', this.filterForm.value);
-    console.log('🔍selectedAgency actual:', this.selectedAgency);
+    console.log('🔍selectedAgency actual:', this.selectedAgency, 'ID:', this.selectedAgencyId);
     
-    const { vin, agencyName, sendedSalesForce, insertado, error } = this.filterForm
+    const { vin, idAgency, sendedSalesForce, insertado, error } = this.filterForm
       .value as {
       vin?: string;
-      agencyName?: string;
+      idAgency?: string;
       sendedSalesForce?: string;
       insertado?: boolean;
       error?: boolean;
@@ -87,7 +90,7 @@ export class InventoryFilterComponent implements OnInit {
 
     const payload = {
       vin,
-      agencyName,
+      idAgency,
       sendedSalesForce: sendedSalesForce ? (sendedSalesForce as '1' | '0') : undefined,
       insertado,
       error,
@@ -102,9 +105,10 @@ export class InventoryFilterComponent implements OnInit {
   onClearFilters(): void {
     // Resetear el formulario a valores vacíos
     this.selectedAgency = '';
+    this.selectedAgencyId = '';
     this.filterForm.reset({
       vin: '',
-      agencyName: '',
+      idAgency: '',
       sendedSalesForce: '',
       insertado: false,
       error: false
@@ -113,7 +117,7 @@ export class InventoryFilterComponent implements OnInit {
     // Emitir filtros vacíos para que la tabla se resetee
     const emptyPayload = {
       vin: undefined,
-      agencyName: undefined,
+      idAgency: undefined,
       sendedSalesForce: undefined,
       insertado: false,
       error: false,
