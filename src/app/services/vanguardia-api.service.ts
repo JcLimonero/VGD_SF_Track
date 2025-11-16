@@ -120,8 +120,8 @@ export class VanguardiaApiService {
     );
   }
 
-  getInventorybyAgencies(agencie:string): Observable<any[]> {
-    const url = `${this.baseUrl}/vgd/inventoryfilter?agencyName=${agencie}`;
+  getInventorybyAgencies(idAgency:string): Observable<any[]> {
+    const url = `${this.baseUrl}/vgd/inventoryfilter?idAgency=${idAgency}`;
 
     const headers = new HttpHeaders()
       .set('Content-Type', 'application/json')

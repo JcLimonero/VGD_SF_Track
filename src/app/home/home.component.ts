@@ -56,6 +56,7 @@ export class HomeComponent {
 
   handleInventoryFilter(filters: any) {
     console.log('Home -> inventory filter recibido:', filters);
+    console.log('🔍 Filtro por idAgency:', filters?.idAgency);
     if (this.inventoryTable && this.inventoryTable.applyFilter) {
       this.inventoryTable.applyFilter(filters);
     } else {
