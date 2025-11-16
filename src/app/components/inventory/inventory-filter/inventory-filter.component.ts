@@ -60,12 +60,12 @@ export class InventoryFilterComponent implements OnInit {
     const input = event.target as HTMLInputElement | null;
     if (!input) return;
     
-    console.log('Agencia seleccionada:', agency.name, 'ID:', agency.id, 'checked:', input.checked);
+    console.log('Agencia seleccionada:', agency.name, 'ID:', agency.idAgency, 'checked:', input.checked);
     
     if (input.checked) {
       this.selectedAgency = agency.name;
-      this.selectedAgencyId = agency.id;
-      this.filterForm.patchValue({ idAgency: agency.id }, { emitEvent: false });
+      this.selectedAgencyId = agency.idAgency;
+      this.filterForm.patchValue({ idAgency: agency.idAgency }, { emitEvent: false });
       console.log('Agencia guardada en formulario - ID:', this.filterForm.get('idAgency')?.value);
     } else if (this.selectedAgency === agency.name) {
       this.selectedAgency = '';
