@@ -58,22 +58,7 @@
     background: #dc2626; /* red-600 */
 }
 
-.excel-icon-btn {
-    background: #10b981; /* green-500 */
-    border: none;
-    padding: 0.45rem;
-    border-radius: 6px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.15s;
-    width: 36px;
-    height: 36px;
-}
-.excel-icon-btn:hover:not(:disabled) {
-    background: #059669; /* green-600 */
-}
+
 .excel-icon-btn:disabled {
     background: #9ca3af;
     cursor: not-allowed;
