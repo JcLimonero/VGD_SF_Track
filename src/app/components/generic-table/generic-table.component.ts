@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TableColumn } from '../../../@vex/interfaces/table-column.interface';
 import { InventoryModalComponent } from '../inventory/inventory-modal/inventory-modal.component';
-
+import { CustomerModalComponent } from '../customer/customer-modal/customer-modal.component';
 @Component({
   selector: 'vex-generic-table',
   standalone: true,
@@ -223,10 +223,19 @@ export class GenericTableComponent implements OnInit, OnChanges {
   }
 
   openModal(rowData: any) {    
-    // Detectar si es datos de inventario por la presencia de campos específicos
+    // Detectar el tipo de datos
     const isInventoryData = this.isInventoryData(rowData);
+    const isCustomerData = this.isCustomerData(rowData);
     
-    const modalComponent = isInventoryData ? InventoryModalComponent : ModalDialogComponent;
+    // Seleccionar el componente de modal apropiado
+    let modalComponent;
+    if (isCustomerData) {
+      modalComponent = CustomerModalComponent;
+    } else if (isInventoryData) {
+      modalComponent = InventoryModalComponent;
+    } else {
+      modalComponent = ModalDialogComponent;
+    }
     
     const dialogRef = this.dialog.open(modalComponent, {
       data: rowData,
@@ -239,11 +248,15 @@ export class GenericTableComponent implements OnInit, OnChanges {
     });
   }
   
-  // Método para detectar si los datos son de inventario
+  // Metodo para detectar si los datos son de inventario
   private isInventoryData(data: any): boolean {
-    // Los datos de inventario tienen campos específicos como statusDescription, typeDescription, etc.
     return !!(data?.statusDescription || data?.typeDescription || 
              (data?.brand && data?.model && !data?.order_dms));
+  }
+
+  // Metodo para detectar si los datos son de cliente
+  private isCustomerData(data: any): boolean {
+    return !!(data?.ndClientDMS || data?.bussines_name);
   }
 
   openJsonModal(rowData: any) {

@@ -1,0 +1,87 @@
+<h2 mat-dialog-title class="title text-xl">Detalles del Cliente</h2>
+
+<mat-dialog-content class="mat-typography">
+  <div class="inventory-details">
+    <div class="detail-row">
+      <strong>Agencia:</strong> {{ data?.agencyName || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Nombre:</strong> {{ data?.bussines_name || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>RFC:</strong> {{ data?.rfc || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>CURP:</strong> {{ data?.curp || 'N/A' }}
+    </div>
+
+    <div class="detail-row">
+      <strong>Celular:</strong> {{ data?.mobile_phone || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Teléfono fijo:</strong> {{ data?.phone || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Otro teléfono:</strong> {{ data?.other_phone || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Correo:</strong> {{ data?.mail || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Ocupación:</strong> {{ data?.activitie || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Calle:</strong> {{ data?.street || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Número externo:</strong> {{ data?.external_number || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Número interno:</strong> {{ data?.internal_number || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Código postal:</strong> {{ data?.zipcode || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Colonia:</strong> {{ data?.settlement || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Delegación:</strong> {{ data?.deputation || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Estado:</strong> {{ data?.state || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Ciudad:</strong> {{ data?.city || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>País:</strong> {{ data?.country || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Fecha de nacimiento:</strong> {{ data?.birthay_date || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Género:</strong> {{ data?.gender || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Tipo de cliente:</strong> {{ data?.costumer_type || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Última venta:</strong> {{ data?.last_sale|| 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Timestamp DMS:</strong> {{ data?.timestamp_dms || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Timestamp:</strong> {{ data?.timestamp || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Consolidado:</strong> {{ get_is_consolidate() }}
+    </div>
+
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onNoClick()">Cerrar</button>
+</mat-dialog-actions>

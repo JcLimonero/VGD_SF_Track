@@ -31,10 +31,14 @@ export class CustomerTableComponent implements OnInit {
     { property: 'mobile_phone', label: 'Celular', type: 'text' },
     { property: 'phone', label: 'Teléfono', type: 'text' },
     { property: 'mail', label: 'Email', type: 'text' },
+    { property: 'street',label: 'Calle',  type: 'text' },
+    { property: 'external_number',label: 'Número',  type: 'text' },
+    { property: 'city',label: 'Ciudad',  type: 'text' },
+    { property: 'actions',label: 'Detalles',  type: 'button' }
+    
   ];
 
-  displayedColumns: string[] = ['agencyName', 'bussines_name', 'mobile_phone', 'phone', 'mail'];
-
+  displayedColumns: string[] = ['agencyName', 'bussines_name', 'mobile_phone', 'phone', 'mail', 'street', 'external_number', 'city', 'actions'];
 
   constructor(private vanguardiaApi: VanguardiaApiService) {}
 
