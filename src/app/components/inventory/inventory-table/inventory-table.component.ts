@@ -27,7 +27,7 @@ export class InventoryTableComponent implements OnInit {
   currentPageSize = 5; // Mantenemos el pageSize actual
   
   // Filtros activos
-  currentFilters: { vin?: string; idAgency?: string; sendedSalesForce?: '1'|'0'; insertado?: boolean; error?: boolean } = {};
+  currentFilters: { vin?: string; idAgency?: string; statusDescription?: string; typeDescription?: string; sendedSalesForce?: '1'|'0'; insertado?: boolean; error?: boolean } = {};
   isDownloadingExcel = false;
   
   // Columnas para inventario
@@ -53,6 +53,8 @@ export class InventoryTableComponent implements OnInit {
     return !!(
       this.currentFilters.vin ||
       this.currentFilters.idAgency ||
+      this.currentFilters.statusDescription ||
+      this.currentFilters.typeDescription ||
       this.currentFilters.sendedSalesForce ||
       this.currentFilters.insertado ||
       this.currentFilters.error
@@ -81,6 +83,8 @@ export class InventoryTableComponent implements OnInit {
     // Map current filters to params
     if (this.currentFilters.vin) params.vin = this.currentFilters.vin;
     if (this.currentFilters.idAgency) params.idAgency = this.currentFilters.idAgency;
+    if (this.currentFilters.statusDescription) params.statusDescription = this.currentFilters.statusDescription;
+    if (this.currentFilters.typeDescription) params.typeDescription = this.currentFilters.typeDescription;
     if (this.currentFilters.sendedSalesForce) params.sendedSalesForce = this.currentFilters.sendedSalesForce;
     if (this.currentFilters.insertado && !this.currentFilters.error) params.insertCorrect = '1';
     if (this.currentFilters.error && !this.currentFilters.insertado) params.insertCorrect = '0';
@@ -94,7 +98,6 @@ export class InventoryTableComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        console.error('❌ Error cargando inventario:', error);
         this.error = 'Error al cargar el inventario';
         this.data = [];
         this.total = 0;
@@ -111,7 +114,7 @@ export class InventoryTableComponent implements OnInit {
     this.loadPage(event.pageIndex, event.pageSize);
   }
 
-  applyFilter(filters: { vin?: string; idAgency?: string; sendedSalesForce?: '1' | '0'; insertado?: boolean; error?: boolean }): void {
+  applyFilter(filters: { vin?: string; idAgency?: string; statusDescription?: string; typeDescription?: string; sendedSalesForce?: '1' | '0'; insertado?: boolean; error?: boolean }): void {
     // Guardar filtros y reiniciar a primera página
     this.currentFilters = { ...filters };
     this.pageIndex = 0;
@@ -143,6 +146,8 @@ export class InventoryTableComponent implements OnInit {
     // Aplicar los mismos filtros que están actualmente activos
     if (this.currentFilters.vin) baseParams.vin = this.currentFilters.vin;
     if (this.currentFilters.idAgency) baseParams.idAgency = this.currentFilters.idAgency;
+    if (this.currentFilters.statusDescription) baseParams.statusDescription = this.currentFilters.statusDescription;
+    if (this.currentFilters.typeDescription) baseParams.typeDescription = this.currentFilters.typeDescription;
     if (this.currentFilters.sendedSalesForce) baseParams.sendedSalesForce = this.currentFilters.sendedSalesForce;
     if (this.currentFilters.insertado && !this.currentFilters.error) baseParams.insertCorrect = '1';
     if (this.currentFilters.error && !this.currentFilters.insertado) baseParams.insertCorrect = '0';

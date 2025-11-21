@@ -18,6 +18,7 @@
             </label>
           </div>
         </details>
+
         <div class="filter-field">
           <label for="vin">VIN</label>
           <input
@@ -27,6 +28,75 @@
             formControlName="vin"
           />
         </div>
+
+    <!-- Dropdown: Estado -->
+        <details class="dropdown">
+          <summary class="dropdown-trigger">
+            {{ selectedStatus || 'Estado' }}
+            <span class="material-symbols-outlined">keyboard_arrow_down</span>
+          </summary>
+          <div class="dropdown-panel">
+            <label class="checkbox">
+              <input 
+                type="checkbox"
+                [checked]="filterForm.get('statusDescription')?.value === 'Vendido'"
+                (change)="onStatusToggle('Vendido', $event); closeDropdown($event)" />
+              Vendido
+            </label>
+            <label class="checkbox">
+              <input 
+                type="checkbox"
+                [checked]="filterForm.get('statusDescription')?.value === 'Reservado'"
+                (change)="onStatusToggle('Reservado', $event); closeDropdown($event)" />
+              Reservado
+            </label>
+            <label class="checkbox">
+              <input 
+                type="checkbox"
+                [checked]="filterForm.get('statusDescription')?.value === 'Listo para venta'"
+                (change)="onStatusToggle('Listo para venta', $event); closeDropdown($event)" />
+              Listo para venta
+            </label>
+            <label class="checkbox">
+              <input 
+                type="checkbox"
+                [checked]="filterForm.get('statusDescription')?.value === 'Sin Definir'"
+                (change)="onStatusToggle('Sin Definir', $event); closeDropdown($event)" />
+              Sin Definir
+            </label>
+            <label class="checkbox">
+              <input 
+                type="checkbox"
+                [checked]="filterForm.get('statusDescription')?.value === 'Cancelado'"
+                (change)="onStatusToggle('Cancelado', $event); closeDropdown($event)" />
+              Cancelado
+            </label>
+          </div>
+        </details>
+
+    <!-- Dropdown: Tipo -->
+        <details class="dropdown">
+          <summary class="dropdown-trigger">
+            {{ selectedType || 'Tipo' }}
+            <span class="material-symbols-outlined">keyboard_arrow_down</span>
+          </summary>
+          <div class="dropdown-panel">
+            <label class="checkbox">
+              <input 
+                type="checkbox"
+                [checked]="filterForm.get('typeDescription')?.value === 'Nuevo'"
+                (change)="onTypeToggle('Nuevo', $event); closeDropdown($event)" />
+              Nuevo
+            </label>
+            <label class="checkbox">
+              <input 
+                type="checkbox"
+                [checked]="filterForm.get('typeDescription')?.value === 'Seminuevo'"
+                (change)="onTypeToggle('Seminuevo', $event); closeDropdown($event)" />
+              Seminuevo
+            </label>
+          </div>
+        </details>
 
         <!-- Dropdown: Salesforce status -->
         <details class="dropdown">
