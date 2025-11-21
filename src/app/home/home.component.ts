@@ -8,7 +8,7 @@ import { TabsComponent } from '../components/tabs/tabs.component';
 import { InventoryTableComponent } from '../components/inventory/inventory-table/inventory-table.component';
 import { InventoryFilterComponent } from "../components/inventory/inventory-filter/inventory-filter.component";
 import { CustomerTableComponent } from '../components/customer/customer-table/customer-table.component';
-
+import { CustomerFilterComponent } from '../components/customer/customer-filter/customer-filter.component';
 @Component({
   selector: 'vex-home',
   standalone: true,
@@ -21,7 +21,8 @@ import { CustomerTableComponent } from '../components/customer/customer-table/cu
     TabsComponent,
     InventoryTableComponent,
     InventoryFilterComponent,
-    CustomerTableComponent
+    CustomerTableComponent,
+    CustomerFilterComponent
 ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
@@ -36,7 +37,6 @@ export class HomeComponent {
 
   onTabChanged(tabId: string): void {
     this.activeTab = tabId;
-    console.log('🏠 Home - Tab cambiado a:', tabId);
   }
 
   handleFilter(filters: any) {
@@ -71,6 +71,23 @@ export class HomeComponent {
       this.inventoryTable.downloadExcel();
     } else {
       console.warn('inventoryTable no disponible aún o no tiene downloadExcel');
+    }
+  }
+
+  handleCustomerDownload(): void {
+    if (this.customerTable && this.customerTable.downloadExcel) {
+      this.customerTable.downloadExcel();
+    } else {
+      console.warn('customerTable no disponible aún o no tiene downloadExcel');
+    }
+  }
+
+
+  handleCustomerFilter(filters: any) {
+    if (this.customerTable && this.customerTable.applyFilter) {
+      this.customerTable.applyFilter(filters);
+    } else {
+      console.warn('customerTable no disponible aún o no tiene applyFilter');
     }
   }
 }
