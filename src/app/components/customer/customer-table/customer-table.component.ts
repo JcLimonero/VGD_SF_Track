@@ -35,9 +35,11 @@ export class CustomerTableComponent implements OnInit {
     { property: 'mobile_phone', label: 'Celular', type: 'text' },
     { property: 'phone', label: 'Teléfono', type: 'text' },
     { property: 'mail', label: 'Email', type: 'text' },
-    { property: 'street', label: 'Calle', type: 'text' },
-    { property: 'external_number', label: 'Número', type: 'text' },
-    { property: 'city', label: 'Ciudad', type: 'text' },
+    { property: 'sendedSalesForce', label: 'Envio SF', type: 'text' },
+    { property: 'timestamp_sales_force',label: 'Fecha SF',  type: 'text' },
+    { property: 'resultSF',label: 'Estado SF',  type: 'text' },
+    { property: 'sf_jsonRequest',label: 'Datos',  type: 'button' },
+    { property: 'sf_link',label: 'Ver SF',  type: 'button' },
     { property: 'actions', label: 'Detalles', type: 'button' }
   ];
 
@@ -47,9 +49,11 @@ export class CustomerTableComponent implements OnInit {
     'mobile_phone',
     'phone',
     'mail',
-    'street',
-    'external_number',
-    'city',
+    'sendedSalesForce',
+    'timestamp_sales_force',
+    'resultSF',
+    'sf_jsonRequest',
+    'sf_link',
     'actions'
   ];
 
@@ -73,7 +77,10 @@ export class CustomerTableComponent implements OnInit {
       perpage: pageSize // Tamaño de página
     };
 
-    // Usar getInventory con parámetros (server-side pagination)
+    // Map current filters to params
+    if (this.currentFilters.idAgency) params.idAgency = this.currentFilters.idAgency;
+
+    // Usar getCustomers con parámetros (server-side pagination)
     this.vanguardiaApi.getCustomers(params).subscribe({
       next: (res) => {
         this.data = res.items || [];
@@ -145,40 +152,56 @@ export class CustomerTableComponent implements OnInit {
             // Datos del Cliente
             'No. Cliente DMS': item.ndClientDMS || '',
             'Nombre': item.name || '',
-            'Apellido Paterno': item.paternal_surname || '',
-            'Apellido Materno': item.maternal_surname || '',
+            'Segundo Nombre': item.second_name || '',
+            'Apellidos': item.last_name || '',
             'Nombre Comercial': item.bussines_name || '',
             'RFC': item.rfc || '',
             'CURP': item.curp || '',
+            'Fecha de Nacimiento': item.birthay_date || '',
+            'Género': item.gender || '',
+            'Saludo': item.salutation || '',
+            'Tipo de Cliente': item.costumer_type || '',
             
             // Contacto
             'Teléfono Móvil': item.mobile_phone || '',
             'Teléfono': item.phone || '',
             'Otro Teléfono': item.other_phone || '',
+            'Tel. Asistente': item.assitant_phone || '',
+            'Tel. Oficina': item.office_phone || '',
             'Email': item.mail || '',
-            
-            // Datos Adicionales
-            'Actividad': item.activitie || '',
-            'Fecha de Nacimiento': item.birthay_date || '',
-            'Género': item.gender || '',
-            'Tipo de Cliente': item.costumer_type || '',
-            'Última Venta': item.last_sale || '',
             
             // Dirección
             'Calle': item.street || '',
             'No. Exterior': item.external_number || '',
             'No. Interior': item.internal_number || '',
+            'Entre Calles': item.between_streets || '',
             'Código Postal': item.zipcode || '',
             'Colonia': item.settlement || '',
-            'Delegación': item.deputation || '',
+            'Delegación/Municipio': item.deputation || '',
             'Ciudad': item.city || '',
             'Estado': item.state || '',
             'País': item.country || '',
             
+            // Datos Adicionales
+            'Ocupación': item.activitie || '',
+            'Cargo/Nombramiento': item.appointment || '',
+            'Permite Contacto': item.allow_contact === '1' ? 'Sí' : 'No',
+            'Clasificación': item.clasification || '',
+            
+            // Vendedor
+            'No. Vendedor': item.ndSeller || '',
+            'Nombre Vendedor': item.seller_Name || '',
+            'Última Venta': item.last_sale || '',
+            
+            // Salesforce
+            'Enviado a SF': item.sendedSalesForce === '1' ? 'Sí' : 'No',
+            'ID Salesforce': item.idSalesForce || '',
+            'Resultado SF': item.resultSF || '',
+            'Timestamp SF': item.timestamp_sales_force || '',
+            
             // Timestamps
             'Timestamp DMS': item.timestamp_dms || '',
-            'Timestamp': item.timestamp || '',
-            'Consolidado': item.is_consolidated === '1' ? 'Sí' : 'No'
+            'Timestamp': item.timestamp || ''
           }));
 
           // Crear libro de Excel

@@ -2,11 +2,26 @@
 
 <mat-dialog-content class="mat-typography">
   <div class="inventory-details">
+    <!-- Información de Agencia -->
     <div class="detail-row">
       <strong>Agencia:</strong> {{ data?.agencyName || 'N/A' }}
     </div>
     <div class="detail-row">
-      <strong>Nombre:</strong> {{ data?.bussines_name || 'N/A' }}
+      <strong>No. Cliente DMS:</strong> {{ data?.ndClientDMS || 'N/A' }}
+    </div>
+
+    <!-- Datos Personales -->
+    <div class="detail-row">
+      <strong>Nombre:</strong> {{ data?.name || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Segundo Nombre:</strong> {{ data?.second_name || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Apellidos:</strong> {{ data?.last_name || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Nombre Comercial:</strong> {{ data?.bussines_name || 'N/A' }}
     </div>
     <div class="detail-row">
       <strong>RFC:</strong> {{ data?.rfc || 'N/A' }}
@@ -14,71 +29,117 @@
     <div class="detail-row">
       <strong>CURP:</strong> {{ data?.curp || 'N/A' }}
     </div>
-
     <div class="detail-row">
-      <strong>Celular:</strong> {{ data?.mobile_phone || 'N/A' }}
-    </div>
-    <div class="detail-row">
-      <strong>Teléfono fijo:</strong> {{ data?.phone || 'N/A' }}
-    </div>
-    <div class="detail-row">
-      <strong>Otro teléfono:</strong> {{ data?.other_phone || 'N/A' }}
-    </div>
-    <div class="detail-row">
-      <strong>Correo:</strong> {{ data?.mail || 'N/A' }}
-    </div>
-    <div class="detail-row">
-      <strong>Ocupación:</strong> {{ data?.activitie || 'N/A' }}
-    </div>
-    <div class="detail-row">
-      <strong>Calle:</strong> {{ data?.street || 'N/A' }}
-    </div>
-    <div class="detail-row">
-      <strong>Número externo:</strong> {{ data?.external_number || 'N/A' }}
-    </div>
-    <div class="detail-row">
-      <strong>Número interno:</strong> {{ data?.internal_number || 'N/A' }}
-    </div>
-    <div class="detail-row">
-      <strong>Código postal:</strong> {{ data?.zipcode || 'N/A' }}
-    </div>
-    <div class="detail-row">
-      <strong>Colonia:</strong> {{ data?.settlement || 'N/A' }}
-    </div>
-    <div class="detail-row">
-      <strong>Delegación:</strong> {{ data?.deputation || 'N/A' }}
-    </div>
-    <div class="detail-row">
-      <strong>Estado:</strong> {{ data?.state || 'N/A' }}
-    </div>
-    <div class="detail-row">
-      <strong>Ciudad:</strong> {{ data?.city || 'N/A' }}
-    </div>
-    <div class="detail-row">
-      <strong>País:</strong> {{ data?.country || 'N/A' }}
-    </div>
-    <div class="detail-row">
-      <strong>Fecha de nacimiento:</strong> {{ data?.birthay_date || 'N/A' }}
+      <strong>Fecha de Nacimiento:</strong> {{ data?.birthay_date || 'N/A' }}
     </div>
     <div class="detail-row">
       <strong>Género:</strong> {{ data?.gender || 'N/A' }}
     </div>
     <div class="detail-row">
-      <strong>Tipo de cliente:</strong> {{ data?.costumer_type || 'N/A' }}
+      <strong>Saludo:</strong> {{ data?.salutation || 'N/A' }}
     </div>
     <div class="detail-row">
-      <strong>Última venta:</strong> {{ data?.last_sale|| 'N/A' }}
+      <strong>Tipo de Cliente:</strong> {{ data?.costumer_type || 'N/A' }}
     </div>
+
+    <!-- Contacto -->
+    <div class="detail-row">
+      <strong>Celular:</strong> {{ data?.mobile_phone || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Teléfono:</strong> {{ data?.phone || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Otro Teléfono:</strong> {{ data?.other_phone || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Tel. Asistente:</strong> {{ data?.assitant_phone || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Tel. Oficina:</strong> {{ data?.office_phone || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Email:</strong> {{ data?.mail || 'N/A' }}
+    </div>
+
+    <!-- Dirección -->
+    <div class="detail-row">
+      <strong>Calle:</strong> {{ data?.street || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>No. Exterior:</strong> {{ data?.external_number || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>No. Interior:</strong> {{ data?.internal_number || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Entre Calles:</strong> {{ data?.between_streets || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Código Postal:</strong> {{ data?.zipcode || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Colonia:</strong> {{ data?.settlement || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Delegación/Municipio:</strong> {{ data?.deputation || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Ciudad:</strong> {{ data?.city || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Estado:</strong> {{ data?.state || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>País:</strong> {{ data?.country || 'N/A' }}
+    </div>
+
+    <!-- Información Adicional -->
+    <div class="detail-row">
+      <strong>Ocupación:</strong> {{ data?.activitie || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Cargo/Nombramiento:</strong> {{ data?.appointment || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Permite Contacto:</strong> {{ data?.allow_contact === '1' ? 'Sí' : 'No' }}
+    </div>
+    <div class="detail-row">
+      <strong>Clasificación:</strong> {{ data?.clasification || 'N/A' }}
+    </div>
+
+    <!-- Vendedor -->
+    <div class="detail-row">
+      <strong>No. Vendedor:</strong> {{ data?.ndSeller || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Nombre Vendedor:</strong> {{ data?.seller_Name || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Última Venta:</strong> {{ data?.last_sale || 'N/A' }}
+    </div>
+
+    <!-- Salesforce -->
+    <div class="detail-row">
+      <strong>Enviado a SF:</strong> {{ data?.sendedSalesForce === '1' ? 'Sí' : 'No' }}
+    </div>
+    <div class="detail-row">
+      <strong>ID Salesforce:</strong> {{ data?.idSalesForce || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Resultado SF:</strong> {{ data?.resultSF || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Timestamp SF:</strong> {{ data?.timestamp_sales_force || 'N/A' }}
+    </div>
+
+    <!-- Timestamps -->
     <div class="detail-row">
       <strong>Timestamp DMS:</strong> {{ data?.timestamp_dms || 'N/A' }}
     </div>
     <div class="detail-row">
       <strong>Timestamp:</strong> {{ data?.timestamp || 'N/A' }}
     </div>
-    <div class="detail-row">
-      <strong>Consolidado:</strong> {{ get_is_consolidate() }}
-    </div>
-
   </div>
 </mat-dialog-content>
 

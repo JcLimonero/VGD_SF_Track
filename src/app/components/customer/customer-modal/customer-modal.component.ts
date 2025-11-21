@@ -21,13 +21,4 @@ export class CustomerModalComponent {
     this.dialogRef.close();
   }
 
-  // formatear estado de campo consolidado
-  get_is_consolidate(): string {
-    if (this.data?.is_consolidated === '1') {
-      return 'Sí';
-    } else if (this.data?.is_consolidated === '0') {
-      return 'No';
-    }
-    return 'N/A';
-  }
 }
