@@ -7,7 +7,7 @@ import { InvoiceFilterComponent } from "../components/invoice-filter/invoice-fil
 import { TabsComponent } from '../components/tabs/tabs.component';
 import { InventoryTableComponent } from '../components/inventory/inventory-table/inventory-table.component';
 import { InventoryFilterComponent } from "../components/inventory/inventory-filter/inventory-filter.component";
-
+import { CustomerTableComponent } from '../components/customer/customer-table/customer-table.component';
 
 @Component({
   selector: 'vex-home',
@@ -20,7 +20,8 @@ import { InventoryFilterComponent } from "../components/inventory/inventory-filt
     InvoiceFilterComponent,
     TabsComponent,
     InventoryTableComponent,
-    InventoryFilterComponent
+    InventoryFilterComponent,
+    CustomerTableComponent
 ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
@@ -29,6 +30,7 @@ import { InventoryFilterComponent } from "../components/inventory/inventory-filt
 export class HomeComponent {
   @ViewChild('invoiceTable') invoiceTable!: InvoiceTableComponent;
   @ViewChild('inventoryTable') inventoryTable!: InventoryTableComponent;
+  @ViewChild('customerTable') customerTable!: CustomerTableComponent;
   
   activeTab = 'orders'; // Tab activo por defecto: Ordenes
 

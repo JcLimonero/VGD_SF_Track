@@ -30,9 +30,8 @@
     <p class="text-gray-500 mt-4">Funcionalidad próximamente...</p>
   </div>
 
-  <div *ngIf="activeTab === 'clients'" class="p-8 text-center">
-    <h2 class="text-2xl font-bold text-gray-600">Sección de Clientes</h2>
-    <p class="text-gray-500 mt-4">Funcionalidad próximamente...</p>
+  <div *ngIf="activeTab === 'clients'">
+    <vex-customer-table></vex-customer-table>
   </div>
 
   <div *ngIf="activeTab === 'dwh'" class="p-8 text-center">
