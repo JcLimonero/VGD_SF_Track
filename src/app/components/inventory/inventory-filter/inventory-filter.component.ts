@@ -15,6 +15,8 @@ export class InventoryFilterComponent implements OnInit {
   @Output() filterChange = new EventEmitter<{
     vin?: string;
     idAgency?: string;
+    statusDescription?: string;
+    typeDescription?: string;
     sendedSalesForce?: '1' | '0';
     insertado?: boolean;
     error?: boolean;
@@ -30,11 +32,15 @@ export class InventoryFilterComponent implements OnInit {
   agencies: any[] = [];
   selectedAgency: string = ''; // Nombre mostrado en UI
   selectedAgencyId: string = ''; // ID para enviar a la API
+  selectedStatus: string = ''; // Estado seleccionado
+  selectedType: string = ''; // Tipo seleccionado
 
   constructor(private fb: FormBuilder, private vanguardiaApi: VanguardiaApiService) {
     this.filterForm = this.fb.group({
       vin: [''],
       idAgency: [''],
+      statusDescription: [''],
+      typeDescription: [''],
       sendedSalesForce: [''],
       insertado: [false],
       error: [false]
@@ -76,13 +82,12 @@ export class InventoryFilterComponent implements OnInit {
   }
 
   onFilter(): void {
-    console.log('Filtro activado - valores del formulario:', this.filterForm.value);
-    console.log('🔍selectedAgency actual:', this.selectedAgency, 'ID:', this.selectedAgencyId);
-    
-    const { vin, idAgency, sendedSalesForce, insertado, error } = this.filterForm
+    const { vin, idAgency, statusDescription,typeDescription, sendedSalesForce, insertado, error } = this.filterForm
       .value as {
       vin?: string;
       idAgency?: string;
+      statusDescription?: string;
+      typeDescription?: string;
       sendedSalesForce?: string;
       insertado?: boolean;
       error?: boolean;
@@ -91,24 +96,26 @@ export class InventoryFilterComponent implements OnInit {
     const payload = {
       vin,
       idAgency,
+      statusDescription,
+      typeDescription,
       sendedSalesForce: sendedSalesForce ? (sendedSalesForce as '1' | '0') : undefined,
       insertado,
       error,
     };
-
-    console.log('InventoryFilter -> onFilter(), emitiendo payload:', payload);
     this.filterChange.emit(payload);
-
-    // YA NO limpiar campos - mantener filtros activos para múltiples filtros
   }
 
   onClearFilters(): void {
     // Resetear el formulario a valores vacíos
     this.selectedAgency = '';
     this.selectedAgencyId = '';
+    this.selectedStatus = '';
+    this.selectedType = '';
     this.filterForm.reset({
       vin: '',
       idAgency: '',
+      statusDescription: '',
+      typeDescription: '',
       sendedSalesForce: '',
       insertado: false,
       error: false
@@ -118,12 +125,13 @@ export class InventoryFilterComponent implements OnInit {
     const emptyPayload = {
       vin: undefined,
       idAgency: undefined,
+      statusDescription: undefined,
+      typeDescription: undefined,
       sendedSalesForce: undefined,
       insertado: false,
       error: false,
     };
 
-    console.log('InventoryFilter -> onClearFilters(), emitiendo filtros vacíos:', emptyPayload);
     this.filterChange.emit(emptyPayload);
   }
 
@@ -156,6 +164,40 @@ export class InventoryFilterComponent implements OnInit {
     }
     if (kind === 'error' && input.checked) {
       this.filterForm.patchValue({ insertado: false }, { emitEvent: false });
+    }
+  }
+
+  onStatusToggle(statusValue: string, event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    if (!input) return;
+    
+    const current = this.filterForm.get('statusDescription')?.value as string;
+    
+    if (input.checked) {
+      this.selectedStatus = statusValue;
+      this.filterForm.patchValue({ statusDescription: statusValue }, { emitEvent: false });
+      console.log('Estado seleccionado:', statusValue);
+    } else if (current === statusValue) {
+      this.selectedStatus = '';
+      this.filterForm.patchValue({ statusDescription: '' }, { emitEvent: false });
+      console.log('Estado deseleccionado');
+    }
+  }
+
+  onTypeToggle(typeValue: string, event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    if (!input) return;
+    
+    const current = this.filterForm.get('typeDescription')?.value as string;
+    
+    if (input.checked) {
+      this.selectedType = typeValue;
+      this.filterForm.patchValue({ typeDescription: typeValue }, { emitEvent: false });
+      console.log('Tipo seleccionado:', typeValue);
+    } else if (current === typeValue) {
+      this.selectedType = '';
+      this.filterForm.patchValue({ typeDescription: '' }, { emitEvent: false });
+      console.log('Tipo deseleccionado');
     }
   }
 

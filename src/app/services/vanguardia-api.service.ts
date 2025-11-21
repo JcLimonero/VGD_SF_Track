@@ -57,22 +57,7 @@ export class VanguardiaApiService {
   }
 
   // INVENTARIO 
-  // Método para paginación client-side - trae TODOS los datos
-  getInventoryAll(): Observable<any[]>{
-    const url = `${this.baseUrl}/vgd/inventoryfilter`;
-
-    const headers= new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
-
-    return this.http.get<any>(url, { headers }).pipe(
-      map(res => {
-        return res?.data?.data ?? []; //devolver solo array como getInvoices
-      })
-    );
-  }
-
-  // Método para paginación server-side (por si se necesita después)
+  // Método para paginación server-side con filtros dinámicos
   getInventory(params?: any): Observable<{items: any[], total: number}>{
     const url = `${this.baseUrl}/vgd/inventoryfilter`;
 
@@ -94,73 +79,7 @@ export class VanguardiaApiService {
       map(res => {
         const items = res?.data?.data ?? [];
         const total = res?.data?.total_rows ?? items.length; // Usar total_rows de la API
-        console.log('🔧 API getInventory respuesta:', {
-          items: items.length,
-          total_rows: res?.data?.total_rows,
-          per_page: res?.data?.per_page,
-          page: res?.data?.page,
-          total_pages: res?.data?.total_pages
-        });
         return { items, total };
-      })
-    );
-  }
-
-  getInventorybyVin(vin:string): Observable<any[]> {
-    const url = `${this.baseUrl}/vgd/inventoryfilter?vin=${vin}`;
-
-    const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
-
-    return this.http.get<any>(url, { headers }).pipe(
-      map(res => {
-        return res?.data?.data ?? []; //devolver solo array
-      })
-    );
-  }
-
-  getInventorybyAgencies(idAgency:string): Observable<any[]> {
-    const url = `${this.baseUrl}/vgd/inventoryfilter?idAgency=${idAgency}`;
-
-    const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
-
-    return this.http.get<any>(url, { headers }).pipe(
-      map(res => {
-        return res?.data?.data ?? []; //devolver solo array
-      })
-    );
-  }
-
-  getInventorybySendSF(send:string): Observable<any[]> {
-    const url = `${this.baseUrl}/vgd/inventoryfilter?sendedSalesForce=${send}`;
-
-    const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
-
-    return this.http.get<any>(url, { headers }).pipe(
-      map(res => {
-        return res?.data?.data ?? []; //devolver solo array
-      })
-    );
-  }
-  
-  getInventorybyInsert(status:string): Observable<any[]> {
-    // status: 'true' => Insertado correctamente (insertCorrect == '1')
-    // status: 'false' => Error (insertCorrect == '0')
-    const insertCorrectValue = (status === 'true') ? '1' : '0';
-    const url = `${this.baseUrl}/vgd/inventoryfilter?insertCorrect=${insertCorrectValue}`;
-
-    const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
-
-    return this.http.get<any>(url, { headers }).pipe(
-      map(res => {
-        return res?.data?.data ?? []; //devolver solo array
       })
     );
   }
