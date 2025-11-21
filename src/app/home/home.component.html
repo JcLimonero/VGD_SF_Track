@@ -31,7 +31,11 @@
   </div>
 
   <div *ngIf="activeTab === 'clients'">
-    <vex-customer-table></vex-customer-table>
+    <vex-customer-filter (filterChange)="handleCustomerFilter($event)"
+                         (downloadRequested)="handleCustomerDownload()"
+                         [isDownloadingExcel]="customerTable?.isDownloadingExcel || false">
+    </vex-customer-filter>
+    <vex-customer-table #customerTable></vex-customer-table>
   </div>
 
   <div *ngIf="activeTab === 'dwh'" class="p-8 text-center">
