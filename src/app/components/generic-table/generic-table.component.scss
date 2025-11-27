@@ -171,6 +171,25 @@ th.mat-column-sf_link {
 .status-badge.sent .material-symbols-outlined { color: #16a34a; } /* green */
 .status-badge.not-sent .material-symbols-outlined { color: #dc2626; } /* red */
 
+/* Update status icon - DWH table */
+.update-status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    font-size: 28px;
+    line-height: 1;
+  }
+}
+
+td.mat-column-updateStatus,
+th.mat-column-updateStatus {
+  width: 80px;
+  text-align: center;
+}
+
 /* Custom pagination styles */
 .custom-pagination {
   display: flex;

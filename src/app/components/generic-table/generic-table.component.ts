@@ -210,6 +210,24 @@ export class GenericTableComponent implements OnInit, OnChanges {
     return isSuccess && hasIdSalesForce;
   }
 
+  getUpdateStatusColor(element: any): string {
+    const colDate = this.cellValue(element, 'colDate');
+    if (!colDate) return 'red';
+    
+    const recordDate = new Date(colDate);
+    const currentDate = new Date();
+    const diffInMs = currentDate.getTime() - recordDate.getTime();
+    const diffInHours = diffInMs / (1000 * 60 * 60);
+
+    if (diffInHours < 3) {
+      return 'green';
+    } else if (diffInHours >= 3 && diffInHours <= 12) {
+      return 'orange';
+    } else {
+      return 'red';
+    }
+  }
+
   openSalesForceLink(element: any): void {
     if (!this.isSalesForceAvailable(element)) {
       console.warn('Salesforce link not available for this element');

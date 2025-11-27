@@ -36,14 +36,16 @@ export class DwhTableComponent implements OnInit {
     { property: 'agencyName', label: 'Agencia', type: 'text' },
     { property: 'type', label: 'Tipo', type: 'text' },
     { property: 'description', label: 'Descripción', type: 'text' },
-    { property: 'colDate', label: 'Fecha', type: 'text' }
+    { property: 'colDate', label: 'Fecha', type: 'text' },
+    { property: 'updateStatus', label: 'Actualización', type: 'text' }
   ];
 
   displayedColumns: string[] = [
     'agencyName',
     'type',
     'description',
-    'colDate'
+    'colDate',
+    'updateStatus'
   ];
 
   get hasActiveFilters(): boolean {
@@ -54,6 +56,23 @@ export class DwhTableComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadPage(this.pageIndex, this.defaultPageSize);
+  }
+
+  getUpdateStatusColor(colDate: string): string {
+    if (!colDate) return 'red';
+    
+    const recordDate = new Date(colDate);
+    const currentDate = new Date();
+    const diffInMs = currentDate.getTime() - recordDate.getTime();
+    const diffInHours = diffInMs / (1000 * 60 * 60);
+
+    if (diffInHours < 3) {
+      return 'green';
+    } else if (diffInHours >= 3 && diffInHours <= 12) {
+      return 'orange';
+    } else {
+      return 'red';
+    }
   }
 
   loadPage(pageIndex: number, pageSize: number): void {
