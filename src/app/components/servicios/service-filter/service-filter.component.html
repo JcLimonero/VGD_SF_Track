@@ -1,0 +1,126 @@
+<div class="filter-bar-wrapper px-[2rem] py-5">
+  <form [formGroup]="filterForm" (ngSubmit)="onFilter()" >
+    <div class="filter-bar">
+
+    <!-- Dropdown: Agencias -->
+        <details class="dropdown">
+          <summary class="dropdown-trigger">
+            {{ selectedAgency || 'Agencia' }} 
+            <span class="material-symbols-outlined">keyboard_arrow_down</span>
+          </summary>
+          <div class="dropdown-panel">
+            <label class="checkbox" *ngFor="let agency of agencies">
+              <input 
+                type="checkbox"
+                [checked]="selectedAgency === agency.name"
+                (change)="onAgencySelect(agency, $event); closeDropdown($event)" />
+              {{ agency.name }}
+            </label>
+          </div>
+        </details>
+
+        <div class="filter-field">
+          <label for="order_dms">Orden DMS</label>
+          <input
+            id="order_dms"
+            type="text"
+            placeholder="Orden DMS"
+            formControlName="order_dms"
+          />
+        </div>
+
+        <div class="filter-field">
+          <label for="vin">VIN</label>
+          <input
+            id="vin"
+            type="text"
+            placeholder="VIN"
+            formControlName="vin"
+          />
+        </div>
+
+        <!-- Dropdown: Salesforce status -->
+        <details class="dropdown">
+          <summary class="dropdown-trigger">Salesforce <span class="material-symbols-outlined">keyboard_arrow_down</span>
+          </summary>
+          <div class="dropdown-panel">
+            <label class="checkbox">
+                <input id="enviadoSF" type="checkbox"
+                  [checked]="filterForm.get('sendedSalesForce')?.value === '1'"
+                  (change)="onSfToggle('1', $event); closeDropdown($event)" />
+              Enviado
+            </label>
+            <label class="checkbox">
+                <input id="noenviadoSF" type="checkbox"
+                  [checked]="filterForm.get('sendedSalesForce')?.value === '0'"
+                  (change)="onSfToggle('0', $event); closeDropdown($event)" />
+              No enviado
+            </label>
+          </div>
+        </details>
+
+        <!-- Dropdown: Inserción status -->
+        <details class="dropdown">
+          <summary class="dropdown-trigger">Estado SF<span class="material-symbols-outlined">keyboard_arrow_down</span>
+          </summary>
+          <div class="dropdown-panel">
+            <label class="checkbox">
+              <input
+                id="insertado"
+                type="checkbox"
+                formControlName="insertado"
+                (change)="onInsertToggle('insertado', $event); closeDropdown($event)"
+              />
+              Insertado
+            </label>
+            <label class="checkbox">
+              <input
+                id="error"
+                type="checkbox"
+                formControlName="error"
+                (change)="onInsertToggle('error', $event); closeDropdown($event)"
+              />
+              Error
+            </label>
+          </div>
+        </details>
+
+        <div class=" flex gap-2">
+          <!-- Botón Buscar -->
+          <button type="submit" class="filter-btn" title="Aplicar filtros">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+          </button>
+  
+          <!-- Botón Limpiar -->
+          <button 
+            type="button" 
+            class="clear-btn" 
+            (click)="onClearFilters()" 
+            title="Limpiar filtros"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h18"></path>
+              <path d="M19 6v14c0 1-1 2-2 2H7c0-1-1-2-1-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </button>
+  
+          <!-- Botón de Excel -->
+          <button
+            type="button"
+            class="excel-icon-btn"
+            (click)="downloadRequested.emit()"
+            [disabled]="isDownloadingExcel"
+            aria-label="Descargar Excel"
+            title="Descargar Excel"
+          >
+            <img src="assets/img/excel.png" alt="Excel Icon" class="w-[36px] h-[36px]" />
+          </button>
+        </div>
+    </div>
+  </form>
+</div>

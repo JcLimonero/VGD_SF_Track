@@ -19,6 +19,72 @@
           </div>
         </details>
 
+<div class="filter-field">
+          <label for="mail">Email</label>
+          <input
+            id="mail"
+            type="text"
+            placeholder="Email"
+            formControlName="mail"
+          />
+        </div>
+
+        <div class="filter-field">
+          <label for="mobile_phone">Celular</label>
+          <input
+            id="mobile_phone"
+            type="text"
+            placeholder="Celular"
+            formControlName="mobile_phone"
+          />
+        </div>
+
+        <!-- Dropdown: Salesforce status -->
+        <details class="dropdown">
+          <summary class="dropdown-trigger">Salesforce <span class="material-symbols-outlined">keyboard_arrow_down</span>
+          </summary>
+          <div class="dropdown-panel">
+            <label class="checkbox">
+                <input id="enviadoSF" type="checkbox"
+                  [checked]="filterForm.get('sendedSalesForce')?.value === '1'"
+                  (change)="onSfToggle('1', $event); closeDropdown($event)" />
+              Enviado
+            </label>
+            <label class="checkbox">
+                <input id="noenviadoSF" type="checkbox"
+                  [checked]="filterForm.get('sendedSalesForce')?.value === '0'"
+                  (change)="onSfToggle('0', $event); closeDropdown($event)" />
+              No enviado
+            </label>
+          </div>
+        </details>
+
+        <!-- Dropdown: Inserción status -->
+        <details class="dropdown">
+          <summary class="dropdown-trigger">Estado SF<span class="material-symbols-outlined">keyboard_arrow_down</span>
+          </summary>
+          <div class="dropdown-panel">
+            <label class="checkbox">
+              <input
+                id="insertado"
+                type="checkbox"
+                formControlName="insertado"
+                (change)="onInsertToggle('insertado', $event); closeDropdown($event)"
+              />
+              Insertado
+            </label>
+            <label class="checkbox">
+              <input
+                id="error"
+                type="checkbox"
+                formControlName="error"
+                (change)="onInsertToggle('error', $event); closeDropdown($event)"
+              />
+              Error
+            </label>
+          </div>
+        </details>
+
         <div class=" flex gap-2">
           <!-- Botón Buscar -->
           <button type="submit" class="filter-btn" title="Aplicar filtros">

@@ -25,7 +25,14 @@ export class CustomerTableComponent implements OnInit {
   currentPageSize = 5; // Mantenemos el pageSize actual
 
   ///filtros
-  currentFilters: { idAgency?: string } = {};
+  currentFilters: {
+    idAgency?: string;
+    mail?: string;
+    mobile_phone?: string;
+    sendedSalesForce?: '1' | '0';
+    insertado?: boolean;
+    error?: boolean;
+  } = {};
   isDownloadingExcel = false;
 
   // Columnas para tabla de clientes
@@ -35,9 +42,11 @@ export class CustomerTableComponent implements OnInit {
     { property: 'mobile_phone', label: 'Celular', type: 'text' },
     { property: 'phone', label: 'Teléfono', type: 'text' },
     { property: 'mail', label: 'Email', type: 'text' },
-    { property: 'street', label: 'Calle', type: 'text' },
-    { property: 'external_number', label: 'Número', type: 'text' },
-    { property: 'city', label: 'Ciudad', type: 'text' },
+    { property: 'sendedSalesForce', label: 'Envio SF', type: 'text' },
+    { property: 'timestamp_sales_force',label: 'Fecha SF',  type: 'text' },
+    { property: 'resultSF',label: 'Estado SF',  type: 'text' },
+    { property: 'sf_jsonRequest',label: 'Datos',  type: 'button' },
+    { property: 'sf_link',label: 'Ver SF',  type: 'button' },
     { property: 'actions', label: 'Detalles', type: 'button' }
   ];
 
@@ -47,14 +56,23 @@ export class CustomerTableComponent implements OnInit {
     'mobile_phone',
     'phone',
     'mail',
-    'street',
-    'external_number',
-    'city',
+    'sendedSalesForce',
+    'timestamp_sales_force',
+    'resultSF',
+    'sf_jsonRequest',
+    'sf_link',
     'actions'
   ];
 
   get hasActiveFilters(): boolean {
-    return !!this.currentFilters.idAgency;
+    return !!(
+      this.currentFilters.idAgency ||
+      this.currentFilters.mail ||
+      this.currentFilters.mobile_phone ||
+      this.currentFilters.sendedSalesForce ||
+      this.currentFilters.insertado ||
+      this.currentFilters.error
+    );
   }
 
   constructor(private vanguardiaApi: VanguardiaApiService) {}
@@ -73,7 +91,15 @@ export class CustomerTableComponent implements OnInit {
       perpage: pageSize // Tamaño de página
     };
 
-    // Usar getInventory con parámetros (server-side pagination)
+    // Map current filters to params
+    if (this.currentFilters.idAgency) params.idAgency = this.currentFilters.idAgency;
+    if (this.currentFilters.mail) params.mail = this.currentFilters.mail;
+    if (this.currentFilters.mobile_phone) params.mobile_phone = this.currentFilters.mobile_phone;
+    if (this.currentFilters.sendedSalesForce) params.sendedSalesForce = this.currentFilters.sendedSalesForce;
+    if (this.currentFilters.insertado) params.insertCorrect = '1';
+    if (this.currentFilters.error) params.insertCorrect = '0';
+
+    // Usar getCustomers con parámetros (server-side pagination)
     this.vanguardiaApi.getCustomers(params).subscribe({
       next: (res) => {
         this.data = res.items || [];
@@ -90,7 +116,14 @@ export class CustomerTableComponent implements OnInit {
     });
   }
 
-  applyFilter(filters: { idAgency?: string }): void {
+  applyFilter(filters: {
+    idAgency?: string;
+    mail?: string;
+    mobile_phone?: string;
+    sendedSalesForce?: '1' | '0';
+    insertado?: boolean;
+    error?: boolean;
+  }): void {
     //guardar filtros y reiniciar a primera página
     this.currentFilters = { ...filters };
     this.pageIndex = 0;
@@ -118,6 +151,16 @@ export class CustomerTableComponent implements OnInit {
     // Aplicar los mismos filtros que están actualmente activos
     if (this.currentFilters.idAgency)
       baseParams.idAgency = this.currentFilters.idAgency;
+    if (this.currentFilters.mail)
+      baseParams.mail = this.currentFilters.mail;
+    if (this.currentFilters.mobile_phone)
+      baseParams.mobile_phone = this.currentFilters.mobile_phone;
+    if (this.currentFilters.sendedSalesForce)
+      baseParams.sendedSalesForce = this.currentFilters.sendedSalesForce;
+    if (this.currentFilters.insertado)
+      baseParams.insertCorrect = '1';
+    if (this.currentFilters.error)
+      baseParams.insertCorrect = '0';
 
     // Crear array de observables para todas las páginas
     const pageRequests = [];
@@ -145,40 +188,56 @@ export class CustomerTableComponent implements OnInit {
             // Datos del Cliente
             'No. Cliente DMS': item.ndClientDMS || '',
             'Nombre': item.name || '',
-            'Apellido Paterno': item.paternal_surname || '',
-            'Apellido Materno': item.maternal_surname || '',
+            'Segundo Nombre': item.second_name || '',
+            'Apellidos': item.last_name || '',
             'Nombre Comercial': item.bussines_name || '',
             'RFC': item.rfc || '',
             'CURP': item.curp || '',
+            'Fecha de Nacimiento': item.birthay_date || '',
+            'Género': item.gender || '',
+            'Saludo': item.salutation || '',
+            'Tipo de Cliente': item.costumer_type || '',
             
             // Contacto
             'Teléfono Móvil': item.mobile_phone || '',
             'Teléfono': item.phone || '',
             'Otro Teléfono': item.other_phone || '',
+            'Tel. Asistente': item.assitant_phone || '',
+            'Tel. Oficina': item.office_phone || '',
             'Email': item.mail || '',
-            
-            // Datos Adicionales
-            'Actividad': item.activitie || '',
-            'Fecha de Nacimiento': item.birthay_date || '',
-            'Género': item.gender || '',
-            'Tipo de Cliente': item.costumer_type || '',
-            'Última Venta': item.last_sale || '',
             
             // Dirección
             'Calle': item.street || '',
             'No. Exterior': item.external_number || '',
             'No. Interior': item.internal_number || '',
+            'Entre Calles': item.between_streets || '',
             'Código Postal': item.zipcode || '',
             'Colonia': item.settlement || '',
-            'Delegación': item.deputation || '',
+            'Delegación/Municipio': item.deputation || '',
             'Ciudad': item.city || '',
             'Estado': item.state || '',
             'País': item.country || '',
             
+            // Datos Adicionales
+            'Ocupación': item.activitie || '',
+            'Cargo/Nombramiento': item.appointment || '',
+            'Permite Contacto': item.allow_contact === '1' ? 'Sí' : 'No',
+            'Clasificación': item.clasification || '',
+            
+            // Vendedor
+            'No. Vendedor': item.ndSeller || '',
+            'Nombre Vendedor': item.seller_Name || '',
+            'Última Venta': item.last_sale || '',
+            
+            // Salesforce
+            'Enviado a SF': item.sendedSalesForce === '1' ? 'Sí' : 'No',
+            'ID Salesforce': item.idSalesForce || '',
+            'Resultado SF': item.resultSF || '',
+            'Timestamp SF': item.timestamp_sales_force || '',
+            
             // Timestamps
             'Timestamp DMS': item.timestamp_dms || '',
-            'Timestamp': item.timestamp || '',
-            'Consolidado': item.is_consolidated === '1' ? 'Sí' : 'No'
+            'Timestamp': item.timestamp || ''
           }));
 
           // Crear libro de Excel

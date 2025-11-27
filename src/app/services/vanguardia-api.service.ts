@@ -87,7 +87,35 @@ export class VanguardiaApiService {
   // CLIENTES
   // Método para paginación server-side con filtros dinámicos
   getCustomers(params?: any): Observable<{items: any[], total: number}>{
-    const url = `${this.baseUrl}/vgd/customerfilter`;
+    const url = `${this.baseUrl}/vgd/customerfilter?ordertype=desc&orderby=timestamp_sales_force`;
+
+    const headers= new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+
+    // Construir parámetros de consulta si se proporcionan
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== null && params[key] !== undefined) {
+          httpParams = httpParams.set(key, params[key].toString());
+        }
+      });
+    }
+
+    return this.http.get<any>(url, { headers, params: httpParams }).pipe(
+      map(res => {
+        const items = res?.data?.data ?? [];
+        const total = res?.data?.total_rows ?? items.length; // Usar total_rows de la API
+        return { items, total };
+      })
+    );
+  }
+
+
+  ///SERVCIOS
+  getServices(params?: any): Observable<{items: any[], total: number}>{
+    const url = `${this.baseUrl}/vgd/servicefilter`;
 
     const headers= new HttpHeaders()
       .set('Content-Type', 'application/json')
