@@ -25,7 +25,14 @@ export class CustomerTableComponent implements OnInit {
   currentPageSize = 5; // Mantenemos el pageSize actual
 
   ///filtros
-  currentFilters: { idAgency?: string } = {};
+  currentFilters: {
+    idAgency?: string;
+    mail?: string;
+    mobile_phone?: string;
+    sendedSalesForce?: '1' | '0';
+    insertado?: boolean;
+    error?: boolean;
+  } = {};
   isDownloadingExcel = false;
 
   // Columnas para tabla de clientes
@@ -58,7 +65,14 @@ export class CustomerTableComponent implements OnInit {
   ];
 
   get hasActiveFilters(): boolean {
-    return !!this.currentFilters.idAgency;
+    return !!(
+      this.currentFilters.idAgency ||
+      this.currentFilters.mail ||
+      this.currentFilters.mobile_phone ||
+      this.currentFilters.sendedSalesForce ||
+      this.currentFilters.insertado ||
+      this.currentFilters.error
+    );
   }
 
   constructor(private vanguardiaApi: VanguardiaApiService) {}
@@ -79,6 +93,11 @@ export class CustomerTableComponent implements OnInit {
 
     // Map current filters to params
     if (this.currentFilters.idAgency) params.idAgency = this.currentFilters.idAgency;
+    if (this.currentFilters.mail) params.mail = this.currentFilters.mail;
+    if (this.currentFilters.mobile_phone) params.mobile_phone = this.currentFilters.mobile_phone;
+    if (this.currentFilters.sendedSalesForce) params.sendedSalesForce = this.currentFilters.sendedSalesForce;
+    if (this.currentFilters.insertado) params.insertCorrect = '1';
+    if (this.currentFilters.error) params.insertCorrect = '0';
 
     // Usar getCustomers con parámetros (server-side pagination)
     this.vanguardiaApi.getCustomers(params).subscribe({
@@ -97,7 +116,14 @@ export class CustomerTableComponent implements OnInit {
     });
   }
 
-  applyFilter(filters: { idAgency?: string }): void {
+  applyFilter(filters: {
+    idAgency?: string;
+    mail?: string;
+    mobile_phone?: string;
+    sendedSalesForce?: '1' | '0';
+    insertado?: boolean;
+    error?: boolean;
+  }): void {
     //guardar filtros y reiniciar a primera página
     this.currentFilters = { ...filters };
     this.pageIndex = 0;
@@ -125,6 +151,16 @@ export class CustomerTableComponent implements OnInit {
     // Aplicar los mismos filtros que están actualmente activos
     if (this.currentFilters.idAgency)
       baseParams.idAgency = this.currentFilters.idAgency;
+    if (this.currentFilters.mail)
+      baseParams.mail = this.currentFilters.mail;
+    if (this.currentFilters.mobile_phone)
+      baseParams.mobile_phone = this.currentFilters.mobile_phone;
+    if (this.currentFilters.sendedSalesForce)
+      baseParams.sendedSalesForce = this.currentFilters.sendedSalesForce;
+    if (this.currentFilters.insertado)
+      baseParams.insertCorrect = '1';
+    if (this.currentFilters.error)
+      baseParams.insertCorrect = '0';
 
     // Crear array de observables para todas las páginas
     const pageRequests = [];

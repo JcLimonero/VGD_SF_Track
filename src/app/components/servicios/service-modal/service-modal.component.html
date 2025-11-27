@@ -1,0 +1,59 @@
+<h2 mat-dialog-title class="title">Detalles del Servicio</h2>
+
+<mat-dialog-content class="mat-typography">
+  <div class="service-details">
+    <div class="detail-row">
+      <strong>Nombre de Agencia:</strong> {{ data?.agencyName || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Orden DMS:</strong> {{ data?.order_dms || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Fecha de Servicio:</strong> {{ data?.service_date || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Tipo de Servicio:</strong> {{ data?.service_type || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Monto:</strong> {{ data?.amount ? '$' + data.amount : 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>VIN:</strong> {{ data?.vin || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Kilometraje:</strong> {{ data?.km || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Estado:</strong> {{ data?.status || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Etapa:</strong> {{ data?.stage_name || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Enviado a Salesforce:</strong> {{ getSalesForceStatus() }}
+    </div>
+    <div class="detail-row">
+      <strong>ID Salesforce:</strong> {{ data?.idSalesForce || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Resultado SF:</strong> {{ data?.resultSF || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Insertado Correctamente:</strong> {{ data?.insertCorrect === '1' ? 'Sí' : 'No' }}
+    </div>
+    <div class="detail-row">
+      <strong>Timestamp DMS:</strong> {{ data?.timestamp_dms || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Timestamp:</strong> {{ data?.timestamp || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Timestamp Salesforce:</strong> {{ data?.timestamp_sales_force || 'N/A' }}
+    </div>
+
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onClose()">Cerrar</button>
+</mat-dialog-actions>

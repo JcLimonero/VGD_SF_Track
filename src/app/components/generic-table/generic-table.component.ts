@@ -7,6 +7,7 @@ import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angu
 import { TableColumn } from '../../../@vex/interfaces/table-column.interface';
 import { InventoryModalComponent } from '../inventory/inventory-modal/inventory-modal.component';
 import { CustomerModalComponent } from '../customer/customer-modal/customer-modal.component';
+import { ServiceModalComponent } from '../servicios/service-modal/service-modal.component';
 @Component({
   selector: 'vex-generic-table',
   standalone: true,
@@ -224,12 +225,15 @@ export class GenericTableComponent implements OnInit, OnChanges {
 
   openModal(rowData: any) {    
     // Detectar el tipo de datos
+    const isServiceData = this.isServiceData(rowData);
     const isInventoryData = this.isInventoryData(rowData);
     const isCustomerData = this.isCustomerData(rowData);
     
     // Seleccionar el componente de modal apropiado
-    let modalComponent;
-    if (isCustomerData) {
+    let modalComponent: any;
+    if (isServiceData) {
+      modalComponent = ServiceModalComponent;
+    } else if (isCustomerData) {
       modalComponent = CustomerModalComponent;
     } else if (isInventoryData) {
       modalComponent = InventoryModalComponent;
@@ -257,6 +261,12 @@ export class GenericTableComponent implements OnInit, OnChanges {
   // Metodo para detectar si los datos son de cliente
   private isCustomerData(data: any): boolean {
     return !!(data?.ndClientDMS || data?.bussines_name);
+  }
+
+  // Metodo para detectar si los datos son de servicio
+  private isServiceData(data: any): boolean {
+    return !!(data?.service_type || data?.service_date || 
+             (data?.order_dms && !data?.invoice_reference && !data?.brand));
   }
 
   openJsonModal(rowData: any) {

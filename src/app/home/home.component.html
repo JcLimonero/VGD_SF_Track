@@ -25,9 +25,12 @@
     <vex-inventory-table #inventoryTable></vex-inventory-table>
   </div>
 
-  <div *ngIf="activeTab === 'services'" class="p-8 text-center">
-    <h2 class="text-2xl font-bold text-gray-600">Sección de Servicios</h2>
-    <p class="text-gray-500 mt-4">Funcionalidad próximamente...</p>
+  <div *ngIf="activeTab === 'services'">
+    <vex-service-filter (filterChange)="handleServiceFilter($event)"
+                       (downloadRequested)="handleServiceDownload()"
+                       [isDownloadingExcel]="serviceTable?.isDownloadingExcel || false">
+    </vex-service-filter>
+    <vex-service-table #serviceTable></vex-service-table>
   </div>
 
   <div *ngIf="activeTab === 'clients'">

@@ -9,6 +9,8 @@ import { InventoryTableComponent } from '../components/inventory/inventory-table
 import { InventoryFilterComponent } from "../components/inventory/inventory-filter/inventory-filter.component";
 import { CustomerTableComponent } from '../components/customer/customer-table/customer-table.component';
 import { CustomerFilterComponent } from '../components/customer/customer-filter/customer-filter.component';
+import { ServiceTableComponent } from '../components/servicios/service-table/service-table.component';
+import { ServiceFilterComponent } from '../components/servicios/service-filter/service-filter.component';
 @Component({
   selector: 'vex-home',
   standalone: true,
@@ -22,7 +24,9 @@ import { CustomerFilterComponent } from '../components/customer/customer-filter/
     InventoryTableComponent,
     InventoryFilterComponent,
     CustomerTableComponent,
-    CustomerFilterComponent
+    CustomerFilterComponent,
+    ServiceTableComponent,
+    ServiceFilterComponent
 ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
@@ -32,6 +36,7 @@ export class HomeComponent {
   @ViewChild('invoiceTable') invoiceTable!: InvoiceTableComponent;
   @ViewChild('inventoryTable') inventoryTable!: InventoryTableComponent;
   @ViewChild('customerTable') customerTable!: CustomerTableComponent;
+  @ViewChild('serviceTable') serviceTable!: ServiceTableComponent;
   
   activeTab = 'orders'; // Tab activo por defecto: Ordenes
 
@@ -88,6 +93,23 @@ export class HomeComponent {
       this.customerTable.applyFilter(filters);
     } else {
       console.warn('customerTable no disponible aún o no tiene applyFilter');
+    }
+  }
+
+  handleServiceFilter(filters: any) {
+    console.log('Home -> service filter recibido:', filters);
+    if (this.serviceTable && this.serviceTable.applyFilter) {
+      this.serviceTable.applyFilter(filters);
+    } else {
+      console.warn('serviceTable no disponible aún o no tiene applyFilter');
+    }
+  }
+
+  handleServiceDownload(): void {
+    if (this.serviceTable && this.serviceTable.downloadExcel) {
+      this.serviceTable.downloadExcel();
+    } else {
+      console.warn('serviceTable no disponible aún o no tiene downloadExcel');
     }
   }
 }

@@ -14,6 +14,11 @@ export class CustomerFilterComponent {
 
   @Output() filterChange = new EventEmitter<{
     idAgency?: string;
+    mail?: string;
+    mobile_phone?: string;
+    sendedSalesForce?: '1' | '0';
+    insertado?: boolean;
+    error?: boolean;
   }>();
 
   /** Emitted when the user requests to download the Excel file */
@@ -29,7 +34,12 @@ export class CustomerFilterComponent {
 
   constructor(private fb: FormBuilder, private vanguardiaApi: VanguardiaApiService) {
     this.filterForm = this.fb.group({
-      idAgency: ['']
+      idAgency: [''],
+      mail: [''],
+      mobile_phone: [''],
+      sendedSalesForce: [''],
+      insertado: [false],
+      error: [false]
     });
   }
 
@@ -64,13 +74,23 @@ export class CustomerFilterComponent {
   }
 
   onFilter(): void {
-    const { idAgency } = this.filterForm
+    const { idAgency, mail, mobile_phone, sendedSalesForce, insertado, error } = this.filterForm
       .value as {
       idAgency?: string;
+      mail?: string;
+      mobile_phone?: string;
+      sendedSalesForce?: string;
+      insertado?: boolean;
+      error?: boolean;
     };
 
     const payload = {
       idAgency,
+      mail,
+      mobile_phone,
+      sendedSalesForce: sendedSalesForce ? (sendedSalesForce as '1' | '0') : undefined,
+      insertado,
+      error,
     };
     this.filterChange.emit(payload);
   }
@@ -81,11 +101,21 @@ export class CustomerFilterComponent {
     this.selectedAgencyId = '';
     this.filterForm.reset({
       idAgency: '',
+      mail: '',
+      mobile_phone: '',
+      sendedSalesForce: '',
+      insertado: false,
+      error: false
     });
 
     // Emitir filtros vacíos para que la tabla se resetee
     const emptyPayload = {
       idAgency: undefined,
+      mail: undefined,
+      mobile_phone: undefined,
+      sendedSalesForce: undefined,
+      insertado: false,
+      error: false,
     };
 
     this.filterChange.emit(emptyPayload);
@@ -100,6 +130,26 @@ export class CustomerFilterComponent {
       setTimeout(() => {
         details.open = false;
       });
+    }
+  }
+
+  onSfToggle(value: '1' | '0', event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    if (!input) return;
+    const current = this.filterForm.get('sendedSalesForce')?.value as string;
+    // If unchecking the currently selected value, clear; otherwise set the new value
+    const next = input.checked ? value : current === value ? '' : current;
+    this.filterForm.patchValue({ sendedSalesForce: next }, { emitEvent: false });
+  }
+
+  onInsertToggle(kind: 'insertado' | 'error', event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    if (!input) return;
+    if (kind === 'insertado' && input.checked) {
+      this.filterForm.patchValue({ error: false }, { emitEvent: false });
+    }
+    if (kind === 'error' && input.checked) {
+      this.filterForm.patchValue({ insertado: false }, { emitEvent: false });
     }
   }
 }
