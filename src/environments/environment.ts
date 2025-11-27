@@ -4,6 +4,6 @@ export const environment = {
     // baseUrl: 'https://192.168.190.140:400',
     baseUrl: 'https://apisvanguardia.com:400',
     providerTokenHeader: 'X-Provider-Token',
-    providerTokenValue: 'b26e88c4-ddbe-4adb-a214-4667f454824a'
+    providerTokenValue: '989b9313-0fd0-48ac-84be-4f9215cb170b'
   }
 };
