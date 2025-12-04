@@ -54,7 +54,14 @@
             </span>
           </span>
         </ng-container>
-        <ng-container *ngIf="col.type !== 'button' && col.property !== 'sendedSalesForce' && col.property !== 'resultSF'">
+        <ng-container *ngIf="col.property === 'updateStatus'">
+          <span class="update-status-icon" [style.color]="getUpdateStatusColor(element)">
+            <span class="material-symbols-outlined">
+              nest_clock_farsight_analog
+            </span>
+          </span>
+        </ng-container>
+        <ng-container *ngIf="col.type !== 'button' && col.property !== 'sendedSalesForce' && col.property !== 'resultSF' && col.property !== 'updateStatus'">
           {{ cellValue(element, col.property) }}
         </ng-container>
       </td>

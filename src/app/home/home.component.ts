@@ -11,6 +11,8 @@ import { CustomerTableComponent } from '../components/customer/customer-table/cu
 import { CustomerFilterComponent } from '../components/customer/customer-filter/customer-filter.component';
 import { ServiceTableComponent } from '../components/servicios/service-table/service-table.component';
 import { ServiceFilterComponent } from '../components/servicios/service-filter/service-filter.component';
+import { DwhTableComponent } from '../components/dwh/dwh-table/dwh-table.component';
+import { DwhFiltersComponent } from '../components/dwh/dwh-filters/dwh-filters.component';
 @Component({
   selector: 'vex-home',
   standalone: true,
@@ -26,7 +28,9 @@ import { ServiceFilterComponent } from '../components/servicios/service-filter/s
     CustomerTableComponent,
     CustomerFilterComponent,
     ServiceTableComponent,
-    ServiceFilterComponent
+    ServiceFilterComponent,
+    DwhTableComponent,
+    DwhFiltersComponent
 ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
@@ -37,6 +41,7 @@ export class HomeComponent {
   @ViewChild('inventoryTable') inventoryTable!: InventoryTableComponent;
   @ViewChild('customerTable') customerTable!: CustomerTableComponent;
   @ViewChild('serviceTable') serviceTable!: ServiceTableComponent;
+  @ViewChild('dwhTable') dwhTable!: DwhTableComponent;
   
   activeTab = 'orders'; // Tab activo por defecto: Ordenes
 
@@ -110,6 +115,23 @@ export class HomeComponent {
       this.serviceTable.downloadExcel();
     } else {
       console.warn('serviceTable no disponible aún o no tiene downloadExcel');
+    }
+  }
+
+  handleDwhFilter(filters: any) {
+    console.log('Home -> DWH filter recibido:', filters);
+    if (this.dwhTable && this.dwhTable.applyFilter) {
+      this.dwhTable.applyFilter(filters);
+    } else {
+      console.warn('dwhTable no disponible aún o no tiene applyFilter');
+    }
+  }
+
+  handleDwhDownload(): void {
+    if (this.dwhTable && this.dwhTable.downloadExcel) {
+      this.dwhTable.downloadExcel();
+    } else {
+      console.warn('dwhTable no disponible aún o no tiene downloadExcel');
     }
   }
 }
