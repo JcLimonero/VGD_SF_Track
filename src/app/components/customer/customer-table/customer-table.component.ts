@@ -34,6 +34,7 @@ export class CustomerTableComponent implements OnInit {
     error?: boolean;
   } = {};
   isDownloadingExcel = false;
+  currentSort: { column: string; direction: 'asc' | 'desc' } | null = { column: 'timestamp_sales_force', direction: 'desc' };
 
   // Columnas para tabla de clientes
   columns: TableColumn<any>[] = [
@@ -99,6 +100,12 @@ export class CustomerTableComponent implements OnInit {
     if (this.currentFilters.insertado) params.insertCorrect = '1';
     if (this.currentFilters.error) params.insertCorrect = '0';
 
+    // Agregar ordenamiento si existe
+    if (this.currentSort && this.currentSort.column) {
+      params.orderby = this.currentSort.column;
+      params.ordertype = this.currentSort.direction;
+    }
+
     // Usar getCustomers con parámetros (server-side pagination)
     this.vanguardiaApi.getCustomers(params).subscribe({
       next: (res) => {
@@ -126,6 +133,17 @@ export class CustomerTableComponent implements OnInit {
   }): void {
     //guardar filtros y reiniciar a primera página
     this.currentFilters = { ...filters };
+    this.pageIndex = 0;
+    this.loadPage(this.pageIndex, this.defaultPageSize);
+  }
+
+  onSortChange(sort: { column: string; direction: 'asc' | 'desc' }): void {
+    console.log('Ordenamiento Customer cambiado:', sort);
+    if (!sort.column) {
+      this.currentSort = null;
+    } else {
+      this.currentSort = sort;
+    }
     this.pageIndex = 0;
     this.loadPage(this.pageIndex, this.defaultPageSize);
   }

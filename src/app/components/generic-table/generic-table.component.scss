@@ -168,8 +168,11 @@ th.mat-column-sf_link {
   font-size: 25px;
   line-height: 1;
 }
-.status-badge.sent .material-symbols-outlined { color: #16a34a; } /* green */
-.status-badge.not-sent .material-symbols-outlined { color: #dc2626; } /* red */
+.status-badge.sent .material-symbols-outlined { color: #16a34a; } /* green - para EnvioSF */
+.status-badge.not-sent .material-symbols-outlined { color: #dc2626; } /* red - para EnvioSF */
+.status-badge.success .material-symbols-outlined { color: #16a34a; } /* green - para EstadoSF */
+.status-badge.warning .material-symbols-outlined { color: #f97316; } /* orange - para EstadoSF */
+.status-badge.error .material-symbols-outlined { color: #dc2626; } /* red - para EstadoSF */
 
 /* Update status icon - DWH table */
 .update-status-icon {
@@ -178,7 +181,7 @@ th.mat-column-sf_link {
   justify-content: center;
   
   .material-symbols-outlined {
-    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     font-size: 28px;
     line-height: 1;
   }
@@ -188,6 +191,21 @@ td.mat-column-updateStatus,
 th.mat-column-updateStatus {
   width: 80px;
   text-align: center;
+}
+
+/* Truncated text for OemLeadId */
+.truncated-text {
+  display: inline-block;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+td.mat-column-OemLeadId,
+th.mat-column-OemLeadId {
+  min-width: 150px;
+  max-width: 170px;
 }
 
 /* Custom pagination styles */

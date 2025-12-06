@@ -49,4 +49,12 @@
     <vex-dwh-table #dwhTable></vex-dwh-table>
   </div>
 
+  <div *ngIf="activeTab === 'leads'">
+    <vex-leads-filter (filterChange)="handleLeadsFilter($event)"
+                      (downloadRequested)="handleLeadsDownload()"
+                      [isDownloadingExcel]="leadsTable?.isDownloadingExcel || false">
+    </vex-leads-filter>
+    <vex-leads-table #leadsTable></vex-leads-table>
+  </div>
+
 </vex-page-layout>

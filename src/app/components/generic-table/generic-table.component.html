@@ -47,10 +47,12 @@
         </ng-container>
         <ng-container *ngIf="col.property === 'resultSF'">
           <span class="status-badge" 
-                [ngClass]="isResultSFSuccess(element) ? 'sent' : 'not-sent'"
-                [title]="cellValue(element, col.property)">
+                [ngClass]="getResultSFStatus(element)"
+                [title]="cellValue(element, col.property)"
+                [style.cursor]="getResultSFStatus(element) === 'error' ? 'pointer' : 'default'"
+                (click)="getResultSFStatus(element) === 'error' && copyErrorToClipboard(element)">
             <span class="material-symbols-outlined">
-              {{ isResultSFSuccess(element) ? 'check_circle' : 'error' }}
+              {{ getResultSFStatus(element) === 'success' ? 'check_circle' : (getResultSFStatus(element) === 'warning' ? 'warning' : 'error') }}
             </span>
           </span>
         </ng-container>
@@ -61,7 +63,12 @@
             </span>
           </span>
         </ng-container>
-        <ng-container *ngIf="col.type !== 'button' && col.property !== 'sendedSalesForce' && col.property !== 'resultSF' && col.property !== 'updateStatus'">
+        <ng-container *ngIf="col.property === 'OemLeadId'">
+          <span class="truncated-text" [title]="cellValue(element, col.property)">
+            {{ cellValue(element, col.property) }}
+          </span>
+        </ng-container>
+        <ng-container *ngIf="col.type !== 'button' && col.property !== 'sendedSalesForce' && col.property !== 'resultSF' && col.property !== 'updateStatus' && col.property !== 'OemLeadId'">
           {{ cellValue(element, col.property) }}
         </ng-container>
       </td>

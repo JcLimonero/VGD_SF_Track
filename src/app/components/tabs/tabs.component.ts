@@ -24,6 +24,7 @@ export class TabsComponent {
     { id: 'inventory', label: 'Inventario', icon: 'inventory' },
     { id: 'services', label: 'Servicios', icon: 'car_repair' },
     { id: 'clients', label: 'Clientes', icon: 'group' },
+    { id: 'leads', label: 'Leads', icon: 'database' },
     { id: 'dwh', label: 'DWH', icon: 'database' }
   ];
 

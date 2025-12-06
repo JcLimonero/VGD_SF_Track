@@ -1,14 +1,14 @@
-<!-- Mensaje de carga inicial -->
-<div *ngIf="loading && (!data || data.length === 0)" class="flex justify-center items-center p-8">
+<!-- Mensaje de carga -->
+<div *ngIf="loading" class="flex justify-center items-center p-8">
   <div class="text-center">
     <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
     <p class="mt-2 text-gray-600">Cargando órdenes...</p>
   </div>
 </div>
 
-<!-- Tabla SIEMPRE visible una vez que hay datos -->
+<!-- Tabla visible cuando no está cargando -->
 <vex-generic-table
-	*ngIf="!loading || (data && data.length > 0)"
+	*ngIf="!loading"
 	[columns]="columns"
 	[displayedColumns]="displayedColumns"
 	[data]="data"

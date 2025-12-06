@@ -30,6 +30,7 @@ export class DwhTableComponent implements OnInit {
     type?: string;
   } = {};
   isDownloadingExcel = false;
+  currentSort: { column: string; direction: 'asc' | 'desc' } | null = { column: 'colDate', direction: 'desc' };
 
   // Columnas para tabla de DWH
   columns: TableColumn<any>[] = [
@@ -89,6 +90,12 @@ export class DwhTableComponent implements OnInit {
     if (this.currentFilters.idAgency) params.idAgency = this.currentFilters.idAgency;
     if (this.currentFilters.type) params.type = this.currentFilters.type;
 
+    // Agregar ordenamiento si existe
+    if (this.currentSort && this.currentSort.column) {
+      params.orderby = this.currentSort.column;
+      params.ordertype = this.currentSort.direction;
+    }
+
     // Usar getDWH con parámetros (server-side pagination)
     this.vanguardiaApi.getDWH(params).subscribe({
       next: (res) => {
@@ -111,6 +118,19 @@ export class DwhTableComponent implements OnInit {
   }): void {
     //guardar filtros y reiniciar a primera página
     this.currentFilters = { ...filters };
+    this.pageIndex = 0;
+    this.loadPage(this.pageIndex, this.defaultPageSize);
+  }
+
+  onSortChange(sort: { column: string; direction: 'asc' | 'desc' }): void {
+    console.log('Ordenamiento DWH cambiado:', sort);
+    // Si column está vacío, resetear ordenamiento
+    if (!sort.column) {
+      this.currentSort = null;
+    } else {
+      this.currentSort = sort;
+    }
+    // Siempre ir a página 1 al cambiar o resetear ordenamiento
     this.pageIndex = 0;
     this.loadPage(this.pageIndex, this.defaultPageSize);
   }
