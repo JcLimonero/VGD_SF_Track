@@ -8,6 +8,7 @@ import { TableColumn } from '../../../@vex/interfaces/table-column.interface';
 import { InventoryModalComponent } from '../inventory/inventory-modal/inventory-modal.component';
 import { CustomerModalComponent } from '../customer/customer-modal/customer-modal.component';
 import { ServiceModalComponent } from '../servicios/service-modal/service-modal.component';
+import { LeadsModalComponent } from '../leads/leads-modal/leads-modal.component';
 @Component({
   selector: 'vex-generic-table',
   standalone: true,
@@ -160,7 +161,11 @@ export class GenericTableComponent implements OnInit, OnChanges {
   }
 
   isSortable(column: string): boolean {
-    return column === 'order_dms' || column === 'timestamp_sales_force' || column === 'billing_date';
+    return column === 'order_dms' || 
+           column === 'timestamp_sales_force' || 
+           column === 'billing_date' || 
+           column === 'colDate' || 
+           column === 'timestamp_dms';
   }
 
   cellValue(row: any, property: string) {
@@ -180,23 +185,27 @@ export class GenericTableComponent implements OnInit, OnChanges {
     return words.slice(0, wordLimit).join(' ') + '...';
   }
 
-  isResultSFSuccess(element: any): boolean {
-    // Verificar el campo insertCorrect para determinar éxito/error
+  getResultSFStatus(element: any): 'success' | 'warning' | 'error' {
+    const sendedSalesForce = this.cellValue(element, 'sendedSalesForce');
     const insertCorrectValue = this.cellValue(element, 'insertCorrect');
     
-    // insertCorrect = '1' o 1 = éxito (ícono verde)
-    // insertCorrect = '0' o 0 = error (ícono rojo)
+    // Prioridad 1: Si no se ha enviado a Salesforce (sendedSalesForce = 0)
+    if (sendedSalesForce === '0' || sendedSalesForce === 0) {
+      return 'warning';
+    }
+    
+    // Prioridad 2: Si se envió y fue exitoso (insertCorrect = 1)
     if (insertCorrectValue === '1' || insertCorrectValue === 1) {
-      return true;
+      return 'success';
     }
     
+    // Prioridad 3: Si se envió pero hubo error (insertCorrect = 0)
     if (insertCorrectValue === '0' || insertCorrectValue === 0) {
-      return false;
+      return 'error';
     }
     
-    // Fallback: si no existe insertCorrect, usar valor truthy del resultSF
-    const resultValue = this.cellValue(element, 'resultSF');
-    return !!resultValue;
+    // Fallback: warning si no hay información clara
+    return 'warning';
   }
 
   isSalesForceAvailable(element: any): boolean {
@@ -208,6 +217,35 @@ export class GenericTableComponent implements OnInit, OnChanges {
     const hasIdSalesForce = idSalesForce && idSalesForce !== null && idSalesForce !== '';
     
     return isSuccess && hasIdSalesForce;
+  }
+
+  copyErrorToClipboard(element: any): void {
+    const errorMessage = this.cellValue(element, 'resultSF');
+    if (!errorMessage) return;
+
+    // Usar la API del Clipboard si está disponible
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(errorMessage).then(() => {
+        console.log('Error copiado al portapapeles:', errorMessage);
+      }).catch(err => {
+        console.error('Error al copiar al portapapeles:', err);
+      });
+    } else {
+      // Fallback para navegadores antiguos o contextos no seguros
+      const textArea = document.createElement('textarea');
+      textArea.value = errorMessage;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        console.log('Error copiado al portapapeles (fallback):', errorMessage);
+      } catch (err) {
+        console.error('Error al copiar al portapapeles (fallback):', err);
+      }
+      document.body.removeChild(textArea);
+    }
   }
 
   getUpdateStatusColor(element: any): string {
@@ -243,13 +281,16 @@ export class GenericTableComponent implements OnInit, OnChanges {
 
   openModal(rowData: any) {    
     // Detectar el tipo de datos
+    const isLeadsData = this.isLeadsData(rowData);
     const isServiceData = this.isServiceData(rowData);
     const isInventoryData = this.isInventoryData(rowData);
     const isCustomerData = this.isCustomerData(rowData);
     
     // Seleccionar el componente de modal apropiado
     let modalComponent: any;
-    if (isServiceData) {
+    if (isLeadsData) {
+      modalComponent = LeadsModalComponent;
+    } else if (isServiceData) {
       modalComponent = ServiceModalComponent;
     } else if (isCustomerData) {
       modalComponent = CustomerModalComponent;
@@ -285,6 +326,11 @@ export class GenericTableComponent implements OnInit, OnChanges {
   private isServiceData(data: any): boolean {
     return !!(data?.service_type || data?.service_date || 
              (data?.order_dms && !data?.invoice_reference && !data?.brand));
+  }
+
+  // Metodo para detectar si los datos son de leads
+  private isLeadsData(data: any): boolean {
+    return !!(data?.LeadNo || data?.OemLeadId || data?.FullName);
   }
 
   openJsonModal(rowData: any) {

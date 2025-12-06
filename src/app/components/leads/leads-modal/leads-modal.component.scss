@@ -1,0 +1,30 @@
+    .title{
+      text-decoration: underline;
+      text-decoration-color: #FF5C20;
+      text-decoration-thickness: 3px;
+      align-self: center;
+    }
+
+    .inventory-details {
+      max-height: 400px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .detail-row {
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-row strong {
+      color: #1b1a1aff;
+      margin-right: 8px;
+    }
+mat-dialog-content {
+  max-height: 500px;
+  overflow-y: auto;
+}

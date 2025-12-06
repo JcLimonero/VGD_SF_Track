@@ -13,6 +13,8 @@ import { ServiceTableComponent } from '../components/servicios/service-table/ser
 import { ServiceFilterComponent } from '../components/servicios/service-filter/service-filter.component';
 import { DwhTableComponent } from '../components/dwh/dwh-table/dwh-table.component';
 import { DwhFiltersComponent } from '../components/dwh/dwh-filters/dwh-filters.component';
+import { LeadsTableComponent } from '../components/leads/leads-table/leads-table.component';
+import { LeadsFilterComponent } from '../components/leads/leads-filter/leads-filter.component';
 @Component({
   selector: 'vex-home',
   standalone: true,
@@ -30,7 +32,9 @@ import { DwhFiltersComponent } from '../components/dwh/dwh-filters/dwh-filters.c
     ServiceTableComponent,
     ServiceFilterComponent,
     DwhTableComponent,
-    DwhFiltersComponent
+    DwhFiltersComponent,
+    LeadsTableComponent,
+    LeadsFilterComponent
 ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
@@ -42,6 +46,7 @@ export class HomeComponent {
   @ViewChild('customerTable') customerTable!: CustomerTableComponent;
   @ViewChild('serviceTable') serviceTable!: ServiceTableComponent;
   @ViewChild('dwhTable') dwhTable!: DwhTableComponent;
+  @ViewChild('leadsTable') leadsTable!: LeadsTableComponent;
   
   activeTab = 'orders'; // Tab activo por defecto: Ordenes
 
@@ -132,6 +137,23 @@ export class HomeComponent {
       this.dwhTable.downloadExcel();
     } else {
       console.warn('dwhTable no disponible aún o no tiene downloadExcel');
+    }
+  }
+
+  handleLeadsFilter(filters: any) {
+    console.log('Home -> Leads filter recibido:', filters);
+    if (this.leadsTable && this.leadsTable.applyFilter) {
+      this.leadsTable.applyFilter(filters);
+    } else {
+      console.warn('leadsTable no disponible aún o no tiene applyFilter');
+    }
+  }
+
+  handleLeadsDownload(): void {
+    if (this.leadsTable && this.leadsTable.downloadExcel) {
+      this.leadsTable.downloadExcel();
+    } else {
+      console.warn('leadsTable no disponible aún o no tiene downloadExcel');
     }
   }
 }

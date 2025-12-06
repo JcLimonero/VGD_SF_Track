@@ -1,0 +1,93 @@
+<h2 mat-dialog-title class="title text-xl">Detalles del Lead</h2>
+
+<mat-dialog-content class="mat-typography">
+  <div class="inventory-details">
+    <!-- Información de Agencia -->
+    <div class="detail-row">
+      <strong>Agencia:</strong> {{ data?.agencyName || 'N/A' }}
+    </div>
+    
+    <!-- Información del Lead -->
+    <div class="detail-row">
+      <strong>Lead No:</strong> {{ data?.LeadNo || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>OEM Lead ID:</strong> {{ data?.OemLeadId || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Nombre Completo:</strong> {{ data?.FullName || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Nombre:</strong> {{ data?.FirstName || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Apellido:</strong> {{ data?.LastName || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Saludo:</strong> {{ data?.Salutation || 'N/A' }}
+    </div>
+    
+    <!-- Información de Contacto -->
+    <div class="detail-row">
+      <strong>Teléfono:</strong> {{ data?.Phone || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Email:</strong> {{ data?.Email || 'N/A' }}
+    </div>
+    
+    <!-- Información de Campaña y Vehículo -->
+    <div class="detail-row">
+      <strong>Campaña:</strong> {{ data?.Campaign || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>OEM:</strong> {{ data?.Oem || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Tipo:</strong> {{ data?.Type || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Fecha Límite:</strong> {{ data?.DueDate || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Marca:</strong> {{ data?.Brand || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Modelo:</strong> {{ data?.Model || 'N/A' }}
+    </div>
+    
+    <!-- Información de Salesforce -->
+    <div class="detail-row">
+      <strong>Enviado a Salesforce:</strong> {{ getSalesForceStatus() }}
+    </div>
+    <div class="detail-row">
+      <strong>ID Salesforce:</strong> {{ data?.idSalesForce || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Resultado SF:</strong> {{ data?.resultSF || 'N/A' }}
+    </div>
+    <div class="detail-row">
+      <strong>Insert Correcto:</strong> {{ data?.insertCorrect === '1' ? 'Sí' : 'No' }}
+    </div>
+    <div class="detail-row">
+      <strong>Intentos SF:</strong> {{ data?.sf_attempts || '0' }}
+    </div>
+    
+    <!-- Timestamps -->
+    <div class="detail-row">
+      <strong>Fecha DMS:</strong> {{ data?.timestamp_dms }}
+    </div>
+    <div class="detail-row">
+      <strong>Timestamp Salesforce:</strong> {{ data?.timestamp_sales_force }}
+    </div>
+    <div class="detail-row">
+      <strong>Timestamp:</strong> {{ data?.timestamp }}
+    </div>
+    <div class="detail-row">
+      <strong>Timestamp Hex:</strong> {{ data?.timestamp_hex || 'N/A' }}
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onClose()">Cerrar</button>
+</mat-dialog-actions>

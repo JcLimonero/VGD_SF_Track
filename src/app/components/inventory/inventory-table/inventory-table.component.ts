@@ -29,6 +29,7 @@ export class InventoryTableComponent implements OnInit {
   // Filtros activos
   currentFilters: { vin?: string; idAgency?: string; statusDescription?: string; typeDescription?: string; sendedSalesForce?: '1'|'0'; insertado?: boolean; error?: boolean } = {};
   isDownloadingExcel = false;
+  currentSort: { column: string; direction: 'asc' | 'desc' } | null = { column: 'timestamp_sales_force', direction: 'desc' };
   
   // Columnas para inventario
   columns: TableColumn<any>[] = [
@@ -89,6 +90,12 @@ export class InventoryTableComponent implements OnInit {
     if (this.currentFilters.insertado && !this.currentFilters.error) params.insertCorrect = '1';
     if (this.currentFilters.error && !this.currentFilters.insertado) params.insertCorrect = '0';
 
+    // Agregar ordenamiento si existe
+    if (this.currentSort && this.currentSort.column) {
+      params.orderby = this.currentSort.column;
+      params.ordertype = this.currentSort.direction;
+    }
+
     // Usar getInventory con parámetros (server-side pagination)
     this.vanguardiaApi.getInventory(params).subscribe({
       next: (res) => {
@@ -119,6 +126,19 @@ export class InventoryTableComponent implements OnInit {
     this.currentFilters = { ...filters };
     this.pageIndex = 0;
     this.loadPage(this.pageIndex, this.defaultPageSize);
+  }
+
+  /**
+   * Maneja el cambio de ordenamiento
+   */
+  onSortChange(sort: { column: string; direction: 'asc' | 'desc' } | null): void {
+    if (!sort || !sort.column) {
+      this.currentSort = null;
+    } else {
+      this.currentSort = sort;
+    }
+    this.pageIndex = 0;
+    this.loadPage(this.pageIndex, this.currentPageSize);
   }
 
   /**
