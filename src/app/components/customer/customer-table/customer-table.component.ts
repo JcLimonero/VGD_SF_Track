@@ -48,6 +48,7 @@ export class CustomerTableComponent implements OnInit {
     { property: 'resultSF',label: 'Estado SF',  type: 'text' },
     { property: 'sf_jsonRequest',label: 'Datos',  type: 'button' },
     { property: 'sf_link',label: 'Ver SF',  type: 'button' },
+    { property: 'resend',label: 'Reenviar',  type: 'button' },
     { property: 'actions', label: 'Detalles', type: 'button' }
   ];
 
@@ -62,6 +63,7 @@ export class CustomerTableComponent implements OnInit {
     'resultSF',
     'sf_jsonRequest',
     'sf_link',
+    'resend',
     'actions'
   ];
 
@@ -146,6 +148,29 @@ export class CustomerTableComponent implements OnInit {
     }
     this.pageIndex = 0;
     this.loadPage(this.pageIndex, this.defaultPageSize);
+  }
+
+
+  resendToSalesForce(row: any): void {
+    if (!row.id) {
+      alert('Error: No se encontró el ID del registro');
+      return;
+    }
+
+    const data = {
+      ...row,
+      sendedSalesForce: '0'
+    };
+
+    this.vanguardiaApi.updateCustomer(row.id, data).subscribe({
+      next: (response) => {
+        alert(`Cliente ${row.bussines_name} reenviado a Salesforce`);
+        this.loadPage(this.pageIndex, this.currentPageSize);
+      },
+      error: (error) => {
+        alert(`Error al actualizar: ${error.error?.message || 'Error desconocido'}`);
+      }
+    });
   }
 
   downloadExcel(): void {
