@@ -40,10 +40,11 @@ export class InvoiceTableComponent implements OnInit {
     { label: 'Estado SF', property: 'resultSF', type: 'text' },
     { label: 'Datos', property: 'sf_jsonRequest', type: 'button' },
     { label: 'Ver SF', property: 'sf_link', type: 'button' },
+    { property: 'resend',label: 'Reenviar',  type: 'button' },
     { label: 'Detalles', property: 'actions', type: 'button' }
   ];
 
-  displayedColumns: string[] = ['agencyName','order_dms', 'vin','billing_date','invoice_reference', 'sendedSalesForce', 'timestamp_sales_force', 'resultSF','sf_jsonRequest', 'sf_link', 'actions'];
+  displayedColumns: string[] = ['agencyName','order_dms', 'vin','billing_date','invoice_reference', 'sendedSalesForce', 'timestamp_sales_force', 'resultSF','sf_jsonRequest', 'sf_link','resend', 'actions'];
 
   constructor(private vanguardiaApi: VanguardiaApiService) {}
 
@@ -130,6 +131,28 @@ onSortChange(sort: { column: string; direction: 'asc' | 'desc' }): void {
   this.pageIndex = 0;
   this.loadPage(this.pageIndex, this.defaultPageSize);
 }
+
+  resendToSalesForce(row: any): void {
+    if (!row.Id) {
+      alert('Error: No se encontró el ID del registro');
+      return;
+    }
+
+    const data = {
+      ...row,
+      sendedSalesForce: '0'
+    };
+
+    this.vanguardiaApi.updateInvoice(row.Id, data).subscribe({
+      next: (response) => {
+        alert(`Orden ${row.order_dms} marcada para reenvío a Salesforce`);
+        this.loadPage(this.pageIndex, this.defaultPageSize);
+      },
+      error: (error) => {
+        alert(`Error al actualizar: ${error.error?.message || 'Error desconocido'}`);
+      }
+    });
+  }
 
   /**
    * Recarga los datos del inventario

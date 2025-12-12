@@ -84,6 +84,27 @@ export class VanguardiaApiService {
     );
   }
 
+
+  // Metodo para actualizar campo sendedSalesForce a 0
+  updateInventory(id: number, data: any): Observable<any> {
+  // Validacion id obligatoria
+    if (!id) {
+      throw new Error('ID es requerido para actualizar el inventario');
+    }
+
+    const url = `${this.baseUrl}/vgd/inventoryfilter/${id}`;
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', this.providerTokenValue);
+
+    return this.http.put<any>(url, data, { headers }).pipe(
+      map(res => {
+        return res;
+      })
+    );
+}
+
   // CLIENTES
   // Método para paginación server-side con filtros dinámicos
   getCustomers(params?: any): Observable<{items: any[], total: number}>{
@@ -194,9 +215,8 @@ export class VanguardiaApiService {
     );
   }
 
-  /**
-   * Obtiene las ordenes de venta desde /vgd/invoice con ordenamiento por defecto por fecha de facturación
-   */
+
+///INVOICES
   getInvoices(): Observable<any[]> {
     const url = `${this.baseUrl}/vgd/invoice?ordertype=desc&orderby=billing_date`;
 
@@ -209,6 +229,24 @@ export class VanguardiaApiService {
         return res?.data?.data ?? []; //devolver solo array
       })
     );
+  }
+
+  updateInvoice(id: number, data: any): Observable<any> {
+      if (!id) {
+        throw new Error('ID es requerido para actualizar el inventario');
+      }
+
+      const url = `${this.baseUrl}/vgd/invoice/${id}`;
+
+      const headers = new HttpHeaders()
+        .set('Content-Type', 'application/json')
+        .set('X-Provider-Token', this.providerTokenValue);
+
+      return this.http.put<any>(url, data, { headers }).pipe(
+        map(res => {
+          return res;
+        })
+      );
   }
 
   getInvoicesbyOrder_dms(order_dms:string): Observable<any[]> {

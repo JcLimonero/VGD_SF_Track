@@ -27,6 +27,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
   @Input() initialSort: { column: string; direction: 'asc' | 'desc' } | null = null; // Estado inicial de ordenamiento
   @Input() hasActiveFilters: boolean = false; // Indica si hay filtros activos
   @Input() onRow: ((row: any) => void) | null = null;
+  @Input() onResend: ((row: any) => void) | null = null; // Función para reenviar registro
   @Output() pageChanged = new EventEmitter<{ pageIndex: number; pageSize: number }>();
   @Output() sortChanged = new EventEmitter<{ column: string; direction: 'asc' | 'desc' }>();
   
