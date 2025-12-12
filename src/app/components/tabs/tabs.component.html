@@ -1,12 +1,12 @@
-<div class="flex justify-center px-[10rem] ">
-    <div class="tab w-full flex justify-center px-4 pt-4 pb-1 rounded-t-2xl bg-white">
-        <ul class=" w-full flex justify-between text-[1rem] text-[#848484]">
+<div class="flex justify-center px-4 sm:px-[10rem]">
+    <div class="tab w-full flex justify-center px-2 sm:px-4 pt-2 sm:pt-4 pb-1 rounded-t-2xl bg-white">
+        <ul class="w-full flex justify-between text-[0.75rem] sm:text-[1rem] text-[#848484]">
             <li *ngFor="let tab of tabs" 
-                class="flex flex-col items-center cursor-pointer transition-colors duration-200 hover:text-blue-600"
+                class="flex flex-col items-center cursor-pointer transition-colors duration-200 hover:text-blue-600 flex-1"
                 [class.active-tab]="isActive(tab.id)"
                 (click)="selectTab(tab.id)">
                 <span class="material-symbols-outlined icon-tab">{{ tab.icon }}</span>
-                <span>{{ tab.label }}</span>
+                <span class="text-center text-[0.65rem] sm:text-[1rem]">{{ tab.label }}</span>
             </li>
         </ul>
     </div>
