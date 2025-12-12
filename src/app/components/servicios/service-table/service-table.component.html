@@ -17,6 +17,7 @@
   [initialPageSize]="currentPageSize"
   [initialSort]="currentSort"
   [hasActiveFilters]="hasActiveFilters"
+  [onResend]="resendToSalesForce.bind(this)"
   (pageChanged)="loadPage($event.pageIndex, $event.pageSize)"
   (sortChanged)="onSortChange($event)">
 </vex-generic-table>

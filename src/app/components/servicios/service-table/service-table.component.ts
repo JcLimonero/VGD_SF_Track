@@ -39,7 +39,7 @@ export class ServiceTableComponent implements OnInit {
   // Columnas para tabla de servicios
   columns: TableColumn<any>[] = [
     { property: 'agencyName', label: 'Agencia', type: 'text' },
-    { property: 'order_dms', label: 'Orden', type: 'text' },
+    { property: 'order_dms', label: 'Número de orden', type: 'text' },
     { property: 'service_date', label: 'Fecha', type: 'text' },
     { property: 'service_type', label: 'Tipo', type: 'text' },
     { property: 'vin', label: 'VIN', type: 'text' },
@@ -48,6 +48,7 @@ export class ServiceTableComponent implements OnInit {
     { property: 'resultSF', label: 'Estado SF', type: 'text' },
     { property: 'sf_jsonRequest', label: 'Datos', type: 'button' },
     { property: 'sf_link', label: 'Ver SF', type: 'button' },
+    { property: 'resend',label: 'Reenviar',  type: 'button' },
     { property: 'actions', label: 'Detalles', type: 'button' }
   ];
 
@@ -62,6 +63,7 @@ export class ServiceTableComponent implements OnInit {
     'resultSF',
     'sf_jsonRequest',
     'sf_link',
+    'resend',
     'actions'
   ];
 
@@ -146,6 +148,28 @@ export class ServiceTableComponent implements OnInit {
     }
     this.pageIndex = 0;
     this.loadPage(this.pageIndex, this.defaultPageSize);
+  }
+
+  resendToSalesForce(row: any): void {
+    if (!row.Id) {
+      alert('Error: No se encontró el ID del registro');
+      return;
+    }
+
+    const data = {
+      ...row,
+      sendedSalesForce: '0'
+    };
+
+    this.vanguardiaApi.updateService(row.Id, data).subscribe({
+      next: (response) => {
+        alert(`Orden ${row.order_dms} marcado para reenvío a Salesforce`);
+        this.loadPage(this.pageIndex, this.currentPageSize);
+      },
+      error: (error) => {
+        alert(`Error al actualizar: ${error.error?.message || 'Error desconocido'}`);
+      }
+    });
   }
 
   downloadExcel(): void {

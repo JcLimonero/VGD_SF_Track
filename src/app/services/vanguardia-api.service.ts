@@ -103,7 +103,7 @@ export class VanguardiaApiService {
         return res;
       })
     );
-}
+  }
 
   // CLIENTES
   // Método para paginación server-side con filtros dinámicos
@@ -133,6 +133,24 @@ export class VanguardiaApiService {
     );
   }
 
+  updateCustomer(id: number, data: any): Observable<any> {
+  // Validacion id obligatoria
+    if (!id) {
+      throw new Error('ID es requerido para actualizar el inventario');
+    }
+
+    const url = `${this.baseUrl}/vgd/customerfilter/${id}`;
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', this.providerTokenValue);
+
+    return this.http.put<any>(url, data, { headers }).pipe(
+      map(res => {
+        return res;
+      })
+    );
+  }
 
   ///SERVCIOS
   getServices(params?: any): Observable<{items: any[], total: number}>{
@@ -157,6 +175,25 @@ export class VanguardiaApiService {
         const items = res?.data?.data ?? [];
         const total = res?.data?.total_rows ?? items.length; // Usar total_rows de la API
         return { items, total };
+      })
+    );
+  }
+
+  updateService(id: number, data: any): Observable<any> {
+  // Validacion id obligatoria
+    if (!id) {
+      throw new Error('ID es requerido para actualizar el inventario');
+    }
+
+    const url = `${this.baseUrl}/vgd/servicefilter/${id}`;
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', this.providerTokenValue);
+
+    return this.http.put<any>(url, data, { headers }).pipe(
+      map(res => {
+        return res;
       })
     );
   }
@@ -215,6 +252,23 @@ export class VanguardiaApiService {
     );
   }
 
+  updateLead(id: number, data: any): Observable<any> {
+    if (!id) {
+      throw new Error('ID es requerido para actualizar el inventario');
+    }
+
+    const url = `${this.baseUrl}/vgd/leadsfilter/${id}`;
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', this.providerTokenValue);
+
+    return this.http.put<any>(url, data, { headers }).pipe(
+      map(res => {
+        return res;
+      })
+    );
+  }
 
 ///INVOICES
   getInvoices(): Observable<any[]> {
