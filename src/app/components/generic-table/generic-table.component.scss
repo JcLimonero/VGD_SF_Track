@@ -111,6 +111,12 @@ th.mat-column-sf_link {
   text-align: center;
 }
 
+td.mat-column-resend,
+th.mat-column-resend {
+  width: 70px;
+  text-align: center;
+}
+
 .btn-info{
   background-color: transparent;
   border: none;
@@ -154,6 +160,25 @@ th.mat-column-sf_link {
   .material-symbols-outlined {
     font-size: 20px;
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+  }
+}
+
+.btn-resend {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #FF5C20;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    color: #d94a15;
+  }
+  
+  .material-symbols-outlined {
+    font-size: 25px;
+    // font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+    transition: transform 0.2s ease;
   }
 }
 

@@ -45,10 +45,11 @@ export class InventoryTableComponent implements OnInit {
     { property: 'resultSF',label: 'Estado SF',  type: 'text' },
     { property: 'sf_jsonRequest',label: 'Datos',  type: 'button' },
     { property: 'sf_link',label: 'Ver SF',  type: 'button' },
+    { property: 'resend',label: 'Reenviar',  type: 'button' },
     { property: 'actions',label: 'Detalles',  type: 'button' }
   ];
 
-  displayedColumns: string[] = ['agencyName', 'vin', 'statusDescription', 'typeDescription', 'brand', 'year', 'model','sendedSalesForce','timestamp_sales_force','resultSF', 'sf_jsonRequest', 'sf_link', 'actions'];
+  displayedColumns: string[] = ['agencyName', 'vin', 'statusDescription', 'typeDescription', 'brand', 'year', 'model','sendedSalesForce','timestamp_sales_force','resultSF', 'sf_jsonRequest', 'sf_link', 'resend', 'actions'];
 
   get hasActiveFilters(): boolean {
     return !!(
@@ -139,6 +140,34 @@ export class InventoryTableComponent implements OnInit {
     }
     this.pageIndex = 0;
     this.loadPage(this.pageIndex, this.currentPageSize);
+  }
+
+  /**
+   * Reenvía el registro a Salesforce actualizando sendedSalesForce a 0
+   */
+  resendToSalesForce(row: any): void {
+    if (!row.id) {
+      alert('Error: No se encontró el ID del registro');
+      return;
+    }
+
+    const data = {
+      ...row,
+      sendedSalesForce: '0',
+      insertCorrect: '0',
+      resultSF: '',
+      idSalesForce: null
+    };
+
+    this.vanguardiaApi.updateInventory(row.id, data).subscribe({
+      next: (response) => {
+        alert(`Vehículo ${row.vin} marcado para reenvío a Salesforce`);
+        this.loadPage(this.pageIndex, this.currentPageSize);
+      },
+      error: (error) => {
+        alert(`Error al actualizar: ${error.error?.message || 'Error desconocido'}`);
+      }
+    });
   }
 
   /**
