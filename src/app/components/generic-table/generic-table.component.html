@@ -47,9 +47,10 @@
         </ng-container>
         <ng-container *ngIf="col.property === 'resend' && col.type === 'button'">
           <button 
-            class="btn-resend" 
+            class="btn-resend"
+            [disabled]="!isSendAvailable(element)" 
             (click)="onResend ? onResend(element) : null"
-            title="Reenviar a Salesforce">
+            [title]="isSendAvailable(element) ? 'Reenviar a Salesforce' : 'Reenvío no disponible'">
             <span class="material-symbols-outlined">
               refresh
             </span>

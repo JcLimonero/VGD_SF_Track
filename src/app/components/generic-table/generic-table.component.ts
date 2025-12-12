@@ -220,6 +220,12 @@ export class GenericTableComponent implements OnInit, OnChanges {
     return isSuccess && hasIdSalesForce;
   }
 
+  isSendAvailable(element: any): boolean {
+    // Solo habilitado si sendedSalesForce = 1
+    const sendedSalesForceValue = this.cellValue(element, 'sendedSalesForce');
+    return sendedSalesForceValue === '1' || sendedSalesForceValue === 1;
+  }
+
   copyErrorToClipboard(element: any): void {
     const errorMessage = this.cellValue(element, 'resultSF');
     if (!errorMessage) return;
