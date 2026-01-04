@@ -6,9 +6,21 @@
   </div>
 </div>
 
-<!-- Tabla visible cuando no está cargando -->
+<!-- Mensaje de error -->
+<div *ngIf="error && !loading" class="no-data-message">
+  <div class="no-data-content">
+    <span class="material-symbols-outlined no-data-icon">error</span>
+    <h3 class="no-data-title">Error al cargar los datos</h3>
+    <p class="no-data-subtitle">
+      {{ error }}
+      <br>Recarga la página y si el error persiste contactar al administrador.
+    </p>
+  </div>
+</div>
+
+<!-- Tabla visible cuando no está cargando ni hay error -->
 <vex-generic-table
-  *ngIf="!loading"
+  *ngIf="!loading && !error"
   [columns]="columns"
   [displayedColumns]="displayedColumns"
   [data]="data"
