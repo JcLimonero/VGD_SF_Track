@@ -2,6 +2,25 @@ table.mat-table {
   width: 100%;
 }
 
+/* Wrapper para scroll horizontal en móvil */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  
+  @media (max-width: 768px) {
+    overflow-x: auto;
+    display: block;
+    width: 100%;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    
+    table {
+      min-width: 100%;
+      width: auto;
+    }
+  }
+}
+
 th.mat-header-cell {
   font-weight: 600;
   
