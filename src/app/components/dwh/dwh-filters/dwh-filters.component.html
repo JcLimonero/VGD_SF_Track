@@ -137,9 +137,10 @@
             (click)="downloadRequested.emit()"
             [disabled]="isDownloadingExcel"
             aria-label="Descargar Excel"
-            title="Descargar Excel"
+            [title]="isDownloadingExcel ? 'Descargando...' : 'Descargar Excel'"
           >
-            <img src="assets/img/excel.png" alt="Excel Icon" class="w-[36px] h-[36px]" />
+            <div *ngIf="isDownloadingExcel" class="spinner-small"></div>
+            <img *ngIf="!isDownloadingExcel" src="assets/img/excel.png" alt="Excel Icon" class="w-[36px] h-[36px]" />
           </button>
         </div>
     </div>

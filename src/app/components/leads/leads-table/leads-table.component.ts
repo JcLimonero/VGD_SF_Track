@@ -119,7 +119,7 @@ export class LeadsTableComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        this.error = 'Error al cargar Leads';
+        this.error = 'No se pudo cargar la información. Por favor, intenta de nuevo.';
         this.data = [];
         this.total = 0;
         this.loading = false;

@@ -104,7 +104,7 @@ loadPage(pageIndex: number, pageSize: number): void {
     },
     error: (err: any) => {
       console.error('Error al cargar inventario (paginado):', err);
-      this.error = 'Error al cargar los datos del inventario';
+      this.error = 'No se pudo cargar la información. Por favor, intenta de nuevo.';
       this.data = [];
       this.loading = false;
     }

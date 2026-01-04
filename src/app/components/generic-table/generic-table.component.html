@@ -59,7 +59,7 @@
         <ng-container *ngIf="col.property === 'resultSF'">
           <span class="status-badge" 
                 [ngClass]="getResultSFStatus(element)"
-                [title]="cellValue(element, col.property)"
+                [title]="getResultSFStatus(element) === 'warning' ? 'Estado desconocido' : cellValue(element, col.property)"
                 [style.cursor]="getResultSFStatus(element) === 'error' ? 'pointer' : 'default'"
                 (click)="getResultSFStatus(element) === 'error' && copyErrorToClipboard(element)">
             <span class="material-symbols-outlined">
