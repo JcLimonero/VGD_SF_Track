@@ -32,6 +32,7 @@ export class InvoiceTableComponent implements OnInit {
   columns: TableColumn<any>[] = [
     { label: 'Agencia', property: 'agencyName', type: 'text' },
     { label: 'Número de orden', property: 'order_dms', type: 'text' },
+    { label: 'Cliente DMS', property: 'ndClientDMS', type: 'text' },
     { label: 'VIN', property: 'vin', type: 'text' },
     { label: 'Fecha Facturación', property: 'billing_date', type: 'text' },
     { label: 'Referencia de venta', property: 'invoice_reference', type: 'text' },
@@ -44,7 +45,7 @@ export class InvoiceTableComponent implements OnInit {
     { label: 'Detalles', property: 'actions', type: 'button' }
   ];
 
-  displayedColumns: string[] = ['agencyName','order_dms', 'vin','billing_date','invoice_reference', 'sendedSalesForce', 'timestamp_sales_force', 'resultSF','sf_jsonRequest', 'sf_link','resend', 'actions'];
+  displayedColumns: string[] = ['agencyName','order_dms', 'ndClientDMS', 'vin','billing_date','invoice_reference', 'sendedSalesForce', 'timestamp_sales_force', 'resultSF','sf_jsonRequest', 'sf_link','resend', 'actions'];
 
   constructor(private vanguardiaApi: VanguardiaApiService) {}
 
@@ -231,6 +232,7 @@ onSortChange(sort: { column: string; direction: 'asc' | 'desc' }): void {
               // Campos básicos de identificación
               'Agencia': item.agencyName || '',
               'Número de Orden': item.order_dms || '',
+              'Cliente DMS': item.ndClientDMS || '',
               'Estado': item.state || '',
               'VIN': item.vin || '',
               
