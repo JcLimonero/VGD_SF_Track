@@ -24,6 +24,9 @@
     "paths": {
       "@vex/*": [
         "./src/@vex/*"
+      ],
+      "@testing/*": [
+        "./src/testing/*"
       ]
     }
   },

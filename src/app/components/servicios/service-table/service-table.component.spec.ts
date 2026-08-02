@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { httpTestProviders } from '@testing/test-providers';
 
 import { ServiceTableComponent } from './service-table.component';
 
@@ -8,7 +9,8 @@ describe('ServiceTableComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ServiceTableComponent]
+      imports: [ServiceTableComponent],
+      providers: httpTestProviders
     })
     .compileComponents();
     

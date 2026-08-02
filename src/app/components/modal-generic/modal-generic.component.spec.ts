@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { dialogTestProviders } from '@testing/test-providers';
 
 import { ModalGenericComponent } from './modal-generic.component';
 
@@ -8,7 +9,8 @@ describe('ModalGenericComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ModalGenericComponent]
+      imports: [ModalGenericComponent],
+      providers: dialogTestProviders()
     })
     .compileComponents();
     

@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Si se empuja varias veces al mismo PR, solo corre la ejecución más reciente.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Typecheck, tests y build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      # Karma usa el Chrome que descarga puppeteer (ver karma.conf.js), así no
+      # se depende de que el runner traiga un Chrome compatible preinstalado.
+      - name: Instalar Chrome para las pruebas
+        run: npx puppeteer browsers install chrome
+
+      - name: Verificar tipos
+        run: npm run typecheck
+
+      - name: Pruebas unitarias
+        run: npm run test:ci
+
+      - name: Build de producción
+        run: npm run build
+
+      - name: Publicar reporte de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          if-no-files-found: ignore
+          retention-days: 7
