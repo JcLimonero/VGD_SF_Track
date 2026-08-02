@@ -28,6 +28,9 @@ export class GenericTableComponent implements OnInit, OnChanges {
   @Input() hasActiveFilters: boolean = false; // Indica si hay filtros activos
   @Input() onRow: ((row: any) => void) | null = null;
   @Input() onResend: ((row: any) => void) | null = null; // Función para reenviar registro
+  @Input() modalComponent: any = null; // Modal de detalles a usar; si es null se detecta por la forma del registro
+  @Input() detailLabels: Record<string, string> | null = null; // Etiquetas de los campos dentro del modal de detalles
+  @Input() sortableColumns: string[] | null = null; // Columnas ordenables; si es null se usa la lista por defecto
   @Output() pageChanged = new EventEmitter<{ pageIndex: number; pageSize: number }>();
   @Output() sortChanged = new EventEmitter<{ column: string; direction: 'asc' | 'desc' }>();
   
@@ -162,10 +165,14 @@ export class GenericTableComponent implements OnInit, OnChanges {
   }
 
   isSortable(column: string): boolean {
-    return column === 'order_dms' || 
-           column === 'timestamp_sales_force' || 
-           column === 'billing_date' || 
-           column === 'colDate' || 
+    if (this.sortableColumns) {
+      return this.sortableColumns.includes(column);
+    }
+
+    return column === 'order_dms' ||
+           column === 'timestamp_sales_force' ||
+           column === 'billing_date' ||
+           column === 'colDate' ||
            column === 'timestamp_dms';
   }
 
@@ -286,7 +293,17 @@ export class GenericTableComponent implements OnInit, OnChanges {
     window.open(url, '_blank');
   }
 
-  openModal(rowData: any) {    
+  openModal(rowData: any) {
+    // Si el padre indicó un modal explícito, se usa sin detectar la forma del registro
+    if (this.modalComponent) {
+      this.dialog.open(this.modalComponent, {
+        data: { row: rowData, labels: this.detailLabels },
+        width: '80%',
+        maxWidth: '800px'
+      });
+      return;
+    }
+
     // Detectar el tipo de datos
     const isLeadsData = this.isLeadsData(rowData);
     const isServiceData = this.isServiceData(rowData);

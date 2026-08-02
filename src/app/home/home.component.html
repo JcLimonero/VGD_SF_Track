@@ -57,4 +57,25 @@
     <vex-leads-table #leadsTable></vex-leads-table>
   </div>
 
+  <!-- Contenido de Crabi -->
+  <div *ngIf="activeTab === 'crabi'">
+    <vex-crabi-filter (filterChange)="handleCrabiFilter($event)"
+                      (downloadRequested)="handleCrabiDownload()"
+                      [isDownloadingExcel]="crabiTable?.isDownloadingExcel || false">
+    </vex-crabi-filter>
+    <vex-crabi-table #crabiTable></vex-crabi-table>
+  </div>
+
+  <!-- Contenido de Salesforce (una sub-pestaña por tabla de honda) -->
+  <div *ngIf="activeTab === 'salesforce'">
+    <vex-salesforce-subtabs (tabChanged)="onSalesforceTableChanged($event)">
+    </vex-salesforce-subtabs>
+    <vex-salesforce-filter (filterChange)="handleSalesforceFilter($event)"
+                           (downloadRequested)="handleSalesforceDownload()"
+                           [isDownloadingExcel]="salesforceTable?.isDownloadingExcel || false">
+    </vex-salesforce-filter>
+    <vex-salesforce-table #salesforceTable [table]="activeSalesforceTable">
+    </vex-salesforce-table>
+  </div>
+
 </vex-page-layout>

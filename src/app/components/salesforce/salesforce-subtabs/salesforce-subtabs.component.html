@@ -1,0 +1,13 @@
+<div class="flex justify-center px-4 sm:px-[10rem] pt-3">
+  <div class="subtab-bar w-full flex flex-wrap justify-center gap-2 px-2 sm:px-4 py-2">
+    <button
+      *ngFor="let tab of tabs"
+      type="button"
+      class="subtab"
+      [class.active-subtab]="isActive(tab.id)"
+      (click)="selectTab(tab.id)"
+      [title]="tab.id">
+      {{ tab.label }}
+    </button>
+  </div>
+</div>
