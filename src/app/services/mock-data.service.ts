@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { CRABI_ORDERS_MOCK } from './mock-data/crabi-orders.mock';
+import { HONDA_SF_MOCK } from './mock-data/honda-sf.mock';
 import {
   SALESFORCE_HONDA_LABELS,
   SALESFORCE_HONDA_MOCK,
@@ -9,7 +10,7 @@ import {
 } from './mock-data/salesforce-honda.mock';
 
 /**
- * Fuente de datos temporal para los módulos de Crabi y Salesforce.
+ * Fuente de datos temporal para los módulos de Crabi, Salesforce y Honda SF.
  *
  * Todavía no existen endpoints en la API de Vanguardia para estas dos
  * secciones, así que la información se sirve desde archivos de prueba locales.
@@ -61,6 +62,16 @@ export class MockDataService {
     params?: any
   ): Observable<{ items: any[]; total: number }> {
     return this.query(SALESFORCE_HONDA_MOCK[table] ?? [], params, false);
+  }
+
+  // HONDA SF
+  getHondaSf(params?: any): Observable<{ items: any[]; total: number }> {
+    return this.query(HONDA_SF_MOCK, params);
+  }
+
+  /** Todos los registros de Honda SF, sin paginar (para el Excel). */
+  getAllHondaSf(params?: any): Observable<{ items: any[]; total: number }> {
+    return this.query(HONDA_SF_MOCK, params, false);
   }
 
   /**

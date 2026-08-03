@@ -21,6 +21,8 @@ import { CrabiFilterComponent } from '../components/crabi/crabi-filter/crabi-fil
 import { SalesforceTableComponent } from '../components/salesforce/salesforce-table/salesforce-table.component';
 import { SalesforceFilterComponent } from '../components/salesforce/salesforce-filter/salesforce-filter.component';
 import { SalesforceSubtabsComponent } from '../components/salesforce/salesforce-subtabs/salesforce-subtabs.component';
+import { HondaSfTableComponent } from '../components/honda-sf/honda-sf-table/honda-sf-table.component';
+import { HondaSfFilterComponent } from '../components/honda-sf/honda-sf-filter/honda-sf-filter.component';
 @Component({
   selector: 'vex-home',
   standalone: true,
@@ -45,7 +47,9 @@ import { SalesforceSubtabsComponent } from '../components/salesforce/salesforce-
     CrabiFilterComponent,
     SalesforceTableComponent,
     SalesforceFilterComponent,
-    SalesforceSubtabsComponent
+    SalesforceSubtabsComponent,
+    HondaSfTableComponent,
+    HondaSfFilterComponent
 ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
@@ -60,6 +64,7 @@ export class HomeComponent {
   @ViewChild('leadsTable') leadsTable!: LeadsTableComponent;
   @ViewChild('crabiTable') crabiTable!: CrabiTableComponent;
   @ViewChild('salesforceTable') salesforceTable!: SalesforceTableComponent;
+  @ViewChild('hondaSfTable') hondaSfTable!: HondaSfTableComponent;
 
   activeTab = 'orders'; // Tab activo por defecto: Ordenes
   activeSalesforceTable: string; // Sub-pestaña activa dentro de Salesforce
@@ -209,6 +214,22 @@ export class HomeComponent {
       this.salesforceTable.downloadExcel();
     } else {
       console.warn('salesforceTable no disponible aún o no tiene downloadExcel');
+    }
+  }
+
+  handleHondaSfFilter(filters: any) {
+    if (this.hondaSfTable && this.hondaSfTable.applyFilter) {
+      this.hondaSfTable.applyFilter(filters);
+    } else {
+      console.warn('hondaSfTable no disponible aún o no tiene applyFilter');
+    }
+  }
+
+  handleHondaSfDownload(): void {
+    if (this.hondaSfTable && this.hondaSfTable.downloadExcel) {
+      this.hondaSfTable.downloadExcel();
+    } else {
+      console.warn('hondaSfTable no disponible aún o no tiene downloadExcel');
     }
   }
 }

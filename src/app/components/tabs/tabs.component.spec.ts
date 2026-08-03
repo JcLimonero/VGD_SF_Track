@@ -35,7 +35,8 @@ describe('TabsComponent', () => {
       'leads',
       'dwh',
       'crabi',
-      'salesforce'
+      'salesforce',
+      'hondasf'
     ]);
   });
 

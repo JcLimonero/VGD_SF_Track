@@ -78,4 +78,13 @@
     </vex-salesforce-table>
   </div>
 
+  <!-- Contenido de Honda SF -->
+  <div *ngIf="activeTab === 'hondasf'">
+    <vex-honda-sf-filter (filterChange)="handleHondaSfFilter($event)"
+                         (downloadRequested)="handleHondaSfDownload()"
+                         [isDownloadingExcel]="hondaSfTable?.isDownloadingExcel || false">
+    </vex-honda-sf-filter>
+    <vex-honda-sf-table #hondaSfTable></vex-honda-sf-table>
+  </div>
+
 </vex-page-layout>

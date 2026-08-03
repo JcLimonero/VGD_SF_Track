@@ -159,4 +159,31 @@ describe('MockDataService', () => {
       });
     });
   });
+
+  describe('getHondaSf', () => {
+    it('paginates the results', (done) => {
+      service.getHondaSf({ page: 1, perpage: 5 }).subscribe((res) => {
+        expect(res.items.length).toBe(5);
+        expect(res.total).toBeGreaterThan(5);
+        done();
+      });
+    });
+
+    it('filters by a field of the record', (done) => {
+      service.getHondaSf({ sf_object: 'Lead', perpage: 100 }).subscribe((res) => {
+        expect(res.items.length).toBeGreaterThan(0);
+        expect(res.items.every((i) => i.sf_object === 'Lead')).toBeTrue();
+        done();
+      });
+    });
+
+    it('returns every record when the download variant is used', (done) => {
+      service.getHondaSf({ page: 1, perpage: 5 }).subscribe((paged) => {
+        service.getAllHondaSf({ perpage: 5 }).subscribe((all) => {
+          expect(all.items.length).toBe(paged.total);
+          done();
+        });
+      });
+    });
+  });
 });
