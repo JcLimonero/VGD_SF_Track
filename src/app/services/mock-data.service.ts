@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { CRABI_ORDERS_MOCK } from './mock-data/crabi-orders.mock';
 import { HONDA_SF_MOCK } from './mock-data/honda-sf.mock';
 import {
   SALESFORCE_HONDA_LABELS,
@@ -10,13 +9,16 @@ import {
 } from './mock-data/salesforce-honda.mock';
 
 /**
- * Fuente de datos temporal para los módulos de Crabi, Salesforce y Honda SF.
+ * Fuente de datos temporal para los módulos de Integración SF y Honda SF.
  *
  * Todavía no existen endpoints en la API de Vanguardia para estas dos
  * secciones, así que la información se sirve desde archivos de prueba locales.
  * Los métodos devuelven exactamente la misma forma que los de
  * `VanguardiaApiService` (`{ items, total }`), de manera que al conectar la API
  * real solo haya que reemplazar el cuerpo de cada método por la llamada HTTP.
+ *
+ * Crabi ya no está aquí: consume `/vgd/orderscrabi` a través de
+ * `VanguardiaApiService`, como los demás módulos.
  */
 @Injectable({
   providedIn: 'root'
@@ -27,16 +29,6 @@ export class MockDataService {
 
   /** Parámetros que controlan la consulta y no se usan para filtrar. */
   private readonly reservedParams = ['page', 'perpage', 'orderby', 'ordertype'];
-
-  // CRABI
-  getCrabiOrders(params?: any): Observable<{ items: any[]; total: number }> {
-    return this.query(CRABI_ORDERS_MOCK, params);
-  }
-
-  /** Todos los registros de Crabi, sin paginar (para el Excel). */
-  getAllCrabiOrders(params?: any): Observable<{ items: any[]; total: number }> {
-    return this.query(CRABI_ORDERS_MOCK, params, false);
-  }
 
   // SALESFORCE
   /** Nombres de las tablas de `vgd_dwh_prod` que contienen "honda". */

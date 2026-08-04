@@ -270,6 +270,64 @@ export class VanguardiaApiService {
     );
   }
 
+  ///CRABI
+  /**
+   * Órdenes enviadas a Crabi (`orders_to_crabi`).
+   *
+   * Filtros soportados por la API, verificados contra el endpoint:
+   * `order_dms`, `vin`, `invoice`, `idAgency`, `brand`, `model`, `year`, `isSend`.
+   * Los parámetros que no reconoce los ignora y devuelve el listado completo.
+   */
+  getCrabiOrders(params?: any): Observable<{items: any[], total: number}>{
+    const url = `${this.baseUrl}/vgd/orderscrabi`;
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set(this.providerTokenHeader, this.providerTokenValue);
+
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== null && params[key] !== undefined && params[key] !== '') {
+          httpParams = httpParams.set(key, params[key].toString());
+        }
+      });
+    }
+
+    return this.http.get<any>(url, { headers, params: httpParams }).pipe(
+      map(res => {
+        const items = res?.data?.data ?? [];
+        const total = res?.data?.total_rows ?? items.length;
+        return { items, total };
+      })
+    );
+  }
+
+  /**
+   * Marca una orden para reenvío a Crabi poniendo `isSend` en 0.
+   *
+   * Es la única escritura disponible en este módulo: Crabi es de consulta y
+   * actualización, no se crean ni se eliminan registros desde el portal. Por eso
+   * aquí no hay POST ni DELETE, y no deben agregarse.
+   */
+  updateCrabiOrder(id: number | string, data: any): Observable<any> {
+    if (!id) {
+      throw new Error('ID es requerido para actualizar la orden de Crabi');
+    }
+
+    const url = `${this.baseUrl}/vgd/orderscrabi/${id}`;
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set(this.providerTokenHeader, this.providerTokenValue);
+
+    return this.http.put<any>(url, data, { headers }).pipe(
+      map(res => {
+        return res;
+      })
+    );
+  }
+
 ///INVOICES
   getInvoices(): Observable<any[]> {
     const url = `${this.baseUrl}/vgd/invoice?ordertype=desc&orderby=billing_date`;

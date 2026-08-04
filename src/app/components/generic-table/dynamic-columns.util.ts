@@ -28,8 +28,9 @@ export function humanizeFieldName(field: string): string {
  * Construye las columnas de una tabla a partir de los datos, sin necesidad de
  * conocer el esquema de antemano.
  *
- * Se usa en los módulos de Crabi y Salesforce, donde el esquema real todavía no
- * está definido y en el caso de Salesforce además cambia entre tablas.
+ * Se usa en Integración SF y Honda SF, donde el esquema real todavía no está
+ * definido y en el caso de Integración SF además cambia entre tablas. Crabi ya
+ * no lo necesita: consume la API real y sus columnas están declaradas.
  */
 export function buildColumns(
   rows: any[],

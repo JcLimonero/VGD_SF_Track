@@ -31,6 +31,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
   @Input() modalComponent: any = null; // Modal de detalles a usar; si es null se detecta por la forma del registro
   @Input() detailLabels: Record<string, string> | null = null; // Etiquetas de los campos dentro del modal de detalles
   @Input() sortableColumns: string[] | null = null; // Columnas ordenables; si es null se usa la lista por defecto
+  @Input() sendField: string = 'sendedSalesForce'; // Campo que indica si el registro ya se envió; Crabi usa 'isSend'
   @Output() pageChanged = new EventEmitter<{ pageIndex: number; pageSize: number }>();
   @Output() sortChanged = new EventEmitter<{ column: string; direction: 'asc' | 'desc' }>();
   
@@ -228,9 +229,9 @@ export class GenericTableComponent implements OnInit, OnChanges {
   }
 
   isSendAvailable(element: any): boolean {
-    // Solo habilitado si sendedSalesForce = 1
-    const sendedSalesForceValue = this.cellValue(element, 'sendedSalesForce');
-    return sendedSalesForceValue === '1' || sendedSalesForceValue === 1;
+    // Solo habilitado si el registro ya se envió (campo de envío = 1)
+    const sendedValue = this.cellValue(element, this.sendField);
+    return sendedValue === '1' || sendedValue === 1;
   }
 
   copyErrorToClipboard(element: any): void {

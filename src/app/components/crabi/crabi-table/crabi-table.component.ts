@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GenericTableComponent } from '../../generic-table/generic-table.component';
 import { GenericDetailModalComponent } from '../../generic-table/generic-detail-modal.component';
-import { buildColumns } from '../../generic-table/dynamic-columns.util';
 import { TableColumn } from '../../../../@vex/interfaces/table-column.interface';
-import { MockDataService } from '../../../services/mock-data.service';
+import { VanguardiaApiService } from '../../../services/vanguardia-api.service';
 import { CrabiFilters } from '../crabi-filter/crabi-filter.component';
+import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
 
 @Component({
@@ -21,7 +21,7 @@ export class CrabiTableComponent implements OnInit {
   error: string | null = null;
   total: number | null = null;
 
-  // Paginación
+  // Paginación - respetando el default de la API
   pageIndex = 0;
   defaultPageSize = 5;
   currentPageSize = 5;
@@ -30,86 +30,107 @@ export class CrabiTableComponent implements OnInit {
   currentFilters: CrabiFilters = {};
   isDownloadingExcel = false;
   currentSort: { column: string; direction: 'asc' | 'desc' } | null = {
-    column: 'created_at',
+    column: 'captured_at',
     direction: 'desc'
   };
 
-  /** Modal de detalles: el esquema no es fijo, así que se recorren los campos */
-  readonly detailModal = GenericDetailModalComponent;
-
-  /** Columnas por las que se puede ordenar */
-  readonly sortableColumns = ['order_dms', 'created_at', 'sent_at', 'premium'];
+  /** El endpoint no devuelve el nombre de la agencia, solo `idAgency` */
+  private agencyNames: Record<string, string> = {};
 
   /**
-   * Las columnas se construyen a partir de los datos porque todavía no se
-   * conoce el esquema real de `orders_to_crabi`. El mapa de etiquetas y el
-   * orden solo aplican a los campos que existan.
+   * Modal de detalles genérico: recorre todos los campos del registro, incluidos
+   * `request_body` y `response_body`, que son los que explican por qué falló un
+   * envío y no caben en la tabla.
    */
-  readonly columnOptions = {
-    labels: {
-      order_dms: 'No. Orden',
-      vin: 'VIN',
-      agencyName: 'Agencia',
-      customer_name: 'Cliente',
-      customer_email: 'Correo',
-      customer_phone: 'Teléfono',
-      brand: 'Marca',
-      model: 'Modelo',
-      year: 'Año',
-      plan: 'Plan',
-      premium: 'Prima',
-      policy_number: 'No. Póliza',
-      crabi_quote_id: 'ID Cotización',
-      status: 'Estado',
-      sent_to_crabi: 'Envío Crabi',
-      response_code: 'Código',
-      error_message: 'Error',
-      created_at: 'Fecha Creación',
-      sent_at: 'Fecha Envío'
-    } as Record<string, string>,
-    order: [
-      'agencyName',
-      'order_dms',
-      'vin',
-      'customer_name',
-      'brand',
-      'model',
-      'plan',
-      'premium',
-      'status',
-      'created_at'
-    ],
-    // Campos internos o demasiado largos para la tabla; siguen visibles en el modal
-    exclude: [
-      'id',
-      'idAgency',
-      'customer_email',
-      'customer_phone',
-      'year',
-      'policy_number',
-      'crabi_quote_id',
-      'sent_to_crabi',
-      'response_code',
-      'error_message',
-      'sent_at'
-    ]
+  readonly detailModal = GenericDetailModalComponent;
+
+  /** Campo de envío de este módulo (los demás usan `sendedSalesForce`) */
+  readonly sendField = 'isSend';
+
+  /** Columnas por las que la API acepta ordenar */
+  readonly sortableColumns = [
+    'order_dms',
+    'vin',
+    'brand',
+    'model',
+    'year',
+    'amount',
+    'isSend',
+    'captured_at',
+    'sent_at'
+  ];
+
+  /** Etiquetas de todos los campos, para la tabla y para el modal de detalles */
+  readonly detailLabels: Record<string, string> = {
+    id: 'ID',
+    idAgency: 'Clave Agencia',
+    agencyName: 'Agencia',
+    order_dms: 'No. Orden',
+    invoice: 'Factura',
+    amount: 'Monto',
+    vin: 'VIN',
+    brand: 'Marca',
+    model: 'Modelo',
+    version: 'Versión',
+    year: 'Año',
+    external_color: 'Color Exterior',
+    internal_color: 'Color Interior',
+    ndClientDMS: 'No. Cliente DMS',
+    ndConsultant: 'No. Asesor',
+    id_status: 'Estado',
+    timestamp_dms: 'Fecha DMS',
+    isSend: 'Envío Crabi',
+    captured_at: 'Capturado',
+    sent_at: 'Fecha Envío',
+    request_body: 'Petición',
+    response_body: 'Respuesta'
   };
 
-  columns: TableColumn<any>[] = [];
-  displayedColumns: string[] = [];
+  columns: TableColumn<any>[] = [
+    { property: 'agencyName', label: 'Agencia', type: 'text' },
+    { property: 'order_dms', label: 'No. Orden', type: 'text' },
+    { property: 'invoice', label: 'Factura', type: 'text' },
+    { property: 'vin', label: 'VIN', type: 'text' },
+    { property: 'brand', label: 'Marca', type: 'text' },
+    { property: 'model', label: 'Modelo', type: 'text' },
+    { property: 'year', label: 'Año', type: 'text' },
+    { property: 'amount', label: 'Monto', type: 'text' },
+    { property: 'isSend', label: 'Envío Crabi', type: 'text' },
+    { property: 'captured_at', label: 'Capturado', type: 'text' },
+    { property: 'sent_at', label: 'Fecha Envío', type: 'text' },
+    { property: 'resend', label: 'Reenviar', type: 'button' },
+    { property: 'actions', label: 'Detalles', type: 'button' }
+  ];
+
+  displayedColumns: string[] = [
+    'agencyName',
+    'order_dms',
+    'invoice',
+    'vin',
+    'brand',
+    'model',
+    'year',
+    'amount',
+    'isSend',
+    'captured_at',
+    'sent_at',
+    'resend',
+    'actions'
+  ];
 
   get hasActiveFilters(): boolean {
     return !!(
       this.currentFilters.order_dms ||
       this.currentFilters.vin ||
-      this.currentFilters.status ||
-      this.currentFilters.sent_to_crabi
+      this.currentFilters.idAgency ||
+      this.currentFilters.isSend
     );
   }
 
-  constructor(private mockData: MockDataService) {}
+  constructor(private vanguardiaApi: VanguardiaApiService) {}
 
   ngOnInit(): void {
+    this.loadAgencies();
     this.loadPage(this.pageIndex, this.defaultPageSize);
   }
 
@@ -117,13 +138,12 @@ export class CrabiTableComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this.mockData.getCrabiOrders(this.buildParams(pageIndex, pageSize)).subscribe({
+    this.vanguardiaApi.getCrabiOrders(this.buildParams(pageIndex, pageSize)).subscribe({
       next: (res) => {
-        this.data = res.items || [];
+        this.data = this.withAgencyName(res.items || []);
         this.total = res.total || 0;
         this.pageIndex = pageIndex;
         this.currentPageSize = pageSize;
-        this.setColumns(this.data);
         this.loading = false;
       },
       error: () => {
@@ -147,6 +167,29 @@ export class CrabiTableComponent implements OnInit {
     this.loadPage(this.pageIndex, this.currentPageSize);
   }
 
+  /**
+   * Marca la orden para que se vuelva a enviar a Crabi.
+   *
+   * Es la única escritura del módulo. No hay alta ni baja de registros: el
+   * portal solo consulta y reenvía.
+   */
+  resendToCrabi(row: any): void {
+    if (!row.id) {
+      alert('Error: No se encontró el ID del registro');
+      return;
+    }
+
+    this.vanguardiaApi.updateCrabiOrder(row.id, { isSend: 0 }).subscribe({
+      next: () => {
+        alert(`Orden ${row.order_dms} marcada para reenvío a Crabi`);
+        this.loadPage(this.pageIndex, this.currentPageSize);
+      },
+      error: (error) => {
+        alert(`Error al actualizar: ${error.error?.message || 'Error desconocido'}`);
+      }
+    });
+  }
+
   downloadExcel(): void {
     if (!this.total || this.total === 0) {
       console.warn('No hay datos de Crabi para descargar');
@@ -155,17 +198,41 @@ export class CrabiTableComponent implements OnInit {
 
     this.isDownloadingExcel = true;
 
-    this.mockData.getAllCrabiOrders(this.buildParams()).subscribe({
-      next: (res) => {
+    // Se pide por páginas, igual que en los demás módulos, para no depender de
+    // que la API acepte un perpage arbitrariamente grande
+    const maxPerPage = 100;
+    const totalPages = Math.ceil(this.total / maxPerPage);
+    const baseParams = this.buildParams();
+
+    const pageRequests = [];
+    for (let page = 1; page <= totalPages; page++) {
+      pageRequests.push(
+        this.vanguardiaApi.getCrabiOrders({ ...baseParams, page, perpage: maxPerPage })
+      );
+    }
+
+    forkJoin(pageRequests).subscribe({
+      next: (responses) => {
         try {
+          const allData: any[] = [];
+          responses.forEach((response) => allData.push(...response.items));
+
           // El Excel lleva todos los campos, no solo los visibles en la tabla
-          const worksheet = XLSX.utils.json_to_sheet(res.items);
+          const excelData = this.withAgencyName(allData).map((item) => {
+            const row: Record<string, any> = {};
+            Object.keys(this.detailLabels).forEach((field) => {
+              row[this.detailLabels[field]] = item[field] ?? '';
+            });
+            return row;
+          });
+
+          const worksheet = XLSX.utils.json_to_sheet(excelData);
           const workbook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(workbook, worksheet, 'Crabi');
 
           worksheet['!cols'] =
-            res.items.length > 0
-              ? Object.keys(res.items[0]).map(() => ({ wch: 20 }))
+            excelData.length > 0
+              ? Object.keys(excelData[0]).map(() => ({ wch: 20 }))
               : [];
 
           const timestamp = new Date()
@@ -174,8 +241,10 @@ export class CrabiTableComponent implements OnInit {
             .replace(/[:-]/g, '');
           XLSX.writeFile(
             workbook,
-            `crabi_${res.items.length}_registros_${timestamp}.xlsx`
+            `crabi_${excelData.length}_registros_${timestamp}.xlsx`
           );
+
+          console.log(`Excel de Crabi generado exitosamente: ${excelData.length} registros`);
         } catch (error) {
           console.error('⚠️ Error al generar Excel de Crabi:', error);
         } finally {
@@ -194,7 +263,7 @@ export class CrabiTableComponent implements OnInit {
     const params: any = { ...this.currentFilters };
 
     if (pageIndex !== undefined && pageSize !== undefined) {
-      params.page = pageIndex + 1;
+      params.page = pageIndex + 1; // La API usa 1-indexed
       params.perpage = pageSize;
     }
 
@@ -206,14 +275,30 @@ export class CrabiTableComponent implements OnInit {
     return params;
   }
 
-  /** Reconstruye las columnas solo si aún no se han definido. */
-  private setColumns(rows: any[]): void {
-    if (this.columns.length > 0 || rows.length === 0) return;
+  /**
+   * Catálogo de agencias, para poder mostrar el nombre en lugar de la clave.
+   * Si falla, la columna queda con la clave y el resto de la tabla sigue igual.
+   */
+  private loadAgencies(): void {
+    this.vanguardiaApi.getAgencies().subscribe({
+      next: (agencies) => {
+        this.agencyNames = {};
+        agencies.forEach((agency: any) => {
+          this.agencyNames[agency.idAgency] = agency.name;
+        });
+        // Las órdenes pueden haber llegado antes que el catálogo
+        this.data = this.withAgencyName(this.data);
+      },
+      error: (error) => {
+        console.error('Error al cargar agencias para Crabi:', error);
+      }
+    });
+  }
 
-    this.columns = [
-      ...buildColumns(rows, this.columnOptions),
-      { property: 'actions', label: 'Detalles', type: 'button' }
-    ];
-    this.displayedColumns = this.columns.map((col) => col.property);
+  private withAgencyName(rows: any[]): any[] {
+    return rows.map((row) => ({
+      ...row,
+      agencyName: this.agencyNames[row.idAgency] ?? row.idAgency
+    }));
   }
 }

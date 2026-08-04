@@ -1,12 +1,18 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { VanguardiaApiService } from '../../../services/vanguardia-api.service';
 
+/**
+ * Filtros de Crabi. Todos corresponden a parámetros que el endpoint
+ * `/vgd/orderscrabi` reconoce; los que no reconoce los ignora y devuelve el
+ * listado completo, así que no conviene agregar campos sin verificarlos.
+ */
 export interface CrabiFilters {
   order_dms?: string;
   vin?: string;
-  status?: string;
-  sent_to_crabi?: string;
+  idAgency?: string;
+  isSend?: string;
 }
 
 @Component({
@@ -16,7 +22,7 @@ export interface CrabiFilters {
   templateUrl: './crabi-filter.component.html',
   styleUrl: './crabi-filter.component.scss'
 })
-export class CrabiFilterComponent {
+export class CrabiFilterComponent implements OnInit {
   @Output() filterChange = new EventEmitter<CrabiFilters>();
 
   /** Se emite cuando el usuario solicita descargar el Excel */
@@ -26,21 +32,36 @@ export class CrabiFilterComponent {
   @Input() isDownloadingExcel = false;
 
   filterForm: FormGroup;
-  selectedStatus = '';
+  agencies: any[] = [];
+  selectedAgency = '';
   selectedSent = '';
 
-  readonly statuses = ['Enviado', 'Pendiente', 'Rechazado', 'En proceso'];
   readonly sentOptions = [
     { label: 'Enviado a Crabi', value: '1' },
-    { label: 'No enviado', value: '0' }
+    { label: 'Pendiente de envío', value: '0' }
   ];
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private vanguardiaApi: VanguardiaApiService) {
     this.filterForm = this.fb.group({
       order_dms: [''],
       vin: [''],
-      status: [''],
-      sent_to_crabi: ['']
+      idAgency: [''],
+      isSend: ['']
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadAgencies();
+  }
+
+  loadAgencies(): void {
+    this.vanguardiaApi.getAgencies().subscribe({
+      next: (agencies) => {
+        this.agencies = agencies;
+      },
+      error: (error) => {
+        console.error('Error al cargar agencias:', error);
+      }
     });
   }
 
@@ -49,33 +70,36 @@ export class CrabiFilterComponent {
   }
 
   onClearFilters(): void {
-    this.selectedStatus = '';
+    this.selectedAgency = '';
     this.selectedSent = '';
     this.filterForm.reset({
       order_dms: '',
       vin: '',
-      status: '',
-      sent_to_crabi: ''
+      idAgency: '',
+      isSend: ''
     });
 
     this.filterChange.emit({
       order_dms: undefined,
       vin: undefined,
-      status: undefined,
-      sent_to_crabi: undefined
+      idAgency: undefined,
+      isSend: undefined
     });
   }
 
-  onStatusToggle(status: string, event: Event): void {
+  onAgencyToggle(agency: any, event: Event): void {
     const input = event.target as HTMLInputElement | null;
     if (!input) return;
 
     if (input.checked) {
-      this.selectedStatus = status;
-      this.filterForm.patchValue({ status }, { emitEvent: false });
-    } else if (this.selectedStatus === status) {
-      this.selectedStatus = '';
-      this.filterForm.patchValue({ status: '' }, { emitEvent: false });
+      this.selectedAgency = agency.name;
+      this.filterForm.patchValue(
+        { idAgency: agency.idAgency },
+        { emitEvent: false }
+      );
+    } else if (this.selectedAgency === agency.name) {
+      this.selectedAgency = '';
+      this.filterForm.patchValue({ idAgency: '' }, { emitEvent: false });
     }
   }
 
@@ -85,13 +109,10 @@ export class CrabiFilterComponent {
 
     if (input.checked) {
       this.selectedSent = option.label;
-      this.filterForm.patchValue(
-        { sent_to_crabi: option.value },
-        { emitEvent: false }
-      );
+      this.filterForm.patchValue({ isSend: option.value }, { emitEvent: false });
     } else if (this.selectedSent === option.label) {
       this.selectedSent = '';
-      this.filterForm.patchValue({ sent_to_crabi: '' }, { emitEvent: false });
+      this.filterForm.patchValue({ isSend: '' }, { emitEvent: false });
     }
   }
 

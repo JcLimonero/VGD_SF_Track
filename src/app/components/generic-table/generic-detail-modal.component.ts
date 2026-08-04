@@ -17,8 +17,9 @@ interface DetailEntry {
  * Modal de detalles que recorre los campos del registro en lugar de tener una
  * lista fija de campos.
  *
- * Se usa en los módulos cuyo esquema no se conoce de antemano (Crabi y
- * Salesforce), donde el modal por defecto mostraría campos vacíos.
+ * Se usa en los módulos cuyo esquema no coincide con el de facturas (Crabi,
+ * Integración SF y Honda SF), donde el modal por defecto mostraría campos
+ * vacíos.
  */
 @Component({
   selector: 'vex-generic-detail-modal',

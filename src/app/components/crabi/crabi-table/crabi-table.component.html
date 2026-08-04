@@ -30,8 +30,10 @@
   [initialSort]="currentSort"
   [hasActiveFilters]="hasActiveFilters"
   [modalComponent]="detailModal"
-  [detailLabels]="columnOptions.labels"
+  [detailLabels]="detailLabels"
   [sortableColumns]="sortableColumns"
+  [sendField]="sendField"
+  [onResend]="resendToCrabi.bind(this)"
   (pageChanged)="loadPage($event.pageIndex, $event.pageSize)"
   (sortChanged)="onSortChange($event)">
 </vex-generic-table>

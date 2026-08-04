@@ -14,19 +14,19 @@
         <input id="crabi-vin" type="text" formControlName="vin" placeholder="VIN" />
       </div>
 
-      <!-- Dropdown: Estado -->
+      <!-- Dropdown: Agencia -->
       <details class="dropdown">
         <summary class="dropdown-trigger">
-          {{ selectedStatus || 'Estado' }}
+          {{ selectedAgency || 'Agencia' }}
           <span class="material-symbols-outlined">keyboard_arrow_down</span>
         </summary>
         <div class="dropdown-panel">
-          <label class="checkbox" *ngFor="let status of statuses">
+          <label class="checkbox" *ngFor="let agency of agencies">
             <input
               type="checkbox"
-              [checked]="selectedStatus === status"
-              (change)="onStatusToggle(status, $event); closeDropdown($event)" />
-            {{ status }}
+              [checked]="selectedAgency === agency.name"
+              (change)="onAgencyToggle(agency, $event); closeDropdown($event)" />
+            {{ agency.name }}
           </label>
         </div>
       </details>
