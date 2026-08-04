@@ -60,28 +60,26 @@ export class CrabiTableComponent implements OnInit {
     'sent_at'
   ];
 
-  /** Etiquetas de todos los campos, para la tabla y para el modal de detalles */
-  readonly detailLabels: Record<string, string> = {
+  /**
+   * Campos que no salen en la tabla pero sí en el detalle y en el Excel.
+   *
+   * Los que sí salen no se repiten aquí: sus etiquetas se toman de `columns`,
+   * que ya las declara.
+   *
+   * `id_status` no es columna porque hoy vale 3 en todos los registros, pero se
+   * etiqueta igual: el modal recorre el registro completo, así que quitarlo de
+   * aquí no lo ocultaría, solo lo dejaría sin traducir.
+   */
+  private readonly extraLabels: Record<string, string> = {
     id: 'ID',
     idAgency: 'Clave Agencia',
-    agencyName: 'Agencia',
-    order_dms: 'No. Orden',
-    invoice: 'Factura',
-    amount: 'Monto',
-    vin: 'VIN',
-    brand: 'Marca',
-    model: 'Modelo',
     version: 'Versión',
-    year: 'Año',
     external_color: 'Color Exterior',
     internal_color: 'Color Interior',
     ndClientDMS: 'No. Cliente DMS',
     ndConsultant: 'No. Asesor',
     id_status: 'Estado',
     timestamp_dms: 'Fecha DMS',
-    isSend: 'Envío Crabi',
-    captured_at: 'Capturado',
-    sent_at: 'Fecha Envío',
     request_body: 'Petición',
     response_body: 'Respuesta'
   };
@@ -117,6 +115,15 @@ export class CrabiTableComponent implements OnInit {
     'resend',
     'actions'
   ];
+
+  /**
+   * Etiquetas de todos los campos, para el modal de detalles y el Excel.
+   *
+   * Se arma a partir de `columns` más `extraLabels`, para no declarar dos veces
+   * la etiqueta de un campo visible. El orden es el de la tabla y luego el de
+   * los campos extra, que es el que usa el Excel.
+   */
+  readonly detailLabels: Record<string, string> = this.buildDetailLabels();
 
   get hasActiveFilters(): boolean {
     return !!(
@@ -258,6 +265,15 @@ export class CrabiTableComponent implements OnInit {
     });
   }
 
+  private buildDetailLabels(): Record<string, string> {
+    const fromColumns: Record<string, string> = {};
+    this.columns
+      .filter((col) => col.type !== 'button')
+      .forEach((col) => (fromColumns[col.property] = col.label));
+
+    return { ...fromColumns, ...this.extraLabels };
+  }
+
   /** Parámetros de consulta; sin paginación cuando no se pasan índices. */
   private buildParams(pageIndex?: number, pageSize?: number): any {
     const params: any = { ...this.currentFilters };
@@ -296,9 +312,11 @@ export class CrabiTableComponent implements OnInit {
   }
 
   private withAgencyName(rows: any[]): any[] {
+    // Va primero para que el modal la liste al principio, como en la tabla, y
+    // no al final detrás de los JSON
     return rows.map((row) => ({
-      ...row,
-      agencyName: this.agencyNames[row.idAgency] ?? row.idAgency
+      agencyName: this.agencyNames[row.idAgency] ?? row.idAgency,
+      ...row
     }));
   }
 }

@@ -85,6 +85,37 @@ describe('CrabiTableComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('takes the labels of the visible columns from the column definitions', () => {
+    // Las etiquetas no se declaran dos veces: las de la tabla salen de
+    // `columns` y solo se declaran a mano las de los campos que no son columna
+    component.columns
+      .filter((col) => col.type !== 'button')
+      .forEach((col) => {
+        expect(component.detailLabels[col.property]).toBe(col.label);
+      });
+  });
+
+  it('labels every field the endpoint returns', () => {
+    // Si la API agrega un campo, el modal lo mostraria sin traducir; esta
+    // prueba lo detecta antes de que llegue al navegador
+    const returnedFields = Object.keys(ORDERS[0]).concat([
+      'agencyName',
+      'version',
+      'external_color',
+      'internal_color',
+      'ndClientDMS',
+      'ndConsultant',
+      'id_status',
+      'timestamp_dms',
+      'request_body',
+      'response_body'
+    ]);
+
+    returnedFields.forEach((field) => {
+      expect(component.detailLabels[field]).toBeDefined();
+    });
+  });
+
   it('requests the real Crabi endpoint on init', () => {
     fixture.detectChanges();
     flushAgencies();
