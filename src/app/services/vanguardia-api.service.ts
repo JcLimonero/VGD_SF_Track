@@ -398,6 +398,7 @@ export class VanguardiaApiService {
     page?: number;
     perpage?: number; // Cambio de per_page a perpage
     order_dms?: string;
+    ndClientDMS?: string;
     vin?: string;
     invoice_reference?: string;
     agencyName?: string; // Agregar agencyName
@@ -412,7 +413,7 @@ export class VanguardiaApiService {
     const p = params || {};
     
     // Core filters
-    ['order_dms','vin','invoice_reference','agencyName','sendedSalesForce','insertCorrect']
+    ['order_dms','ndClientDMS','vin','invoice_reference','agencyName','sendedSalesForce','insertCorrect']
       .forEach((k) => {
         const v = (p as any)[k];
         if (v !== undefined && v !== null && v !== '') {
@@ -461,6 +462,155 @@ export class VanguardiaApiService {
     return this.http.get<any>(url, { headers }).pipe(
       map(res => {
         return res?.data?.data ?? []; //devolver solo array
+      })
+    );
+  }
+
+  // INTEGRATION - HONDA INVENTORY
+  getIntegrationHondaInventory(params?: {
+    page?: number;
+    perpage?: number;
+    customer_id?: string;
+    dealer_id?: string;
+    vin?: string;
+    is_sent?: string; // '1' | '0'
+    orderby?: string;
+    ordertype?: string;
+  }): Observable<{ items: any[]; total: number; per_page: number; page: number }> {
+    const url = `${this.baseUrl}/vgd/integrationhondainventory`;
+
+    let httpParams = new HttpParams();
+    const p = params || {};
+
+    ['customer_id', 'dealer_id', 'vin', 'is_sent'].forEach((k) => {
+      const v = (p as any)[k];
+      if (v !== undefined && v !== null && v !== '') {
+        httpParams = httpParams.set(k, String(v));
+      }
+    });
+
+    const page = Number(p.page || 1);
+    const perpage = Number(p.perpage || 5);
+    httpParams = httpParams.set('page', String(page));
+    httpParams = httpParams.set('perpage', String(perpage));
+
+    if (p.orderby && p.ordertype) {
+      httpParams = httpParams.set('orderby', p.orderby);
+      httpParams = httpParams.set('ordertype', p.ordertype);
+    }
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', this.providerTokenValue);
+
+    return this.http.get<any>(url, { headers, params: httpParams }).pipe(
+      map(res => {
+        const d = res?.data ?? {};
+        return {
+          items: d?.data ?? [],
+          total: d?.total_rows ?? 0,
+          per_page: d?.per_page ?? (Array.isArray(d?.data) ? d.data.length : 0),
+          page: d?.page ?? 1
+        };
+      })
+    );
+  }
+
+  // INTEGRATION - HONDA SALES
+  getIntegrationHondaSales(params?: {
+    page?: number;
+    perpage?: number;
+    customer_id?: string;
+    dealer_id?: string;
+    vin?: string;
+    is_sent?: string; // '1' | '0'
+    orderby?: string;
+    ordertype?: string;
+  }): Observable<{ items: any[]; total: number; per_page: number; page: number }> {
+    const url = `${this.baseUrl}/vgd/integrationhondasales`;
+
+    let httpParams = new HttpParams();
+    const p = params || {};
+
+    ['customer_id', 'dealer_id', 'vin', 'is_sent'].forEach((k) => {
+      const v = (p as any)[k];
+      if (v !== undefined && v !== null && v !== '') {
+        httpParams = httpParams.set(k, String(v));
+      }
+    });
+
+    const page = Number(p.page || 1);
+    const perpage = Number(p.perpage || 5);
+    httpParams = httpParams.set('page', String(page));
+    httpParams = httpParams.set('perpage', String(perpage));
+
+    if (p.orderby && p.ordertype) {
+      httpParams = httpParams.set('orderby', p.orderby);
+      httpParams = httpParams.set('ordertype', p.ordertype);
+    }
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', this.providerTokenValue);
+
+    return this.http.get<any>(url, { headers, params: httpParams }).pipe(
+      map(res => {
+        const d = res?.data ?? {};
+        return {
+          items: d?.data ?? [],
+          total: d?.total_rows ?? 0,
+          per_page: d?.per_page ?? (Array.isArray(d?.data) ? d.data.length : 0),
+          page: d?.page ?? 1
+        };
+      })
+    );
+  }
+
+  // INTEGRATION - HONDA CUSTOMERS
+  getIntegrationHondaCustomers(params?: {
+    page?: number;
+    perpage?: number;
+    customer_id?: string;
+    dealer_id?: string;
+    is_sent?: string; // '1' | '0'
+    orderby?: string;
+    ordertype?: string;
+  }): Observable<{ items: any[]; total: number; per_page: number; page: number }> {
+    const url = `${this.baseUrl}/vgd/integrationhondacostumers`;
+
+    let httpParams = new HttpParams();
+    const p = params || {};
+
+    ['customer_id', 'dealer_id', 'is_sent'].forEach((k) => {
+      const v = (p as any)[k];
+      if (v !== undefined && v !== null && v !== '') {
+        httpParams = httpParams.set(k, String(v));
+      }
+    });
+
+    const page = Number(p.page || 1);
+    const perpage = Number(p.perpage || 5);
+    httpParams = httpParams.set('page', String(page));
+    httpParams = httpParams.set('perpage', String(perpage));
+
+    if (p.orderby && p.ordertype) {
+      httpParams = httpParams.set('orderby', p.orderby);
+      httpParams = httpParams.set('ordertype', p.ordertype);
+    }
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('X-Provider-Token', this.providerTokenValue);
+
+    return this.http.get<any>(url, { headers, params: httpParams }).pipe(
+      map(res => {
+        const d = res?.data ?? {};
+        return {
+          items: d?.data ?? [],
+          total: d?.total_rows ?? 0,
+          per_page: d?.per_page ?? (Array.isArray(d?.data) ? d.data.length : 0),
+          page: d?.page ?? 1
+        };
       })
     );
   }

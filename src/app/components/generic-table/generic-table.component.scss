@@ -112,6 +112,28 @@ th.mat-column-sendedSalesForce {
   text-align: center;
 }
 
+td.mat-column-is_sent,
+th.mat-column-is_sent {
+  min-width: 50px;
+  max-width: 60px;
+  text-align: center;
+}
+
+td.mat-column-is_valid,
+th.mat-column-is_valid {
+  min-width: 50px;
+  max-width: 60px;
+  text-align: center;
+}
+
+.valid-emoji {
+  font-size: 20px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 td.mat-column-actions,
 th.mat-column-actions {
   width: 70px;

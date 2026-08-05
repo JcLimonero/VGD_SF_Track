@@ -1,0 +1,44 @@
+<div class="integration-wrapper px-[2rem]">
+  <div class="integration-tabs-container">
+    <ul class="integration-tabs-list">
+      <li
+        *ngFor="let tab of tabs"
+        class="integration-tab-item"
+        [class.integration-tab-item-active]="isActive(tab.id)"
+        (click)="selectTab(tab.id)">
+        <span class="material-symbols-outlined">{{ tab.icon }}</span>
+        <span>{{ tab.label }}</span>
+      </li>
+    </ul>
+  </div>
+
+  <div *ngIf="activeTab === 'inventory'" class="integration-content">
+    <integration-inventory-filter
+      (filterChange)="handleInventoryFilter($event)"
+      (downloadRequested)="handleInventoryDownload()"
+      [isDownloadingExcel]="integrationInventoryTable?.isDownloadingExcel || false">
+    </integration-inventory-filter>
+
+    <integration-inventory-table #integrationInventoryTable></integration-inventory-table>
+  </div>
+
+  <div *ngIf="activeTab === 'sales'" class="integration-content">
+    <integration-sales-filter
+      (filterChange)="handleSalesFilter($event)"
+      (downloadRequested)="handleSalesDownload()"
+      [isDownloadingExcel]="integrationSalesTable?.isDownloadingExcel || false">
+    </integration-sales-filter>
+
+    <integration-sales-table #integrationSalesTable></integration-sales-table>
+  </div>
+
+  <div *ngIf="activeTab === 'customers'" class="integration-content">
+    <integration-customer-filter
+      (filterChange)="handleCustomerFilter($event)"
+      (downloadRequested)="handleCustomerDownload()"
+      [isDownloadingExcel]="integrationCustomerTable?.isDownloadingExcel || false">
+    </integration-customer-filter>
+
+    <integration-customer-table #integrationCustomerTable></integration-customer-table>
+  </div>
+</div>

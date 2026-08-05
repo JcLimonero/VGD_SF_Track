@@ -25,7 +25,8 @@ export class TabsComponent {
     { id: 'services', label: 'Servicios', icon: 'car_repair' },
     { id: 'clients', label: 'Clientes', icon: 'group' },
     { id: 'leads', label: 'Leads', icon: 'database' },
-    { id: 'dwh', label: 'DWH', icon: 'database' }
+    { id: 'dwh', label: 'DWH', icon: 'database' },
+    { id: 'integration', label: 'Integración', icon: 'hub' }
   ];
 
   selectTab(tabId: string): void {

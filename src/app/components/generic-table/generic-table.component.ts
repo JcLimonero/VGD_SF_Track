@@ -9,6 +9,7 @@ import { InventoryModalComponent } from '../inventory/inventory-modal/inventory-
 import { CustomerModalComponent } from '../customer/customer-modal/customer-modal.component';
 import { ServiceModalComponent } from '../servicios/service-modal/service-modal.component';
 import { LeadsModalComponent } from '../leads/leads-modal/leads-modal.component';
+import { ModalGenericComponent } from '../modal-generic/modal-generic.component';
 @Component({
   selector: 'vex-generic-table',
   standalone: true,
@@ -226,6 +227,14 @@ export class GenericTableComponent implements OnInit, OnChanges {
     return sendedSalesForceValue === '1' || sendedSalesForceValue === 1;
   }
 
+  isSentIconValue(value: any): boolean {
+    return String(value) === '1';
+  }
+
+  isValidIconValue(value: any): boolean {
+    return String(value) === '1';
+  }
+
   copyErrorToClipboard(element: any): void {
     const errorMessage = this.cellValue(element, 'resultSF');
     if (!errorMessage) return;
@@ -291,6 +300,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
     const isLeadsData = this.isLeadsData(rowData);
     const isServiceData = this.isServiceData(rowData);
     const isInventoryData = this.isInventoryData(rowData);
+    const isInvoiceData = this.isInvoiceData(rowData);
     const isCustomerData = this.isCustomerData(rowData);
     
     // Seleccionar el componente de modal apropiado
@@ -299,10 +309,12 @@ export class GenericTableComponent implements OnInit, OnChanges {
       modalComponent = LeadsModalComponent;
     } else if (isServiceData) {
       modalComponent = ServiceModalComponent;
-    } else if (isCustomerData) {
-      modalComponent = CustomerModalComponent;
     } else if (isInventoryData) {
       modalComponent = InventoryModalComponent;
+    } else if (isInvoiceData) {
+      modalComponent = ModalGenericComponent;
+    } else if (isCustomerData) {
+      modalComponent = CustomerModalComponent;
     } else {
       modalComponent = ModalDialogComponent;
     }
@@ -320,8 +332,22 @@ export class GenericTableComponent implements OnInit, OnChanges {
   
   // Metodo para detectar si los datos son de inventario
   private isInventoryData(data: any): boolean {
-    return !!(data?.statusDescription || data?.typeDescription || 
-             (data?.brand && data?.model && !data?.order_dms));
+    return !!(
+      data?.statusDescription ||
+      data?.typeDescription ||
+      data?.brand ||
+      data?.model ||
+      data?.version ||
+      data?.km ||
+      data?.exterior_color ||
+      data?.interior_color ||
+      (data?.vin && data?.idAgency && !data?.order_dms)
+    );
+  }
+
+  // Metodo para detectar si los datos son de facturas
+  private isInvoiceData(data: any): boolean {
+    return !!(data?.invoice_reference || data?.billing_date || data?.sf_jsonRequest);
   }
 
   // Metodo para detectar si los datos son de cliente
@@ -340,9 +366,12 @@ export class GenericTableComponent implements OnInit, OnChanges {
     return !!(data?.LeadNo || data?.OemLeadId || data?.FullName);
   }
 
-  openJsonModal(rowData: any) {
+  openJsonModal(rowData: any, jsonField: string = 'sf_jsonRequest', modalTitle: string = 'JSON Request - SalesForce') {
     const dialogRef = this.dialog.open(JsonModalComponent, {
-      data: rowData.sf_jsonRequest,
+      data: {
+        payload: this.cellValue(rowData, jsonField),
+        title: modalTitle
+      },
       width: '90%',
       maxWidth: '900px',
       maxHeight: '80vh'
@@ -472,7 +501,7 @@ export class ModalDialogComponent {
   standalone: true,
   imports: [MatDialogModule, MatButtonModule, CommonModule],
   template: `
-    <h2 mat-dialog-title>JSON Request - SalesForce</h2>
+    <h2 mat-dialog-title>{{ modalTitle }}</h2>
 
     <mat-dialog-content class="mat-typography">
       <div class="json-container">
@@ -520,6 +549,7 @@ export class ModalDialogComponent {
   `]
 })
 export class JsonModalComponent {
+  modalTitle = 'JSON Request - SalesForce';
   formattedJson: string;
   copyButtonText = 'Copiar';
 
@@ -527,17 +557,23 @@ export class JsonModalComponent {
     public dialogRef: MatDialogRef<JsonModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
+    const rawPayload = data && typeof data === 'object' && 'payload' in data ? data.payload : data;
+    const customTitle = data && typeof data === 'object' && 'title' in data ? data.title : null;
+    if (typeof customTitle === 'string' && customTitle.trim()) {
+      this.modalTitle = customTitle;
+    }
+
     // Format JSON with proper indentation
     try {
-      if (typeof data === 'string') {
+      if (typeof rawPayload === 'string') {
         // If it's a string, try to parse and re-stringify
-        this.formattedJson = JSON.stringify(JSON.parse(data), null, 2);
+        this.formattedJson = JSON.stringify(JSON.parse(rawPayload), null, 2);
       } else {
-        this.formattedJson = JSON.stringify(data, null, 2);
+        this.formattedJson = JSON.stringify(rawPayload, null, 2);
       }
     } catch (e) {
       // If parsing fails, show as-is
-      this.formattedJson = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+      this.formattedJson = typeof rawPayload === 'string' ? rawPayload : JSON.stringify(rawPayload, null, 2);
     }
   }
 

@@ -1,21 +1,28 @@
 .invoice-details {
   max-height: 400px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .detail-row {
-  margin-bottom: 12px;
-  padding: 8px;
   border-bottom: 1px solid #e0e0e0;
-  
-  &:last-child {
-    border-bottom: none;
-  }
-  
-  strong {
-    color: #1976d2;
-    margin-right: 8px;
-  }
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row strong {
+  color: #1b1a1aff;
+  margin-right: 8px;
+}
+
+.title {
+  text-decoration: underline;
+  text-decoration-color: #FF5C20;
+  text-decoration-thickness: 3px;
+  align-self: center;
 }
 
 mat-dialog-content {

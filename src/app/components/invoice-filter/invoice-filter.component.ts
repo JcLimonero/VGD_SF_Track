@@ -14,6 +14,7 @@ export class InvoiceFilterComponent implements OnInit {
 
   @Output() filterChange = new EventEmitter<{
     order_dms?: string;
+    ndClientDMS?: string;
     vin?: string;
     reference?: string;
     agencyName?: string;
@@ -35,6 +36,7 @@ export class InvoiceFilterComponent implements OnInit {
   constructor(private fb: FormBuilder, private vanguardiaApi: VanguardiaApiService) {
     this.filterForm = this.fb.group({
       order_dms: [''],
+      ndClientDMS: [''],
       vin: [''],
       reference: [''],
       agencyName: [''],
@@ -80,9 +82,10 @@ export class InvoiceFilterComponent implements OnInit {
     console.log('Filtro activado - valores del formulario:', this.filterForm.value);
     console.log('🔍selectedAgency actual:', this.selectedAgency);
     
-    const { order_dms, vin, reference, agencyName, sendedSalesForce, insertado, error } = this.filterForm
+    const { order_dms, ndClientDMS, vin, reference, agencyName, sendedSalesForce, insertado, error } = this.filterForm
       .value as {
       order_dms?: string;
+      ndClientDMS?: string;
       vin?: string;
       reference?: string;
       agencyName?: string;
@@ -93,6 +96,7 @@ export class InvoiceFilterComponent implements OnInit {
 
     const payload = {
       order_dms,
+      ndClientDMS,
       vin,
       reference,
       agencyName,
@@ -112,6 +116,7 @@ export class InvoiceFilterComponent implements OnInit {
     this.selectedAgency = '';
     this.filterForm.reset({
       order_dms: '',
+      ndClientDMS: '',
       vin: '',
       reference: '',
       agencyName: '',
@@ -123,6 +128,7 @@ export class InvoiceFilterComponent implements OnInit {
     // Emitir filtros vacíos para que la tabla se resetee
     const emptyPayload = {
       order_dms: undefined,
+      ndClientDMS: undefined,
       vin: undefined,
       reference: undefined,
       agencyName: undefined,

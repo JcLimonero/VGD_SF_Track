@@ -1,18 +1,15 @@
-<h2 mat-dialog-title>Detalles de la Factura</h2>
+<h2 mat-dialog-title class="title text-xl">Detalles de la orden</h2>
 
 <mat-dialog-content class="mat-typography">
   <div class="invoice-details">
     <div class="detail-row">
-      <strong>ID:</strong> {{ data?.Id }}
+      <strong>Agencia:</strong> {{ data?.agencyName }}
     </div>
     <div class="detail-row">
-      <strong>ID Agencia:</strong> {{ data?.idAgency }}
+      <strong>No.Pedido:</strong> {{ data?.order_dms }}
     </div>
     <div class="detail-row">
-      <strong>Nombre de Agencia:</strong> {{ data?.agencyName }}
-    </div>
-    <div class="detail-row">
-      <strong>Número de Pedido DMS:</strong> {{ data?.order_dms }}
+      <strong>No.Cliente:</strong> {{ data?.ndClientDMS }}
     </div>
     <div class="detail-row">
       <strong>Estado:</strong> {{ data?.state }}

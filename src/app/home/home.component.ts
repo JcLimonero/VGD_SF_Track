@@ -15,6 +15,7 @@ import { DwhTableComponent } from '../components/dwh/dwh-table/dwh-table.compone
 import { DwhFiltersComponent } from '../components/dwh/dwh-filters/dwh-filters.component';
 import { LeadsTableComponent } from '../components/leads/leads-table/leads-table.component';
 import { LeadsFilterComponent } from '../components/leads/leads-filter/leads-filter.component';
+import { IntegrationComponent } from '../components/integration/integration.component';
 @Component({
   selector: 'vex-home',
   standalone: true,
@@ -34,7 +35,8 @@ import { LeadsFilterComponent } from '../components/leads/leads-filter/leads-fil
     DwhTableComponent,
     DwhFiltersComponent,
     LeadsTableComponent,
-    LeadsFilterComponent
+    LeadsFilterComponent,
+    IntegrationComponent
 ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'

@@ -24,7 +24,7 @@ export class InvoiceTableComponent implements OnInit {
   total = 0;
   defaultPageSize = 5; // Tamaño por defecto
   pageIndex = 0;
-  currentFilters: { order_dms?: string; vin?: string; reference?: string; agencyName?: string; sendedSalesForce?: '1'|'0'; insertado?: boolean; error?: boolean } = {};
+  currentFilters: { order_dms?: string; ndClientDMS?: string; vin?: string; reference?: string; agencyName?: string; sendedSalesForce?: '1'|'0'; insertado?: boolean; error?: boolean } = {};
   currentSort: { column: string; direction: 'asc' | 'desc' } | null = { column: 'billing_date', direction: 'desc' };
   isDownloadingExcel = false;
 
@@ -52,6 +52,7 @@ export class InvoiceTableComponent implements OnInit {
   get hasActiveFilters(): boolean {
     return !!(
       this.currentFilters.order_dms ||
+      this.currentFilters.ndClientDMS ||
       this.currentFilters.vin ||
       this.currentFilters.reference ||
       this.currentFilters.agencyName ||
@@ -82,6 +83,7 @@ loadPage(pageIndex: number, pageSize: number): void {
 
   // Map current filters to params
   if (this.currentFilters.order_dms) params.order_dms = this.currentFilters.order_dms;
+  if (this.currentFilters.ndClientDMS) params.ndClientDMS = this.currentFilters.ndClientDMS;
   if (this.currentFilters.vin) params.vin = this.currentFilters.vin;
   if (this.currentFilters.reference) params.invoice_reference = this.currentFilters.reference;
   if (this.currentFilters.agencyName) params.agencyName = this.currentFilters.agencyName;
@@ -112,7 +114,7 @@ loadPage(pageIndex: number, pageSize: number): void {
   });
 }
 
-applyFilter(filters: { order_dms?: string; vin?: string; reference?: string; agencyName?: string; sendedSalesForce?: '1' | '0'; insertado?: boolean; error?: boolean }): void {
+applyFilter(filters: { order_dms?: string; ndClientDMS?: string; vin?: string; reference?: string; agencyName?: string; sendedSalesForce?: '1' | '0'; insertado?: boolean; error?: boolean }): void {
   console.log('ApplyFilter recibido:', filters);
   // Guardar filtros y reiniciar a primera página
   this.currentFilters = { ...filters };
@@ -195,6 +197,7 @@ onSortChange(sort: { column: string; direction: 'asc' | 'desc' }): void {
 
     // Aplicar los mismos filtros que están actualmente activos
     if (this.currentFilters.order_dms) baseParams.order_dms = this.currentFilters.order_dms;
+    if (this.currentFilters.ndClientDMS) baseParams.ndClientDMS = this.currentFilters.ndClientDMS;
     if (this.currentFilters.vin) baseParams.vin = this.currentFilters.vin;
     if (this.currentFilters.reference) baseParams.invoice_reference = this.currentFilters.reference;
     if (this.currentFilters.agencyName) baseParams.agencyName = this.currentFilters.agencyName;
