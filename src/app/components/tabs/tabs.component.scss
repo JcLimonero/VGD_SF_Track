@@ -1,13 +1,22 @@
 li {
     // padding-left: 0.5rem;
     // padding-right: 0.5rem;
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
     padding-bottom: 0.3rem;
     transition: all 0.3s ease;
 }
 
 @media (min-width: 640px) {
+    li {
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+        padding-left: 0.4rem;
+        padding-right: 0.4rem;
+    }
+}
+
+@media (min-width: 1280px) {
     li {
         padding-left: 1rem;
         padding-right: 1rem;

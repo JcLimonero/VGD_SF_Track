@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { httpTestProviders } from '@testing/test-providers';
 
 import { InvoiceFilterComponent } from './invoice-filter.component';
 
@@ -8,7 +9,8 @@ describe('InvoiceFilterComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [InvoiceFilterComponent]
+      imports: [InvoiceFilterComponent],
+      providers: httpTestProviders
     })
     .compileComponents();
     

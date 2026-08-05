@@ -25,7 +25,10 @@ export class TabsComponent {
     { id: 'services', label: 'Servicios', icon: 'car_repair' },
     { id: 'clients', label: 'Clientes', icon: 'group' },
     { id: 'leads', label: 'Leads', icon: 'database' },
-    { id: 'dwh', label: 'DWH', icon: 'database' }
+    { id: 'dwh', label: 'DWH', icon: 'database' },
+    { id: 'crabi', label: 'Crabi', icon: 'directions_car' },
+    { id: 'salesforce', label: 'Integración SF', icon: 'cloud' },
+    { id: 'hondasf', label: 'Honda SF', icon: 'cloud_sync' }
   ];
 
   selectTab(tabId: string): void {

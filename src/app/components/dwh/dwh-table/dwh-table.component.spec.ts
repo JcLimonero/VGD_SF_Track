@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { httpTestProviders } from '@testing/test-providers';
 
 import { DwhTableComponent } from './dwh-table.component';
 
@@ -8,7 +9,8 @@ describe('DwhTableComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DwhTableComponent]
+      imports: [DwhTableComponent],
+      providers: httpTestProviders
     })
     .compileComponents();
     

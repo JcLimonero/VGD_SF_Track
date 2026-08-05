@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { httpTestProviders } from '@testing/test-providers';
 
 import { DwhFiltersComponent } from './dwh-filters.component';
 
@@ -8,7 +9,8 @@ describe('DwhFiltersComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DwhFiltersComponent]
+      imports: [DwhFiltersComponent],
+      providers: httpTestProviders
     })
     .compileComponents();
     

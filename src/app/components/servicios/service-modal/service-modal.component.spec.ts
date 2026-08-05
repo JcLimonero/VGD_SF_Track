@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { dialogTestProviders } from '@testing/test-providers';
 
 import { ServiceModalComponent } from './service-modal.component';
 
@@ -8,7 +9,8 @@ describe('ServiceModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ServiceModalComponent]
+      imports: [ServiceModalComponent],
+      providers: dialogTestProviders()
     })
     .compileComponents();
     
