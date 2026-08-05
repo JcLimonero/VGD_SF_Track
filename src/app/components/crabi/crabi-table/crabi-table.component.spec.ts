@@ -241,6 +241,23 @@ describe('CrabiTableComponent', () => {
     expect(component.loading).toBeFalse();
   });
 
+  it('keeps the active filters in the Excel pages', () => {
+    spyOn(console, 'error');
+    fixture.detectChanges();
+    flushAgencies();
+    flushOrders();
+
+    component.applyFilter({ isSend: '0' });
+    flushOrders(ORDERS, 120);
+
+    component.downloadExcel();
+    const pages = httpMock.match(isOrders);
+    expect(pages.length).toBe(2);
+    pages.forEach((p) => expect(p.request.params.get('isSend')).toBe('0'));
+
+    pages[0].flush('x', { status: 500, statusText: 'Server Error' });
+  });
+
   it('does not attempt an Excel download when there is nothing to export', () => {
     const warn = spyOn(console, 'warn');
     component.total = 0;
@@ -262,6 +279,13 @@ describe('CrabiTableComponent', () => {
     expect(pages.length).toBe(3);
     expect(pages.map((p) => p.request.params.get('page'))).toEqual(['1', '2', '3']);
     expect(pages[0].request.params.get('perpage')).toBe('100');
+
+    // Sin ordenar: `captured_at` tiene empates y la API no desempata, asi que
+    // pedir las paginas ordenadas devolvia filas repetidas y otras faltantes
+    pages.forEach((p) => {
+      expect(p.request.params.has('orderby')).toBeFalse();
+      expect(p.request.params.has('ordertype')).toBeFalse();
+    });
 
     // Se falla la primera para no generar el archivo dentro de la prueba;
     // forkJoin cancela las demás por sí solo

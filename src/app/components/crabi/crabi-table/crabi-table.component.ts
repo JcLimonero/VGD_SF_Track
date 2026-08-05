@@ -179,6 +179,12 @@ export class CrabiTableComponent implements OnInit {
    *
    * Es la única escritura del módulo. No hay alta ni baja de registros: el
    * portal solo consulta y reenvía.
+   *
+   * El cuerpo lleva solo `isSend`, a diferencia de los demás módulos, que
+   * mandan `{ ...row, sendedSalesForce: '0' }`. Aquí no debe hacerse: `row`
+   * trae `agencyName`, que se resuelve en el cliente y no es columna de
+   * `orders_to_crabi`, así que se enviaría un campo inexistente. El `id` va en
+   * la ruta y no hace falta repetirlo en el cuerpo.
    */
   resendToCrabi(row: any): void {
     if (!row.id) {
@@ -206,10 +212,16 @@ export class CrabiTableComponent implements OnInit {
     this.isDownloadingExcel = true;
 
     // Se pide por páginas, igual que en los demás módulos, para no depender de
-    // que la API acepte un perpage arbitrariamente grande
+    // que la API acepte un perpage arbitrariamente grande.
+    //
+    // Deliberadamente SIN ordenar: `captured_at` tiene muchísimos empates (en
+    // 100 filas hay 3 valores distintos, uno repetido 64 veces) y la API no
+    // desempata, así que el orden entre páginas no es estable y las descargas
+    // salían con filas repetidas y otras faltantes. Sin `orderby` la paginación
+    // es consistente; el orden se aplica aquí, ya con todo en memoria.
     const maxPerPage = 100;
     const totalPages = Math.ceil(this.total / maxPerPage);
-    const baseParams = this.buildParams();
+    const baseParams = { ...this.currentFilters };
 
     const pageRequests = [];
     for (let page = 1; page <= totalPages; page++) {
@@ -225,7 +237,7 @@ export class CrabiTableComponent implements OnInit {
           responses.forEach((response) => allData.push(...response.items));
 
           // El Excel lleva todos los campos, no solo los visibles en la tabla
-          const excelData = this.withAgencyName(allData).map((item) => {
+          const excelData = this.sortInMemory(this.withAgencyName(allData)).map((item) => {
             const row: Record<string, any> = {};
             Object.keys(this.detailLabels).forEach((field) => {
               row[this.detailLabels[field]] = item[field] ?? '';
@@ -262,6 +274,27 @@ export class CrabiTableComponent implements OnInit {
         console.error('⚠️ Error al obtener datos de Crabi para Excel:', error);
         this.isDownloadingExcel = false;
       }
+    });
+  }
+
+  /**
+   * Ordena en memoria con el criterio activo en la tabla, para que el Excel
+   * salga como el usuario lo está viendo. Se usa solo en la descarga: ahí las
+   * páginas se piden sin ordenar para que la paginación sea consistente.
+   */
+  private sortInMemory(rows: any[]): any[] {
+    const sort = this.currentSort;
+    if (!sort?.column) return rows;
+
+    const dir = sort.direction === 'desc' ? -1 : 1;
+    return [...rows].sort((a, b) => {
+      const av = a[sort.column];
+      const bv = b[sort.column];
+      // Los nulos al final, sin importar la dirección
+      if (av === null || av === undefined) return 1;
+      if (bv === null || bv === undefined) return -1;
+      if (av === bv) return 0;
+      return av < bv ? -1 * dir : 1 * dir;
     });
   }
 
