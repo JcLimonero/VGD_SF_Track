@@ -31,8 +31,12 @@
   [hasActiveFilters]="hasActiveFilters"
   [modalComponent]="detailModal"
   [detailLabels]="detailLabels"
+  [detailExclude]="detailExclude"
   [sortableColumns]="sortableColumns"
   [sendField]="sendField"
+  [jsonField]="jsonField"
+  [jsonTitle]="jsonTitle"
+  [jsonFields]="jsonFields"
   [onResend]="resendToCrabi.bind(this)"
   (pageChanged)="loadPage($event.pageIndex, $event.pageSize)"
   (sortChanged)="onSortChange($event)">

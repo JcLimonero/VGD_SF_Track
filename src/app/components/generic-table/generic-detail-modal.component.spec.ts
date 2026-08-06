@@ -74,6 +74,25 @@ describe('GenericDetailModalComponent', () => {
     expect(component.entries[0].value).toBe('{"a":1}');
   });
 
+  it('leaves out the excluded fields', () => {
+    const component = setup({
+      row: { vin: 'VIN1', request_body: '{"rfc":"X"}', response_body: '{}' },
+      labels: {},
+      exclude: ['request_body', 'response_body']
+    }).componentInstance;
+
+    expect(component.entries.map((e) => e.label)).toEqual(['Vin']);
+  });
+
+  it('lists every field when no exclusion is given', () => {
+    const component = setup({
+      row: { vin: 'VIN1', request_body: '{}' },
+      labels: {}
+    }).componentInstance;
+
+    expect(component.entries.length).toBe(2);
+  });
+
   it('handles a null row without throwing', () => {
     const component = setup({ row: null, labels: {} }).componentInstance;
     expect(component.entries).toEqual([]);

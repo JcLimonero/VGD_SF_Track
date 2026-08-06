@@ -116,6 +116,51 @@ describe('CrabiTableComponent', () => {
     });
   });
 
+  describe('petición y respuesta', () => {
+    // Van en su propio modal, como 'Datos' en los módulos que mandan a
+    // Salesforce, y no sueltas en la lista de detalles
+
+    it('keeps them out of the detail modal', () => {
+      expect(component.detailExclude).toEqual([
+        'request_body',
+        'response_body'
+      ]);
+    });
+
+    it('shows in the JSON modal exactly what the detail modal hides', () => {
+      // Si se excluye un campo y no se muestra en otro lado, se pierde
+      expect(component.jsonFields.map((f) => f.field)).toEqual(
+        component.detailExclude
+      );
+    });
+
+    it('opens from a column that is not a field of the record', () => {
+      const column = component.columns.find(
+        (col) => col.property === component.jsonField
+      );
+
+      expect(column?.type).toBe('button');
+      expect(component.displayedColumns).toContain(component.jsonField);
+      // Al no ser un campo real no debe acabar como columna del Excel
+      expect(component.detailLabels[component.jsonField]).toBeUndefined();
+    });
+
+    it('still exports both to the Excel', () => {
+      // Igual que 'JSON Request SF' y 'JSON Response SF' en el de facturas
+      const rows = component.buildExcelRows([
+        { ...ORDERS[0], request_body: '{"vin":"V1"}', response_body: '{}' }
+      ]);
+
+      expect(rows[0]['Petición']).toBe('{"vin":"V1"}');
+      expect(rows[0]['Respuesta']).toBe('{}');
+    });
+
+    it('does not add a column for the JSON button to the Excel', () => {
+      const rows = component.buildExcelRows([ORDERS[0]]);
+      expect(Object.keys(rows[0])).not.toContain('Datos');
+    });
+  });
+
   it('requests the real Crabi endpoint on init', () => {
     fixture.detectChanges();
     flushAgencies();

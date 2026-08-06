@@ -30,8 +30,14 @@ export class GenericTableComponent implements OnInit, OnChanges {
   @Input() onResend: ((row: any) => void) | null = null; // Función para reenviar registro
   @Input() modalComponent: any = null; // Modal de detalles a usar; si es null se detecta por la forma del registro
   @Input() detailLabels: Record<string, string> | null = null; // Etiquetas de los campos dentro del modal de detalles
+  @Input() detailExclude: string[] | null = null; // Campos que el modal de detalles no debe listar
   @Input() sortableColumns: string[] | null = null; // Columnas ordenables; si es null se usa la lista por defecto
   @Input() sendField: string = 'sendedSalesForce'; // Campo que indica si el registro ya se envió; Crabi usa 'isSend'
+  @Input() jsonField: string = 'sf_jsonRequest'; // Columna que abre el modal de JSON; Crabi usa 'json_data'
+  @Input() jsonTitle: string = 'JSON Request - SalesForce'; // Título de ese modal
+  // Campos que muestra el modal de JSON. Si es null se muestra solo `jsonField`,
+  // que es el caso de los módulos que mandan a Salesforce.
+  @Input() jsonFields: { field: string; label: string }[] | null = null;
   @Output() pageChanged = new EventEmitter<{ pageIndex: number; pageSize: number }>();
   @Output() sortChanged = new EventEmitter<{ column: string; direction: 'asc' | 'desc' }>();
   
@@ -298,7 +304,11 @@ export class GenericTableComponent implements OnInit, OnChanges {
     // Si el padre indicó un modal explícito, se usa sin detectar la forma del registro
     if (this.modalComponent) {
       this.dialog.open(this.modalComponent, {
-        data: { row: rowData, labels: this.detailLabels },
+        data: {
+          row: rowData,
+          labels: this.detailLabels,
+          exclude: this.detailExclude
+        },
         width: '80%',
         maxWidth: '800px'
       });
@@ -359,8 +369,14 @@ export class GenericTableComponent implements OnInit, OnChanges {
   }
 
   openJsonModal(rowData: any) {
+    const fields = this.jsonFields ?? [{ field: this.jsonField, label: '' }];
+    const sections = fields.map(({ field, label }) => ({
+      label,
+      value: this.cellValue(rowData, field)
+    }));
+
     const dialogRef = this.dialog.open(JsonModalComponent, {
-      data: rowData.sf_jsonRequest,
+      data: { title: this.jsonTitle, sections },
       width: '90%',
       maxWidth: '900px',
       maxHeight: '80vh'
@@ -490,11 +506,14 @@ export class ModalDialogComponent {
   standalone: true,
   imports: [MatDialogModule, MatButtonModule, CommonModule],
   template: `
-    <h2 mat-dialog-title>JSON Request - SalesForce</h2>
+    <h2 mat-dialog-title>{{ title }}</h2>
 
     <mat-dialog-content class="mat-typography">
-      <div class="json-container">
-        <pre class="json-content">{{ formattedJson }}</pre>
+      <div class="json-section" *ngFor="let section of sections">
+        <h3 class="json-label" *ngIf="section.label">{{ section.label }}</h3>
+        <div class="json-container">
+          <pre class="json-content">{{ section.content }}</pre>
+        </div>
       </div>
     </mat-dialog-content>
 
@@ -509,6 +528,16 @@ export class ModalDialogComponent {
     </mat-dialog-actions>
   `,
   styles: [`
+    .json-section + .json-section {
+      margin-top: 16px;
+    }
+
+    .json-label {
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #1b1a1a;
+    }
+
     .json-container {
       background-color: #f5f5f5;
       border-radius: 4px;
@@ -538,24 +567,51 @@ export class ModalDialogComponent {
   `]
 })
 export class JsonModalComponent {
-  formattedJson: string;
+  title = 'JSON Request - SalesForce';
+  sections: { label: string; content: string }[] = [];
   copyButtonText = 'Copiar';
 
   constructor(
     public dialogRef: MatDialogRef<JsonModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    // Format JSON with proper indentation
+    // `vex-generic-table` envía { title, sections }; también se acepta un valor
+    // suelto por si el modal se abre desde otro lugar. Se distingue por la
+    // presencia de la llave `sections`, no por su valor.
+    const isWrapped = !!data && typeof data === 'object' && 'sections' in data;
+
+    if (isWrapped) {
+      this.title = data.title || this.title;
+      this.sections = (data.sections ?? []).map((section: any) => ({
+        label: section?.label ?? '',
+        content: this.format(section?.value)
+      }));
+    } else {
+      this.sections = [{ label: '', content: this.format(data) }];
+    }
+  }
+
+  /** Lo que se copia: todas las secciones, con su etiqueta si la tienen. */
+  get formattedJson(): string {
+    return this.sections
+      .map((section) =>
+        section.label ? `${section.label}:\n${section.content}` : section.content
+      )
+      .join('\n\n');
+  }
+
+  /** Indenta el JSON; si no se puede interpretar se muestra tal cual llegó. */
+  private format(value: any): string {
+    if (value === null || value === undefined || value === '') return 'Sin datos';
+
     try {
-      if (typeof data === 'string') {
-        // If it's a string, try to parse and re-stringify
-        this.formattedJson = JSON.stringify(JSON.parse(data), null, 2);
-      } else {
-        this.formattedJson = JSON.stringify(data, null, 2);
-      }
+      return JSON.stringify(
+        typeof value === 'string' ? JSON.parse(value) : value,
+        null,
+        2
+      );
     } catch (e) {
-      // If parsing fails, show as-is
-      this.formattedJson = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+      return typeof value === 'string' ? value : String(value);
     }
   }
 
