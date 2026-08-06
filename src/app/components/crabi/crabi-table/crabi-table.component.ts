@@ -38,11 +38,32 @@ export class CrabiTableComponent implements OnInit {
   private agencyNames: Record<string, string> = {};
 
   /**
-   * Modal de detalles genérico: recorre todos los campos del registro, incluidos
-   * `request_body` y `response_body`, que son los que explican por qué falló un
-   * envío y no caben en la tabla.
+   * Modal de detalles genérico: recorre todos los campos del registro en lugar
+   * de tener una lista fija, porque el esquema de Crabi no es el de facturas.
    */
   readonly detailModal = GenericDetailModalComponent;
+
+  /**
+   * `request_body` y `response_body` salen del modal de detalles y se muestran
+   * en el de JSON, igual que `sf_jsonRequest` en los módulos que mandan a
+   * Salesforce.
+   *
+   * Son el payload que se envió a Crabi y lo que Crabi contestó. En la lista de
+   * detalles aparecían como un renglón de JSON sin formato, mezclado con los
+   * datos del vehículo; en su propio modal salen indentados y con botón de
+   * copiar, y los datos personales del cliente que lleva la petición quedan
+   * detrás de un clic explícito en vez de a la vista.
+   *
+   * No se ocultan del todo: `response_body` es lo que dice por qué falló un
+   * envío, que es con lo que se decide si reenviar.
+   */
+  readonly detailExclude = ['request_body', 'response_body'];
+  readonly jsonField = 'json_data';
+  readonly jsonTitle = 'Petición y respuesta - Crabi';
+  readonly jsonFields = [
+    { field: 'request_body', label: 'Petición' },
+    { field: 'response_body', label: 'Respuesta' }
+  ];
 
   /** Campo de envío de este módulo (los demás usan `sendedSalesForce`) */
   readonly sendField = 'isSend';
@@ -69,6 +90,11 @@ export class CrabiTableComponent implements OnInit {
    * `id_status` no es columna porque hoy vale 3 en todos los registros, pero se
    * etiqueta igual: el modal recorre el registro completo, así que quitarlo de
    * aquí no lo ocultaría, solo lo dejaría sin traducir.
+   *
+   * `request_body` y `response_body` siguen aquí aunque `detailExclude` los saca
+   * del modal de detalles: estas etiquetas también nombran las columnas del
+   * Excel, donde sí van, como 'JSON Request SF' y 'JSON Response SF' en el de
+   * facturas.
    */
   private readonly extraLabels: Record<string, string> = {
     id: 'ID',
@@ -96,6 +122,9 @@ export class CrabiTableComponent implements OnInit {
     { property: 'isSend', label: 'Envío Crabi', type: 'text' },
     { property: 'captured_at', label: 'Capturado', type: 'text' },
     { property: 'sent_at', label: 'Fecha Envío', type: 'text' },
+    // No es un campo del registro: es la columna que abre el modal con
+    // `request_body` y `response_body`, como 'Datos' en los demás módulos
+    { property: 'json_data', label: 'Datos', type: 'button' },
     { property: 'resend', label: 'Reenviar', type: 'button' },
     { property: 'actions', label: 'Detalles', type: 'button' }
   ];
@@ -112,6 +141,7 @@ export class CrabiTableComponent implements OnInit {
     'isSend',
     'captured_at',
     'sent_at',
+    'json_data',
     'resend',
     'actions'
   ];
@@ -236,14 +266,7 @@ export class CrabiTableComponent implements OnInit {
           const allData: any[] = [];
           responses.forEach((response) => allData.push(...response.items));
 
-          // El Excel lleva todos los campos, no solo los visibles en la tabla
-          const excelData = this.sortInMemory(this.withAgencyName(allData)).map((item) => {
-            const row: Record<string, any> = {};
-            Object.keys(this.detailLabels).forEach((field) => {
-              row[this.detailLabels[field]] = item[field] ?? '';
-            });
-            return row;
-          });
+          const excelData = this.buildExcelRows(allData);
 
           const worksheet = XLSX.utils.json_to_sheet(excelData);
           const workbook = XLSX.utils.book_new();
@@ -274,6 +297,22 @@ export class CrabiTableComponent implements OnInit {
         console.error('⚠️ Error al obtener datos de Crabi para Excel:', error);
         this.isDownloadingExcel = false;
       }
+    });
+  }
+
+  /**
+   * Arma las filas del Excel: una columna por cada campo etiquetado, no solo
+   * por los visibles en la tabla. `request_body` y `response_body` van incluidos
+   * aunque no se listen en el modal de detalles, igual que 'JSON Request SF' y
+   * 'JSON Response SF' en el Excel de facturas.
+   */
+  buildExcelRows(items: any[]): Record<string, any>[] {
+    return this.sortInMemory(this.withAgencyName(items)).map((item) => {
+      const row: Record<string, any> = {};
+      Object.keys(this.detailLabels).forEach((field) => {
+        row[this.detailLabels[field]] = item[field] ?? '';
+      });
+      return row;
     });
   }
 

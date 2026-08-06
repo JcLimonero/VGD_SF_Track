@@ -93,23 +93,35 @@ export class GenericDetailModalComponent {
     public dialogRef: MatDialogRef<GenericDetailModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    // `vex-generic-table` envía { row, labels }; también se acepta el registro
-    // directo por si el modal se abre desde otro lugar. Se distingue por la
-    // presencia de la llave `row`, no por su valor: un `row` nulo es válido y
-    // no debe hacer que se listen los campos del propio envoltorio.
+    // `vex-generic-table` envía { row, labels, exclude }; también se acepta el
+    // registro directo por si el modal se abre desde otro lugar. Se distingue
+    // por la presencia de la llave `row`, no por su valor: un `row` nulo es
+    // válido y no debe hacer que se listen los campos del propio envoltorio.
     const isWrapped = !!data && typeof data === 'object' && 'row' in data;
     const row = isWrapped ? data.row : data;
     const labels = (isWrapped ? data.labels : null) ?? {};
-    this.entries = this.buildEntries(row, labels);
+    const exclude = (isWrapped ? data.exclude : null) ?? [];
+    this.entries = this.buildEntries(row, labels, exclude);
   }
 
-  private buildEntries(row: any, labels: Record<string, string>): DetailEntry[] {
+  /**
+   * `exclude` deja fuera campos que sí vienen en el registro. Se usa para los
+   * que no se leen bien en una lista de renglones —un JSON completo, por
+   * ejemplo—, que se muestran aparte en su propio modal.
+   */
+  private buildEntries(
+    row: any,
+    labels: Record<string, string>,
+    exclude: string[]
+  ): DetailEntry[] {
     if (!row || typeof row !== 'object') return [];
 
-    return Object.entries(row).map(([field, value]) => ({
-      label: labels[field] ?? humanizeFieldName(field),
-      value: this.formatValue(value)
-    }));
+    return Object.entries(row)
+      .filter(([field]) => !exclude.includes(field))
+      .map(([field, value]) => ({
+        label: labels[field] ?? humanizeFieldName(field),
+        value: this.formatValue(value)
+      }));
   }
 
   private formatValue(value: any): string {

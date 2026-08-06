@@ -57,7 +57,22 @@ describe('GenericTableComponent', () => {
       expect(open).toHaveBeenCalled();
       const [modal, config] = open.calls.mostRecent().args as any[];
       expect(modal).toBe(GenericDetailModalComponent);
-      expect(config.data).toEqual({ row, labels: { vin: 'VIN' } });
+      expect(config.data).toEqual({
+        row,
+        labels: { vin: 'VIN' },
+        exclude: null
+      });
+    });
+
+    it('forwards the excluded fields', () => {
+      const open = spyOn(component.dialog, 'open');
+      component.modalComponent = GenericDetailModalComponent;
+      component.detailExclude = ['request_body'];
+
+      component.openModal({ vin: 'VIN1', request_body: '{}' });
+
+      const [, config] = open.calls.mostRecent().args as any[];
+      expect(config.data.exclude).toEqual(['request_body']);
     });
 
     it('falls back to shape detection when no modal is given', () => {
@@ -76,6 +91,48 @@ describe('GenericTableComponent', () => {
       expect(modal).not.toBe(GenericDetailModalComponent);
       // En la ruta anterior el registro se pasa tal cual
       expect(config.data.LeadNo).toBe('LD1');
+    });
+  });
+
+  describe('openJsonModal', () => {
+    function openWith(row: any) {
+      const open = spyOn(component.dialog, 'open').and.returnValue({
+        afterClosed: () => of(undefined)
+      } as any);
+      component.openJsonModal(row);
+      const [, config] = open.calls.mostRecent().args as any[];
+      return config.data;
+    }
+
+    it('shows sf_jsonRequest by default', () => {
+      // Los módulos que mandan a Salesforce no configuran nada; el
+      // comportamiento previo al modal de varias secciones debe mantenerse
+      expect(component.jsonField).toBe('sf_jsonRequest');
+      expect(component.jsonFields).toBeNull();
+
+      const data = openWith({ sf_jsonRequest: '{"a":1}', other: 'x' });
+
+      expect(data.title).toBe('JSON Request - SalesForce');
+      expect(data.sections).toEqual([{ label: '', value: '{"a":1}' }]);
+    });
+
+    it('shows one section per configured field', () => {
+      component.jsonTitle = 'Petición y respuesta - Crabi';
+      component.jsonFields = [
+        { field: 'request_body', label: 'Petición' },
+        { field: 'response_body', label: 'Respuesta' }
+      ];
+
+      const data = openWith({
+        request_body: '{"rfc":"X"}',
+        response_body: '{"code":201}'
+      });
+
+      expect(data.title).toBe('Petición y respuesta - Crabi');
+      expect(data.sections).toEqual([
+        { label: 'Petición', value: '{"rfc":"X"}' },
+        { label: 'Respuesta', value: '{"code":201}' }
+      ]);
     });
   });
 
