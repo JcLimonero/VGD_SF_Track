@@ -1,5 +1,4 @@
 import { Component, ViewChild } from '@angular/core';
-import { MockDataService } from '../services/mock-data.service';
 import { VexPageLayoutComponent } from '@vex/components/vex-page-layout/vex-page-layout.component';
 import { MenuComponent } from '../components/menu/menu.component';
 import { CommonModule } from '@angular/common';
@@ -18,11 +17,10 @@ import { LeadsTableComponent } from '../components/leads/leads-table/leads-table
 import { LeadsFilterComponent } from '../components/leads/leads-filter/leads-filter.component';
 import { CrabiTableComponent } from '../components/crabi/crabi-table/crabi-table.component';
 import { CrabiFilterComponent } from '../components/crabi/crabi-filter/crabi-filter.component';
-import { SalesforceTableComponent } from '../components/salesforce/salesforce-table/salesforce-table.component';
-import { SalesforceFilterComponent } from '../components/salesforce/salesforce-filter/salesforce-filter.component';
-import { SalesforceSubtabsComponent } from '../components/salesforce/salesforce-subtabs/salesforce-subtabs.component';
 import { HondaSfTableComponent } from '../components/honda-sf/honda-sf-table/honda-sf-table.component';
 import { HondaSfFilterComponent } from '../components/honda-sf/honda-sf-filter/honda-sf-filter.component';
+import { HondaSfSubtabsComponent } from '../components/honda-sf/honda-sf-subtabs/honda-sf-subtabs.component';
+import { HONDA_SF_TABLES, findHondaSfTable } from '../components/honda-sf/honda-sf.catalog';
 @Component({
   selector: 'vex-home',
   standalone: true,
@@ -45,11 +43,9 @@ import { HondaSfFilterComponent } from '../components/honda-sf/honda-sf-filter/h
     LeadsFilterComponent,
     CrabiTableComponent,
     CrabiFilterComponent,
-    SalesforceTableComponent,
-    SalesforceFilterComponent,
-    SalesforceSubtabsComponent,
     HondaSfTableComponent,
-    HondaSfFilterComponent
+    HondaSfFilterComponent,
+    HondaSfSubtabsComponent
 ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
@@ -63,23 +59,24 @@ export class HomeComponent {
   @ViewChild('dwhTable') dwhTable!: DwhTableComponent;
   @ViewChild('leadsTable') leadsTable!: LeadsTableComponent;
   @ViewChild('crabiTable') crabiTable!: CrabiTableComponent;
-  @ViewChild('salesforceTable') salesforceTable!: SalesforceTableComponent;
   @ViewChild('hondaSfTable') hondaSfTable!: HondaSfTableComponent;
 
   activeTab = 'orders'; // Tab activo por defecto: Ordenes
-  activeSalesforceTable: string; // Sub-pestaña activa dentro de Salesforce
 
-  constructor(private mockData: MockDataService) {
-    // Misma tabla por defecto que muestra vex-salesforce-subtabs
-    this.activeSalesforceTable = this.mockData.getSalesforceTables()[0] ?? '';
+  /** Sub-pestaña activa dentro de Honda SF; la misma que muestra el subtabs */
+  activeHondaSfTable = HONDA_SF_TABLES[0]?.id ?? '';
+
+  /** Filtros que corresponden a la sub-pestaña activa */
+  get hondaSfFilterFields() {
+    return findHondaSfTable(this.activeHondaSfTable)?.filters ?? [];
   }
 
   onTabChanged(tabId: string): void {
     this.activeTab = tabId;
   }
 
-  onSalesforceTableChanged(table: string): void {
-    this.activeSalesforceTable = table;
+  onHondaSfTableChanged(table: string): void {
+    this.activeHondaSfTable = table;
   }
 
   handleFilter(filters: any) {
@@ -198,22 +195,6 @@ export class HomeComponent {
       this.crabiTable.downloadExcel();
     } else {
       console.warn('crabiTable no disponible aún o no tiene downloadExcel');
-    }
-  }
-
-  handleSalesforceFilter(filters: any) {
-    if (this.salesforceTable && this.salesforceTable.applyFilter) {
-      this.salesforceTable.applyFilter(filters);
-    } else {
-      console.warn('salesforceTable no disponible aún o no tiene applyFilter');
-    }
-  }
-
-  handleSalesforceDownload(): void {
-    if (this.salesforceTable && this.salesforceTable.downloadExcel) {
-      this.salesforceTable.downloadExcel();
-    } else {
-      console.warn('salesforceTable no disponible aún o no tiene downloadExcel');
     }
   }
 

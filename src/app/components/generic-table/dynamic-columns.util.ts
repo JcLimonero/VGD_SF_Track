@@ -7,6 +7,16 @@ export interface DynamicColumnOptions {
   order?: string[];
   /** Campos que no se muestran en la tabla. */
   exclude?: string[];
+  /**
+   * Únicos campos que se muestran, en este orden. Tiene prioridad sobre
+   * `order` y `exclude`.
+   *
+   * Es para las tablas de esquema conocido pero muy ancho: Honda SF tiene tablas
+   * de hasta 55 campos, donde enumerar los que sobran es más frágil que
+   * enumerar los que caben. Los que no vengan en los datos simplemente no se
+   * pintan, así que quitar un campo en la API no deja una columna vacía.
+   */
+  include?: string[];
 }
 
 /**
@@ -28,9 +38,8 @@ export function humanizeFieldName(field: string): string {
  * Construye las columnas de una tabla a partir de los datos, sin necesidad de
  * conocer el esquema de antemano.
  *
- * Se usa en Integración SF y Honda SF, donde el esquema real todavía no está
- * definido y en el caso de Integración SF además cambia entre tablas. Crabi ya
- * no lo necesita: consume la API real y sus columnas están declaradas.
+ * Se usa en Honda SF, donde el esquema cambia entre las siete sub-pestañas.
+ * Crabi no lo necesita: es una sola tabla y sus columnas están declaradas.
  */
 export function buildColumns(
   rows: any[],
@@ -38,11 +47,15 @@ export function buildColumns(
 ): TableColumn<any>[] {
   if (!rows || rows.length === 0) return [];
 
-  const { labels = {}, order = [], exclude = [] } = opts;
+  const { labels = {}, order = [], exclude = [], include } = opts;
 
-  const fields = Object.keys(rows[0]).filter(
-    (field) => !exclude.includes(field)
-  );
+  const present = Object.keys(rows[0]);
+
+  // Con `include` la lista blanca ya define cuáles y en qué orden; sin él se
+  // parte de todos los campos del registro menos los excluidos.
+  const fields = include
+    ? include.filter((field) => present.includes(field))
+    : present.filter((field) => !exclude.includes(field));
 
   const ordered = [
     ...order.filter((field) => fields.includes(field)),

@@ -328,6 +328,47 @@ export class VanguardiaApiService {
     );
   }
 
+  ///HONDA SF
+  /**
+   * Tablas de Honda en Salesforce (`portalhonda*`).
+   *
+   * Un solo método para los siete endpoints porque comparten envoltorio y
+   * mecánica; los que existen están declarados en `honda-sf.catalog.ts`, que es
+   * también donde está documentado cómo se comportan sus filtros. Un nombre que
+   * no exista responde 401, no 404.
+   *
+   * Son de solo lectura: estas tablas son el reflejo de lo que ya está en
+   * Salesforce, el portal no las modifica. Por eso aquí no hay PUT ni POST.
+   */
+  getHondaPortal(endpoint: string, params?: any): Observable<{items: any[], total: number}>{
+    if (!endpoint) {
+      throw new Error('Se requiere el endpoint de la tabla de Honda SF');
+    }
+
+    const url = `${this.baseUrl}/vgd/${endpoint}`;
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set(this.providerTokenHeader, this.providerTokenValue);
+
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== null && params[key] !== undefined && params[key] !== '') {
+          httpParams = httpParams.set(key, params[key].toString());
+        }
+      });
+    }
+
+    return this.http.get<any>(url, { headers, params: httpParams }).pipe(
+      map(res => {
+        const items = res?.data?.data ?? [];
+        const total = res?.data?.total_rows ?? items.length;
+        return { items, total };
+      })
+    );
+  }
+
 ///INVOICES
   getInvoices(): Observable<any[]> {
     const url = `${this.baseUrl}/vgd/invoice?ordertype=desc&orderby=billing_date`;

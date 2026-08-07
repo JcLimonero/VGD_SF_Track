@@ -2,51 +2,38 @@
   <form [formGroup]="filterForm" (ngSubmit)="onFilter()">
     <div class="filter-bar">
 
-      <!-- Identificador del registro -->
-      <div class="filter-field">
-        <label for="honda-sf-record">No.Registro</label>
-        <input id="honda-sf-record" type="text" formControlName="record_id" placeholder="Número de registro" />
-      </div>
+      <ng-container *ngFor="let field of fields">
 
-      <!-- VIN -->
-      <div class="filter-field">
-        <label for="honda-sf-vin">VIN</label>
-        <input id="honda-sf-vin" type="text" formControlName="vin" placeholder="VIN" />
-      </div>
+        <!-- Lista de valores: la API compara exacto, escribirlos a mano no sirve -->
+        <details class="dropdown" *ngIf="isDropdown(field); else textField">
+          <summary class="dropdown-trigger">
+            {{ selected[field.field] || field.label }}
+            <span class="material-symbols-outlined">keyboard_arrow_down</span>
+          </summary>
+          <div class="dropdown-panel">
+            <label class="checkbox" *ngFor="let option of optionsFor(field)">
+              <input
+                type="checkbox"
+                [checked]="isChecked(field, option)"
+                (change)="onOptionToggle(field, option, $event); closeDropdown($event)" />
+              {{ option.label }}
+            </label>
+          </div>
+        </details>
 
-      <!-- Dropdown: Objeto de Salesforce -->
-      <details class="dropdown">
-        <summary class="dropdown-trigger">
-          {{ selectedObject || 'Objeto SF' }}
-          <span class="material-symbols-outlined">keyboard_arrow_down</span>
-        </summary>
-        <div class="dropdown-panel">
-          <label class="checkbox" *ngFor="let sfObject of sfObjects">
+        <!-- Texto libre: solo para valores que se copian y pegan completos -->
+        <ng-template #textField>
+          <div class="filter-field">
+            <label [for]="'honda-sf-' + field.field">{{ field.label }}</label>
             <input
-              type="checkbox"
-              [checked]="selectedObject === sfObject"
-              (change)="onObjectToggle(sfObject, $event); closeDropdown($event)" />
-            {{ sfObject }}
-          </label>
-        </div>
-      </details>
+              [id]="'honda-sf-' + field.field"
+              type="text"
+              [formControlName]="field.field"
+              [placeholder]="field.label + ' exacto'" />
+          </div>
+        </ng-template>
 
-      <!-- Dropdown: Estado de sincronización -->
-      <details class="dropdown">
-        <summary class="dropdown-trigger">
-          {{ selectedStatus || 'Sincronización' }}
-          <span class="material-symbols-outlined">keyboard_arrow_down</span>
-        </summary>
-        <div class="dropdown-panel">
-          <label class="checkbox" *ngFor="let status of syncStatuses">
-            <input
-              type="checkbox"
-              [checked]="selectedStatus === status"
-              (change)="onStatusToggle(status, $event); closeDropdown($event)" />
-            {{ status }}
-          </label>
-        </div>
-      </details>
+      </ng-container>
 
       <div class="flex gap-2">
         <!-- Botón Buscar -->

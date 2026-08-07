@@ -79,4 +79,43 @@ describe('buildColumns', () => {
     const columns = buildColumns(rows, { order: ['id'], exclude: ['id'] });
     expect(columns.map((c) => c.property)).not.toContain('id');
   });
+
+  describe('include', () => {
+    // Lista blanca, para las tablas anchas de Honda SF: enumerar los campos que
+    // sobran es más frágil que enumerar los que caben
+
+    it('shows only the listed fields, in that order', () => {
+      const columns = buildColumns(rows, { include: ['agencyName', 'vin'] });
+      expect(columns.map((c) => c.property)).toEqual(['agencyName', 'vin']);
+    });
+
+    it('skips fields that are not in the data instead of leaving them empty', () => {
+      const columns = buildColumns(rows, {
+        include: ['vin', 'does_not_exist', 'id']
+      });
+      expect(columns.map((c) => c.property)).toEqual(['vin', 'id']);
+    });
+
+    it('takes precedence over exclude', () => {
+      const columns = buildColumns(rows, {
+        include: ['id', 'vin'],
+        exclude: ['id']
+      });
+      expect(columns.map((c) => c.property)).toEqual(['id', 'vin']);
+    });
+
+    it('still applies the label overrides', () => {
+      const columns = buildColumns(rows, {
+        include: ['order_dms'],
+        labels: { order_dms: 'No. Orden' }
+      });
+      expect(columns[0].label).toBe('No. Orden');
+    });
+
+    it('an empty list shows no columns', () => {
+      // Distinto de no pasar `include`, que muestra todas
+      expect(buildColumns(rows, { include: [] })).toEqual([]);
+      expect(buildColumns(rows).length).toBe(4);
+    });
+  });
 });
