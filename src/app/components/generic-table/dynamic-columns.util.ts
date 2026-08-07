@@ -38,8 +38,9 @@ export function humanizeFieldName(field: string): string {
  * Construye las columnas de una tabla a partir de los datos, sin necesidad de
  * conocer el esquema de antemano.
  *
- * Se usa en Honda SF, donde el esquema cambia entre las siete sub-pestañas.
- * Crabi no lo necesita: es una sola tabla y sus columnas están declaradas.
+ * Se usa en Honda SF, donde el esquema cambia entre las siete sub-pestañas, y
+ * en Integración SF, cuyas tablas de prueba tienen cada una su forma. Crabi no
+ * lo necesita: es una sola tabla y sus columnas están declaradas.
  */
 export function buildColumns(
   rows: any[],
