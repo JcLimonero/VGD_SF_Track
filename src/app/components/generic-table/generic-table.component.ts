@@ -31,6 +31,10 @@ export class GenericTableComponent implements OnInit, OnChanges {
   @Input() modalComponent: any = null; // Modal de detalles a usar; si es null se detecta por la forma del registro
   @Input() detailLabels: Record<string, string> | null = null; // Etiquetas de los campos dentro del modal de detalles
   @Input() detailExclude: string[] | null = null; // Campos que el modal de detalles no debe listar
+  // Traducción de los valores codificados dentro del modal de detalles, por
+  // campo: { isSend: { '1': 'Enviado a Crabi' } }. La tabla ya pinta algunos
+  // como icono, pero el modal los mostraría como el número que llega.
+  @Input() detailValueLabels: Record<string, Record<string, string>> | null = null;
   @Input() sortableColumns: string[] | null = null; // Columnas ordenables; si es null se usa la lista por defecto
   @Input() sendField: string = 'sendedSalesForce'; // Campo que indica si el registro ya se envió; Crabi usa 'isSend'
   @Input() jsonField: string = 'sf_jsonRequest'; // Columna que abre el modal de JSON; Crabi usa 'json_data'
@@ -307,7 +311,8 @@ export class GenericTableComponent implements OnInit, OnChanges {
         data: {
           row: rowData,
           labels: this.detailLabels,
-          exclude: this.detailExclude
+          exclude: this.detailExclude,
+          valueLabels: this.detailValueLabels
         },
         width: '80%',
         maxWidth: '800px'
@@ -602,7 +607,9 @@ export class JsonModalComponent {
 
   /** Indenta el JSON; si no se puede interpretar se muestra tal cual llegó. */
   private format(value: any): string {
-    if (value === null || value === undefined || value === '') return 'Sin datos';
+    // Misma palabra que el modal de detalles para un campo vacío, para que el
+    // portal no diga dos cosas distintas de lo mismo según el modal que se abra
+    if (value === null || value === undefined || value === '') return 'N/A';
 
     try {
       return JSON.stringify(

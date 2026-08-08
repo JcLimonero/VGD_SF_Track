@@ -68,6 +68,24 @@ export class CrabiTableComponent implements OnInit {
   /** Campo de envío de este módulo (los demás usan `sendedSalesForce`) */
   readonly sendField = 'isSend';
 
+  /**
+   * En la tabla `isSend` se pinta como icono, pero el modal de detalles listaba
+   * el valor tal cual y se leía 'Envío Crabi: 1'.
+   *
+   * La redacción es la misma de `sentOptions` en el filtro, para que la opción
+   * con la que se busca y lo que se lee en el detalle digan igual.
+   *
+   * `id_status` no está aquí a propósito: vale 3 en las 707 filas y no hay
+   * catálogo que diga qué significa, así que se muestra el número en vez de
+   * inventarle un nombre.
+   */
+  readonly detailValueLabels: Record<string, Record<string, string>> = {
+    isSend: {
+      '1': 'Enviado a Crabi',
+      '0': 'Pendiente de envío'
+    }
+  };
+
   /** Columnas por las que la API acepta ordenar */
   readonly sortableColumns = [
     'order_dms',

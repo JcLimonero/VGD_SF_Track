@@ -107,7 +107,8 @@ export class GenericDetailModalComponent {
     const row = isWrapped ? data.row : data;
     const labels = (isWrapped ? data.labels : null) ?? {};
     const exclude = (isWrapped ? data.exclude : null) ?? [];
-    this.entries = this.buildEntries(row, labels, exclude);
+    const valueLabels = (isWrapped ? data.valueLabels : null) ?? {};
+    this.entries = this.buildEntries(row, labels, exclude, valueLabels);
   }
 
   /**
@@ -118,7 +119,8 @@ export class GenericDetailModalComponent {
   private buildEntries(
     row: any,
     labels: Record<string, string>,
-    exclude: string[]
+    exclude: string[],
+    valueLabels: Record<string, Record<string, string>>
   ): DetailEntry[] {
     if (!row || typeof row !== 'object') return [];
 
@@ -126,14 +128,28 @@ export class GenericDetailModalComponent {
       .filter(([field]) => !exclude.includes(field))
       .map(([field, value]) => ({
         label: labels[field] ?? humanizeFieldName(field),
-        value: this.formatValue(value)
+        value: this.formatValue(value, valueLabels[field])
       }));
   }
 
-  private formatValue(value: any): string {
+  /**
+   * `valueLabels` traduce los valores codificados de un campo, para que el
+   * detalle no muestre el número que llega de la API. Solo se aplica a los
+   * valores declarados: uno que no esté en el mapa se muestra tal cual, que es
+   * preferible a esconderlo detrás de una etiqueta equivocada.
+   *
+   * Un campo vacío es 'N/A' antes de traducir: `valueLabels` nombra valores
+   * reales, no la ausencia de valor.
+   */
+  private formatValue(
+    value: any,
+    valueLabels?: Record<string, string>
+  ): string {
     if (value === null || value === undefined || value === '') return 'N/A';
     if (typeof value === 'object') return JSON.stringify(value);
-    return String(value);
+
+    const raw = String(value);
+    return valueLabels?.[raw] ?? raw;
   }
 
   onClose(): void {
