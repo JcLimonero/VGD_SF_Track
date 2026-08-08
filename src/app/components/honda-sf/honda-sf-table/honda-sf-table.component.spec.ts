@@ -2,11 +2,14 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { HttpRequest } from '@angular/common/http';
 import { SimpleChange } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { httpTestProviders } from '@testing/test-providers';
 import { environment } from '../../../../environments/environment';
 
 import { HondaSfTableComponent } from './honda-sf-table.component';
-import { HONDA_SF_TABLES } from '../honda-sf.catalog';
+import { GenericTableComponent } from '../../generic-table/generic-table.component';
+import { GenericDetailModalComponent } from '../../generic-table/generic-detail-modal.component';
+import { HONDA_SF_LABELS, HONDA_SF_TABLES } from '../honda-sf.catalog';
 
 const BASE = environment.api.baseUrl;
 const CUSTOMERS = `${BASE}/vgd/portalhondacustomers`;
@@ -234,6 +237,57 @@ describe('HondaSfTableComponent', () => {
     expect(component.data).toEqual([]);
     expect(component.total).toBe(0);
     expect(component.loading).toBeFalse();
+  });
+
+  describe('detalle (ojito)', () => {
+    /** La tabla interna, ya renderizada con sus enlaces resueltos. */
+    function genericTable(): GenericTableComponent {
+      fixture.detectChanges();
+      return fixture.debugElement.query(By.directive(GenericTableComponent))
+        .componentInstance;
+    }
+
+    it('opens the modal that walks the record, not the invoice one', () => {
+      start();
+      // Sin esto `openModal` adivina por la forma del registro y termina en el
+      // modal de facturas, que pintaría una columna de campos en blanco
+      expect(genericTable().modalComponent).toBe(GenericDetailModalComponent);
+    });
+
+    it('hides nothing: the modal receives every field of the record', () => {
+      start();
+
+      // El modal lista `Object.entries(row)` menos `exclude`. Aquí no se excluye
+      // nada a propósito: la tabla enseña 9 columnas y el detalle las 29 que
+      // devuelve el endpoint. Crabi sí excluye, pero para mandar esos dos JSON a
+      // su propio modal, no para ocultarlos.
+      expect(genericTable().detailExclude).toBeNull();
+    });
+
+    it('lists more fields than the table has columns', () => {
+      start();
+
+      const shown = component.displayedColumns;
+      const oculta = Object.keys(component.data[0]).filter(
+        (field) => !shown.includes(field)
+      );
+
+      // `rfc` e `id` no son columnas de la tabla y aun así salen en el detalle
+      expect(oculta).toContain('rfc');
+      expect(oculta).toContain('id');
+    });
+
+    it('has a Spanish label for every field the catalog names', () => {
+      // El modal cae en `humanizeFieldName` para lo que no esté etiquetado, y lo
+      // muestra en inglés ("Loan Term"). Se revisan las siete tablas de una vez.
+      const untranslated = HONDA_SF_TABLES.flatMap((table) =>
+        [...table.columns, ...table.filters.map((filter) => filter.field)].filter(
+          (field) => !HONDA_SF_LABELS[field]
+        )
+      );
+
+      expect(untranslated).toEqual([]);
+    });
   });
 
   describe('fechas 0000-00-00', () => {
