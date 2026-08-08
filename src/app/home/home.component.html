@@ -66,7 +66,7 @@
     <vex-crabi-table #crabiTable></vex-crabi-table>
   </div>
 
-  <!-- Contenido de Salesforce (una sub-pestaña por tabla de honda) -->
+  <!-- Contenido de Integración SF (datos de prueba, no hay endpoint) -->
   <div *ngIf="activeTab === 'salesforce'">
     <vex-salesforce-subtabs (tabChanged)="onSalesforceTableChanged($event)">
     </vex-salesforce-subtabs>
@@ -78,13 +78,17 @@
     </vex-salesforce-table>
   </div>
 
-  <!-- Contenido de Honda SF -->
+  <!-- Contenido de Honda SF (una sub-pestaña por tabla de Salesforce) -->
   <div *ngIf="activeTab === 'hondasf'">
-    <vex-honda-sf-filter (filterChange)="handleHondaSfFilter($event)"
+    <vex-honda-sf-subtabs (tabChanged)="onHondaSfTableChanged($event)">
+    </vex-honda-sf-subtabs>
+    <vex-honda-sf-filter [fields]="hondaSfFilterFields"
+                         (filterChange)="handleHondaSfFilter($event)"
                          (downloadRequested)="handleHondaSfDownload()"
                          [isDownloadingExcel]="hondaSfTable?.isDownloadingExcel || false">
     </vex-honda-sf-filter>
-    <vex-honda-sf-table #hondaSfTable></vex-honda-sf-table>
+    <vex-honda-sf-table #hondaSfTable [table]="activeHondaSfTable">
+    </vex-honda-sf-table>
   </div>
 
 </vex-page-layout>

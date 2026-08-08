@@ -1,5 +1,4 @@
 import { Component, ViewChild } from '@angular/core';
-import { MockDataService } from '../services/mock-data.service';
 import { VexPageLayoutComponent } from '@vex/components/vex-page-layout/vex-page-layout.component';
 import { MenuComponent } from '../components/menu/menu.component';
 import { CommonModule } from '@angular/common';
@@ -23,6 +22,9 @@ import { SalesforceFilterComponent } from '../components/salesforce/salesforce-f
 import { SalesforceSubtabsComponent } from '../components/salesforce/salesforce-subtabs/salesforce-subtabs.component';
 import { HondaSfTableComponent } from '../components/honda-sf/honda-sf-table/honda-sf-table.component';
 import { HondaSfFilterComponent } from '../components/honda-sf/honda-sf-filter/honda-sf-filter.component';
+import { HondaSfSubtabsComponent } from '../components/honda-sf/honda-sf-subtabs/honda-sf-subtabs.component';
+import { HONDA_SF_TABLES, findHondaSfTable } from '../components/honda-sf/honda-sf.catalog';
+import { MockDataService } from '../services/mock-data.service';
 @Component({
   selector: 'vex-home',
   standalone: true,
@@ -49,7 +51,8 @@ import { HondaSfFilterComponent } from '../components/honda-sf/honda-sf-filter/h
     SalesforceFilterComponent,
     SalesforceSubtabsComponent,
     HondaSfTableComponent,
-    HondaSfFilterComponent
+    HondaSfFilterComponent,
+    HondaSfSubtabsComponent
 ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
@@ -67,7 +70,17 @@ export class HomeComponent {
   @ViewChild('hondaSfTable') hondaSfTable!: HondaSfTableComponent;
 
   activeTab = 'orders'; // Tab activo por defecto: Ordenes
-  activeSalesforceTable: string; // Sub-pestaña activa dentro de Salesforce
+
+  /** Sub-pestaña activa dentro de Integración SF (datos de prueba) */
+  activeSalesforceTable: string;
+
+  /** Sub-pestaña activa dentro de Honda SF; la misma que muestra el subtabs */
+  activeHondaSfTable = HONDA_SF_TABLES[0]?.id ?? '';
+
+  /** Filtros que corresponden a la sub-pestaña activa de Honda SF */
+  get hondaSfFilterFields() {
+    return findHondaSfTable(this.activeHondaSfTable)?.filters ?? [];
+  }
 
   constructor(private mockData: MockDataService) {
     // Misma tabla por defecto que muestra vex-salesforce-subtabs
@@ -80,6 +93,10 @@ export class HomeComponent {
 
   onSalesforceTableChanged(table: string): void {
     this.activeSalesforceTable = table;
+  }
+
+  onHondaSfTableChanged(table: string): void {
+    this.activeHondaSfTable = table;
   }
 
   handleFilter(filters: any) {

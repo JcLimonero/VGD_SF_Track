@@ -1,10 +1,15 @@
 /**
- * Datos de prueba para el módulo de Salesforce (esquema `vgd_dwh_prod`,
+ * Datos de prueba para el módulo de Integración SF (esquema `vgd_dwh_prod`,
  * tablas cuyo nombre contiene "honda").
  *
- * IMPORTANTE: todavía no existe un endpoint en la API de Vanguardia para esta
- * información. Tanto los nombres de las tablas como los de sus campos son
- * provisionales y deben reemplazarse cuando se conozca el esquema real.
+ * IMPORTANTE: TODO ESTO ES INVENTADO. No existe endpoint en la API de
+ * Vanguardia para esta información, las cuatro tablas no existen, y tanto sus
+ * nombres como los de sus campos son provisionales. Quien abra la pestaña
+ * "Integración SF" está viendo registros generados con los bucles de este
+ * archivo, no datos del negocio.
+ *
+ * No confundir con la pestaña "Honda SF", que sí consume la API real a través
+ * de los siete endpoints `/vgd/portalhonda*`.
  *
  * Cada tabla tiene un esquema distinto a propósito: la tabla de Salesforce
  * construye sus columnas dinámicamente, y esto ejercita ese comportamiento.

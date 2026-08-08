@@ -2,7 +2,7 @@
 <div *ngIf="loading" class="flex justify-center items-center p-8">
   <div class="text-center">
     <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-    <p class="mt-2 text-gray-600">Cargando Honda SF...</p>
+    <p class="mt-2 text-gray-600">Cargando {{ config.label }}...</p>
   </div>
 </div>
 
@@ -30,7 +30,7 @@
   [initialSort]="currentSort"
   [hasActiveFilters]="hasActiveFilters"
   [modalComponent]="detailModal"
-  [detailLabels]="columnOptions.labels"
+  [detailLabels]="detailLabels"
   [sortableColumns]="sortableColumns"
   (pageChanged)="loadPage($event.pageIndex, $event.pageSize)"
   (sortChanged)="onSortChange($event)">

@@ -53,8 +53,6 @@ interface DetailEntry {
       }
 
       .detail-list {
-        max-height: 400px;
-        overflow-y: auto;
         display: flex;
         flex-direction: column;
       }
@@ -78,8 +76,16 @@ interface DetailEntry {
         color: #848484;
       }
 
+      /*
+       * Único contenedor con scroll del modal, y en alto relativo.
+       *
+       * Antes la lista tenía su propio max-height de 400px dentro de este, así
+       * que mandaba el más chico de los dos y sobraba espacio alrededor: de los
+       * 29 campos de Clientes se veían 12 a la vez. En vh el modal aprovecha la
+       * pantalla que haya en vez de un alto fijo.
+       */
       mat-dialog-content {
-        max-height: 550px;
+        max-height: 70vh;
         overflow-y: auto;
       }
     `
