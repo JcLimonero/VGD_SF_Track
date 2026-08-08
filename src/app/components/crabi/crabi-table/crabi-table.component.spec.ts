@@ -13,34 +13,65 @@ function apiPage(items: any[], total = items.length) {
   return { status: 200, message: 'ok', data: { data: items, total_rows: total } };
 }
 
+/**
+ * Los 21 campos que devuelve `/vgd/orderscrabi`, en el orden en que los manda.
+ *
+ * Es el esquema completo a propósito, no una selección: de aquí sale la prueba
+ * de que ningún campo llega sin etiqueta, así que un fixture recortado la
+ * volvería inútil. Verificado contra las 707 filas del endpoint: ninguna trae
+ * llaves de menos y ninguna trae campos que no estén aquí.
+ *
+ * La primera fila es una ya enviada; la segunda es de las que no se han enviado
+ * (24 de 707), que son las que dejan `sent_at`, `request_body` y `response_body`
+ * vacíos. Los colores van vacíos ahí para cubrir el otro hueco del endpoint:
+ * 160 filas sin `external_color` ni `internal_color`.
+ */
 const ORDERS = [
   {
     id: '1',
     idAgency: '88888',
     order_dms: '2160',
-    invoice: 'GGGV1425',
     amount: '299990.00',
     vin: 'LB3F31046TG034231',
     brand: 'GEELY',
     model: 'EMGRAND',
+    version: 'GC, SEDAN, 1.5LTS, MANUAL, 4CIL',
     year: '2026',
+    external_color: 'NEGRO',
+    internal_color: 'NEGRO',
+    ndClientDMS: '5818',
+    ndConsultant: '62',
+    id_status: '3',
+    invoice: 'GGGV1425',
+    timestamp_dms: '2026-07-22 00:00:00',
     isSend: '1',
     captured_at: '2026-07-22 15:36:02',
-    sent_at: '2026-08-01 21:14:24'
+    sent_at: '2026-08-01 21:14:24',
+    request_body: '{"person":{"rfc":"AARR991026762"}}',
+    response_body: '{"code":201,"status":"success"}'
   },
   {
     id: '2',
     idAgency: '00000',
     order_dms: '32764',
-    invoice: 'MJRMI27947',
     amount: '43990.00',
     vin: '3H1KD1340TD212377',
     brand: 'HONDA',
     model: 'XR150LEK',
+    version: 'XR150',
     year: '2026',
+    external_color: '',
+    internal_color: '',
+    ndClientDMS: '77921',
+    ndConsultant: '272',
+    id_status: '3',
+    invoice: 'MJRMI27947',
+    timestamp_dms: '2026-07-20 00:00:00',
     isSend: '0',
     captured_at: '2026-07-22 15:36:02',
-    sent_at: null
+    sent_at: null,
+    request_body: '',
+    response_body: ''
   }
 ];
 
@@ -96,24 +127,40 @@ describe('CrabiTableComponent', () => {
   });
 
   it('labels every field the endpoint returns', () => {
-    // Si la API agrega un campo, el modal lo mostraria sin traducir; esta
-    // prueba lo detecta antes de que llegue al navegador
-    const returnedFields = Object.keys(ORDERS[0]).concat([
-      'agencyName',
-      'version',
-      'external_color',
-      'internal_color',
-      'ndClientDMS',
-      'ndConsultant',
-      'id_status',
-      'timestamp_dms',
-      'request_body',
-      'response_body'
-    ]);
+    // Si la API agrega un campo, el modal lo mostraria sin traducir. La lista
+    // sale del fixture, que es el esquema completo: antes estaba escrita a mano
+    // aparte, asi que un campo nuevo pasaba la prueba y llegaba al navegador en
+    // ingles. Agregarlo al fixture es ahora lo unico que hace falta.
+    const returnedFields = Object.keys(ORDERS[0]).concat('agencyName');
 
-    returnedFields.forEach((field) => {
-      expect(component.detailLabels[field]).toBeDefined();
+    const untranslated = returnedFields.filter(
+      (field) => !component.detailLabels[field]
+    );
+    expect(untranslated).toEqual([]);
+  });
+
+  it('does not label anything the endpoint does not return', () => {
+    // Una etiqueta de mas es una columna vacia en el Excel, que arma sus
+    // columnas recorriendo `detailLabels`
+    const returnedFields = Object.keys(ORDERS[0]).concat('agencyName');
+
+    const sobran = Object.keys(component.detailLabels).filter(
+      (field) => !returnedFields.includes(field)
+    );
+    expect(sobran).toEqual([]);
+  });
+
+  it('translates the send code instead of showing the raw number', () => {
+    // En la tabla `isSend` es un icono; en el detalle se leia 'Envio Crabi: 1'.
+    // La redaccion es la del filtro, para que buscar y leer digan igual.
+    expect(component.detailValueLabels['isSend']).toEqual({
+      '1': 'Enviado a Crabi',
+      '0': 'Pendiente de envío'
     });
+
+    // `id_status` vale 3 en las 707 filas y no hay catalogo que diga que
+    // significa, asi que se muestra el numero en vez de inventarle un nombre
+    expect(component.detailValueLabels['id_status']).toBeUndefined();
   });
 
   describe('petición y respuesta', () => {

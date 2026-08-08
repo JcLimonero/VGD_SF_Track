@@ -93,6 +93,50 @@ describe('GenericDetailModalComponent', () => {
     expect(component.entries.length).toBe(2);
   });
 
+  describe('valores codificados', () => {
+    // Los campos que la tabla pinta como icono llegaban al detalle como el
+    // numero que manda la API: 'Envio Crabi: 1'
+
+    it('translates a value that the caller declared', () => {
+      const component = setup({
+        row: { isSend: '1' },
+        labels: { isSend: 'Envío Crabi' },
+        valueLabels: { isSend: { '1': 'Enviado a Crabi', '0': 'Pendiente' } }
+      }).componentInstance;
+
+      expect(component.entries[0].value).toBe('Enviado a Crabi');
+    });
+
+    it('leaves an undeclared value as it came', () => {
+      // Mejor el codigo crudo que una etiqueta equivocada
+      const component = setup({
+        row: { isSend: '7' },
+        labels: {},
+        valueLabels: { isSend: { '1': 'Enviado a Crabi' } }
+      }).componentInstance;
+
+      expect(component.entries[0].value).toBe('7');
+    });
+
+    it('does not translate the absence of a value', () => {
+      // 'N/A' gana: `valueLabels` nombra valores reales, no el hueco
+      const component = setup({
+        row: { isSend: '' },
+        labels: {},
+        valueLabels: { isSend: { '': 'nunca' } }
+      }).componentInstance;
+
+      expect(component.entries[0].value).toBe('N/A');
+    });
+
+    it('touches nothing when no translation is given', () => {
+      const component = setup({ row: { isSend: '1' }, labels: {} })
+        .componentInstance;
+
+      expect(component.entries[0].value).toBe('1');
+    });
+  });
+
   it('handles a null row without throwing', () => {
     const component = setup({ row: null, labels: {} }).componentInstance;
     expect(component.entries).toEqual([]);

@@ -87,7 +87,9 @@ describe('JsonModalComponent', () => {
     });
 
     it('reports empty values instead of printing undefined', () => {
-      // Un envío que aún no sale no tiene respuesta; antes se veía "undefined"
+      // Un envío que aún no sale no tiene respuesta; antes se veía "undefined".
+      // Dice 'N/A' igual que el modal de detalles: son dos modales del mismo
+      // registro y no deben nombrar distinto a un campo vacío.
       const component = setup({
         sections: [
           { label: 'Petición', value: '{"a":1}' },
@@ -95,7 +97,7 @@ describe('JsonModalComponent', () => {
         ]
       }).componentInstance;
 
-      expect(component.sections[1].content).toBe('Sin datos');
+      expect(component.sections[1].content).toBe('N/A');
     });
 
     it('copies every section with its label', () => {

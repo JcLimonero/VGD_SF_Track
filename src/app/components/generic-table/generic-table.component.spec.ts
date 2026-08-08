@@ -60,7 +60,21 @@ describe('GenericTableComponent', () => {
       expect(config.data).toEqual({
         row,
         labels: { vin: 'VIN' },
-        exclude: null
+        exclude: null,
+        valueLabels: null
+      });
+    });
+
+    it('forwards the coded value translations', () => {
+      const open = spyOn(component.dialog, 'open');
+      component.modalComponent = GenericDetailModalComponent;
+      component.detailValueLabels = { isSend: { '1': 'Enviado a Crabi' } };
+
+      component.openModal({ isSend: '1' });
+
+      const [, config] = open.calls.mostRecent().args as any[];
+      expect(config.data.valueLabels).toEqual({
+        isSend: { '1': 'Enviado a Crabi' }
       });
     });
 
