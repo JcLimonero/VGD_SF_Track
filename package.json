@@ -18,16 +18,16 @@
     "e2e": "ng e2e"
   },
   "dependencies": {
-    "@angular/animations": "^17.0.9",
-    "@angular/cdk": "^17.0.5",
-    "@angular/common": "^17.0.9",
-    "@angular/compiler": "^17.0.9",
-    "@angular/core": "^17.0.9",
-    "@angular/forms": "^17.0.9",
-    "@angular/material": "^17.0.5",
-    "@angular/platform-browser": "^17.0.9",
-    "@angular/platform-browser-dynamic": "^17.0.9",
-    "@angular/router": "^17.0.9",
+    "@angular/animations": "^18.2.14",
+    "@angular/cdk": "^18.2.14",
+    "@angular/common": "^18.2.14",
+    "@angular/compiler": "^18.2.14",
+    "@angular/core": "^18.2.14",
+    "@angular/forms": "^18.2.14",
+    "@angular/material": "^18.2.14",
+    "@angular/platform-browser": "^18.2.14",
+    "@angular/platform-browser-dynamic": "^18.2.14",
+    "@angular/router": "^18.2.14",
     "@material-design-icons/svg": "^0.14.13",
     "@ngx-loading-bar/core": "^6.0.2",
     "@ngx-loading-bar/router": "^6.0.2",
@@ -39,10 +39,10 @@
     "zone.js": "~0.14.3"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^17.0.10",
-    "@angular/cli": "^17.0.10",
-    "@angular/compiler-cli": "^17.0.9",
-    "@angular/language-service": "^17.0.9",
+    "@angular-devkit/build-angular": "^18.2.21",
+    "@angular/cli": "^18.2.21",
+    "@angular/compiler-cli": "^18.2.14",
+    "@angular/language-service": "^18.2.14",
     "@tailwindcss/typography": "^0.5.10",
     "@types/chroma-js": "^2.4.1",
     "@types/jasmine": "^3.6.11",
@@ -65,6 +65,6 @@
     "puppeteer": "^25.4.0",
     "tailwindcss": "^3.3.5",
     "ts-node": "~8.3.0",
-    "typescript": "~5.2.2"
+    "typescript": "~5.5.4"
   }
 }
