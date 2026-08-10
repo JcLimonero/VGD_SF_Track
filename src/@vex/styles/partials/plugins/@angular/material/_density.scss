@@ -2,7 +2,10 @@
 
 .vex-mat-dense-default {
   $density: -2;
-  @include mat.private-form-field-density($density);
+  // Era `mat.private-form-field-density`, un mixin privado de Material que el
+  // template usaba y que desaparecio en Material 17.2. El publico
+  // `form-field-density` hace lo mismo y esta soportado.
+  @include mat.form-field-density($density);
   @include mat.autocomplete-density($density);
   @include mat.select-density($density);
   @include mat.input-density($density);
