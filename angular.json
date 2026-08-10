@@ -43,22 +43,10 @@
             "allowedCommonJsDependencies": [
               "simplebar",
               "highlight.js",
-              "faker",
               "showdown",
-              "core-js",
-              "dom-set",
-              "dom-plane",
-              "angular-calendar/date-adapters/date-fns",
-              "calendar-utils/date-adapters/date-fns",
-              "@mattlewis92/dom-autoscroller",
               "apexcharts",
-              "can-use-dom",
-              "lodash.debounce",
-              "lodash.memoize",
-              "lodash.throttle",
               "luxon",
-              "quill",
-              "seedrandom"
+              "quill"
             ],
             "vendorChunk": true,
             "extractLicenses": false,

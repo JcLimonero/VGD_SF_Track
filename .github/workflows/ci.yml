@@ -34,6 +34,20 @@ jobs:
       - name: Instalar Chrome para las pruebas
         run: npx puppeteer browsers install chrome
 
+      # Se audita solo lo que llega al navegador (--omit=dev). Las herramientas
+      # de construcción no viajan en el bundle y su ruido tapaba lo que sí
+      # importa: 94 avisos contando dev, 8 sin contarlo.
+      - name: Auditoría de dependencias (informativa)
+        run: npm audit --omit=dev || true
+
+      # Corta solo en crítica, no en alta. Hoy las altas de producción son de
+      # @angular/* y no tienen arreglo dentro de Angular 17: el aviso cubre
+      # hasta 19.2.25 y la última 17.x es la 17.3.12. Cortar en alta dejaría
+      # el CI en rojo permanente, que equivale a no tener auditoría.
+      # Cuando se suba Angular, bajar este umbral a `high`.
+      - name: Bloquear vulnerabilidades críticas
+        run: npm audit --omit=dev --audit-level=critical
+
       - name: Verificar tipos
         run: npm run typecheck
 
