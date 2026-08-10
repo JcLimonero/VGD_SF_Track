@@ -42,11 +42,7 @@
             "scripts": [],
             "allowedCommonJsDependencies": [
               "simplebar",
-              "highlight.js",
-              "showdown",
-              "apexcharts",
-              "luxon",
-              "quill"
+              "luxon"
             ],
             "vendorChunk": true,
             "extractLicenses": false,
