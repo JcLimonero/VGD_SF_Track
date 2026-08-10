@@ -14,8 +14,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "format:check": "prettier --check \"src/**/*.{ts,html,scss,json}\"",
     "format": "prettier --write \"src/**/*.{ts,html,scss,json}\"",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
+    "lint": "ng lint"
   },
   "dependencies": {
     "@angular/animations": "^20.3.27",
