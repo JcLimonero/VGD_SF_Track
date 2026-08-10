@@ -40,11 +40,17 @@ jobs:
       - name: Auditoría de dependencias (informativa)
         run: npm audit --omit=dev || true
 
-      # Corta solo en crítica, no en alta. Hoy las altas de producción son de
-      # @angular/* y no tienen arreglo dentro de Angular 17: el aviso cubre
-      # hasta 19.2.25 y la última 17.x es la 17.3.12. Cortar en alta dejaría
-      # el CI en rojo permanente, que equivale a no tener auditoría.
-      # Cuando se suba Angular, bajar este umbral a `high`.
+      # Corta solo en crítica, no en alta.
+      #
+      # Tras subir a Angular 20 la única vulnerabilidad de producción que queda
+      # es `xlsx`, alta y SIN arreglo publicado: el paquete está abandonado en
+      # npm y 0.18.5 es su última versión. Cortar en alta dejaría el CI en rojo
+      # permanente por algo que hoy no se puede arreglar, y un CI siempre rojo
+      # equivale a no tener auditoría.
+      #
+      # Aquí solo se ESCRIBEN archivos con xlsx, nunca se parsean archivos
+      # ajenos, así que la explotabilidad real es baja. Si se migra al paquete
+      # que publica SheetJS, bajar este umbral a `high`.
       - name: Bloquear vulnerabilidades críticas
         run: npm audit --omit=dev --audit-level=critical
 
