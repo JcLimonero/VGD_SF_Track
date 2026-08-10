@@ -8,10 +8,10 @@ export interface TabItem {
 }
 
 @Component({
-    selector: 'vex-tabs',
-    imports: [CommonModule],
-    templateUrl: './tabs.component.html',
-    styleUrl: './tabs.component.scss'
+  selector: 'vex-tabs',
+  imports: [CommonModule],
+  templateUrl: './tabs.component.html',
+  styleUrl: './tabs.component.scss'
 })
 export class TabsComponent {
   @Output() tabChanged = new EventEmitter<string>();

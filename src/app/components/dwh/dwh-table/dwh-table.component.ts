@@ -7,10 +7,10 @@ import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
 
 @Component({
-    selector: 'vex-dwh-table',
-    imports: [CommonModule, GenericTableComponent],
-    templateUrl: './dwh-table.component.html',
-    styleUrl: './dwh-table.component.scss'
+  selector: 'vex-dwh-table',
+  imports: [CommonModule, GenericTableComponent],
+  templateUrl: './dwh-table.component.html',
+  styleUrl: './dwh-table.component.scss'
 })
 export class DwhTableComponent implements OnInit {
   data: any[] = [];
@@ -29,7 +29,10 @@ export class DwhTableComponent implements OnInit {
     type?: string;
   } = {};
   isDownloadingExcel = false;
-  currentSort: { column: string; direction: 'asc' | 'desc' } | null = { column: 'colDate', direction: 'desc' };
+  currentSort: { column: string; direction: 'asc' | 'desc' } | null = {
+    column: 'colDate',
+    direction: 'desc'
+  };
 
   // Columnas para tabla de DWH
   columns: TableColumn<any>[] = [
@@ -60,7 +63,7 @@ export class DwhTableComponent implements OnInit {
 
   getUpdateStatusColor(colDate: string): string {
     if (!colDate) return 'red';
-    
+
     const recordDate = new Date(colDate);
     const currentDate = new Date();
     const diffInMs = currentDate.getTime() - recordDate.getTime();
@@ -86,7 +89,8 @@ export class DwhTableComponent implements OnInit {
     };
 
     // Map current filters to params
-    if (this.currentFilters.idAgency) params.idAgency = this.currentFilters.idAgency;
+    if (this.currentFilters.idAgency)
+      params.idAgency = this.currentFilters.idAgency;
     if (this.currentFilters.type) params.type = this.currentFilters.type;
 
     // Agregar ordenamiento si existe
@@ -104,7 +108,8 @@ export class DwhTableComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        this.error = 'No se pudo cargar la información. Por favor, intenta de nuevo.';
+        this.error =
+          'No se pudo cargar la información. Por favor, intenta de nuevo.';
         this.data = [];
         this.total = 0;
         this.loading = false;
@@ -112,9 +117,7 @@ export class DwhTableComponent implements OnInit {
     });
   }
 
-  applyFilter(filters: {
-    idAgency?: string;
-  }): void {
+  applyFilter(filters: { idAgency?: string }): void {
     //guardar filtros y reiniciar a primera página
     this.currentFilters = { ...filters };
     this.pageIndex = 0;
@@ -174,11 +177,11 @@ export class DwhTableComponent implements OnInit {
 
           // Preparar los datos para Excel con TODOS los campos disponibles
           const excelData = allData.map((item) => ({
-            'Agencia': item.agencyName || '',
+            Agencia: item.agencyName || '',
             'ID Agencia': item.idAgency || '',
-            'Tipo': item.type || '',
-            'Descripción': item.description || '',
-            'Fecha': item.colDate || '',
+            Tipo: item.type || '',
+            Descripción: item.description || '',
+            Fecha: item.colDate || '',
             'Fecha UTC': item.colDateUTC || ''
           }));
 
@@ -213,10 +216,7 @@ export class DwhTableComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error(
-          '⚠️ Error al obtener datos de DWH para Excel:',
-          error
-        );
+        console.error('⚠️ Error al obtener datos de DWH para Excel:', error);
         this.isDownloadingExcel = false;
       }
     });

@@ -1,13 +1,18 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators
+} from '@angular/forms';
 import { Router } from '@angular/router';
 
 @Component({
-    selector: 'vex-login',
-    imports: [CommonModule, ReactiveFormsModule],
-    templateUrl: './login.component.html',
-    styleUrl: './login.component.scss'
+  selector: 'vex-login',
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.scss'
 })
 export class LoginComponent {
   loginForm: FormGroup;
@@ -16,7 +21,10 @@ export class LoginComponent {
 
   private readonly VALID_PASSWORD = 'Vanguardia123';
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router
+  ) {
     this.loginForm = this.fb.group({
       password: ['', [Validators.required]]
     });
@@ -37,7 +45,7 @@ export class LoginComponent {
         // Login exitoso - guardar estado en localStorage
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('loginTime', Date.now().toString());
-        
+
         // Redirigir a home
         this.router.navigate(['/home']);
       } else {

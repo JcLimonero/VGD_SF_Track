@@ -3,10 +3,10 @@ import { VexPageLayoutComponent } from '@vex/components/vex-page-layout/vex-page
 import { MenuComponent } from '../components/menu/menu.component';
 import { CommonModule } from '@angular/common';
 import { InvoiceTableComponent } from '../components/invoice-table/invoice-table.component';
-import { InvoiceFilterComponent } from "../components/invoice-filter/invoice-filter.component";
+import { InvoiceFilterComponent } from '../components/invoice-filter/invoice-filter.component';
 import { TabsComponent } from '../components/tabs/tabs.component';
 import { InventoryTableComponent } from '../components/inventory/inventory-table/inventory-table.component';
-import { InventoryFilterComponent } from "../components/inventory/inventory-filter/inventory-filter.component";
+import { InventoryFilterComponent } from '../components/inventory/inventory-filter/inventory-filter.component';
 import { CustomerTableComponent } from '../components/customer/customer-table/customer-table.component';
 import { CustomerFilterComponent } from '../components/customer/customer-filter/customer-filter.component';
 import { ServiceTableComponent } from '../components/servicios/service-table/service-table.component';
@@ -23,40 +23,42 @@ import { SalesforceSubtabsComponent } from '../components/salesforce/salesforce-
 import { HondaSfTableComponent } from '../components/honda-sf/honda-sf-table/honda-sf-table.component';
 import { HondaSfFilterComponent } from '../components/honda-sf/honda-sf-filter/honda-sf-filter.component';
 import { HondaSfSubtabsComponent } from '../components/honda-sf/honda-sf-subtabs/honda-sf-subtabs.component';
-import { HONDA_SF_TABLES, findHondaSfTable } from '../components/honda-sf/honda-sf.catalog';
+import {
+  HONDA_SF_TABLES,
+  findHondaSfTable
+} from '../components/honda-sf/honda-sf.catalog';
 import { MockDataService } from '../services/mock-data.service';
 @Component({
-    selector: 'vex-home',
-    imports: [
-        VexPageLayoutComponent,
-        MenuComponent,
-        CommonModule,
-        InvoiceTableComponent,
-        InvoiceFilterComponent,
-        TabsComponent,
-        InventoryTableComponent,
-        InventoryFilterComponent,
-        CustomerTableComponent,
-        CustomerFilterComponent,
-        ServiceTableComponent,
-        ServiceFilterComponent,
-        DwhTableComponent,
-        DwhFiltersComponent,
-        LeadsTableComponent,
-        LeadsFilterComponent,
-        CrabiTableComponent,
-        CrabiFilterComponent,
-        SalesforceTableComponent,
-        SalesforceFilterComponent,
-        SalesforceSubtabsComponent,
-        HondaSfTableComponent,
-        HondaSfFilterComponent,
-        HondaSfSubtabsComponent
-    ],
-    templateUrl: './home.component.html',
-    styleUrl: './home.component.scss'
+  selector: 'vex-home',
+  imports: [
+    VexPageLayoutComponent,
+    MenuComponent,
+    CommonModule,
+    InvoiceTableComponent,
+    InvoiceFilterComponent,
+    TabsComponent,
+    InventoryTableComponent,
+    InventoryFilterComponent,
+    CustomerTableComponent,
+    CustomerFilterComponent,
+    ServiceTableComponent,
+    ServiceFilterComponent,
+    DwhTableComponent,
+    DwhFiltersComponent,
+    LeadsTableComponent,
+    LeadsFilterComponent,
+    CrabiTableComponent,
+    CrabiFilterComponent,
+    SalesforceTableComponent,
+    SalesforceFilterComponent,
+    SalesforceSubtabsComponent,
+    HondaSfTableComponent,
+    HondaSfFilterComponent,
+    HondaSfSubtabsComponent
+  ],
+  templateUrl: './home.component.html',
+  styleUrl: './home.component.scss'
 })
-
 export class HomeComponent {
   @ViewChild('invoiceTable') invoiceTable!: InvoiceTableComponent;
   @ViewChild('inventoryTable') inventoryTable!: InventoryTableComponent;
@@ -140,7 +142,6 @@ export class HomeComponent {
       console.warn('customerTable no disponible aún o no tiene downloadExcel');
     }
   }
-
 
   handleCustomerFilter(filters: any) {
     if (this.customerTable && this.customerTable.applyFilter) {
@@ -229,7 +230,9 @@ export class HomeComponent {
     if (this.salesforceTable && this.salesforceTable.downloadExcel) {
       this.salesforceTable.downloadExcel();
     } else {
-      console.warn('salesforceTable no disponible aún o no tiene downloadExcel');
+      console.warn(
+        'salesforceTable no disponible aún o no tiene downloadExcel'
+      );
     }
   }
 

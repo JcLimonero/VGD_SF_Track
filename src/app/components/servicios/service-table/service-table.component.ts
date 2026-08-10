@@ -7,10 +7,10 @@ import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
 
 @Component({
-    selector: 'vex-service-table',
-    imports: [CommonModule, GenericTableComponent],
-    templateUrl: './service-table.component.html',
-    styleUrl: './service-table.component.scss'
+  selector: 'vex-service-table',
+  imports: [CommonModule, GenericTableComponent],
+  templateUrl: './service-table.component.html',
+  styleUrl: './service-table.component.scss'
 })
 export class ServiceTableComponent implements OnInit {
   data: any[] = [];
@@ -33,7 +33,10 @@ export class ServiceTableComponent implements OnInit {
     error?: boolean;
   } = {};
   isDownloadingExcel = false;
-  currentSort: { column: string; direction: 'asc' | 'desc' } | null = { column: 'order_dms', direction: 'desc' };
+  currentSort: { column: string; direction: 'asc' | 'desc' } | null = {
+    column: 'order_dms',
+    direction: 'desc'
+  };
 
   // Columnas para tabla de servicios
   columns: TableColumn<any>[] = [
@@ -47,7 +50,7 @@ export class ServiceTableComponent implements OnInit {
     { property: 'resultSF', label: 'Estado SF', type: 'text' },
     { property: 'sf_jsonRequest', label: 'Datos', type: 'button' },
     { property: 'sf_link', label: 'Ver SF', type: 'button' },
-    { property: 'resend',label: 'Reenviar',  type: 'button' },
+    { property: 'resend', label: 'Reenviar', type: 'button' },
     { property: 'actions', label: 'Detalles', type: 'button' }
   ];
 
@@ -94,10 +97,13 @@ export class ServiceTableComponent implements OnInit {
     };
 
     // Map current filters to params
-    if (this.currentFilters.idAgency) params.idAgency = this.currentFilters.idAgency;
-    if (this.currentFilters.order_dms) params.order_dms = this.currentFilters.order_dms;
+    if (this.currentFilters.idAgency)
+      params.idAgency = this.currentFilters.idAgency;
+    if (this.currentFilters.order_dms)
+      params.order_dms = this.currentFilters.order_dms;
     if (this.currentFilters.vin) params.vin = this.currentFilters.vin;
-    if (this.currentFilters.sendedSalesForce) params.sendedSalesForce = this.currentFilters.sendedSalesForce;
+    if (this.currentFilters.sendedSalesForce)
+      params.sendedSalesForce = this.currentFilters.sendedSalesForce;
     if (this.currentFilters.insertado) params.insertCorrect = '1';
     if (this.currentFilters.error) params.insertCorrect = '0';
 
@@ -116,7 +122,8 @@ export class ServiceTableComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        this.error = 'No se pudo cargar la información. Por favor, intenta de nuevo.';
+        this.error =
+          'No se pudo cargar la información. Por favor, intenta de nuevo.';
         this.data = [];
         this.total = 0;
         this.loading = false;
@@ -166,7 +173,9 @@ export class ServiceTableComponent implements OnInit {
         this.loadPage(this.pageIndex, this.currentPageSize);
       },
       error: (error) => {
-        alert(`Error al actualizar: ${error.error?.message || 'Error desconocido'}`);
+        alert(
+          `Error al actualizar: ${error.error?.message || 'Error desconocido'}`
+        );
       }
     });
   }
@@ -193,14 +202,11 @@ export class ServiceTableComponent implements OnInit {
       baseParams.idAgency = this.currentFilters.idAgency;
     if (this.currentFilters.order_dms)
       baseParams.order_dms = this.currentFilters.order_dms;
-    if (this.currentFilters.vin)
-      baseParams.vin = this.currentFilters.vin;
+    if (this.currentFilters.vin) baseParams.vin = this.currentFilters.vin;
     if (this.currentFilters.sendedSalesForce)
       baseParams.sendedSalesForce = this.currentFilters.sendedSalesForce;
-    if (this.currentFilters.insertado)
-      baseParams.insertCorrect = '1';
-    if (this.currentFilters.error)
-      baseParams.insertCorrect = '0';
+    if (this.currentFilters.insertado) baseParams.insertCorrect = '1';
+    if (this.currentFilters.error) baseParams.insertCorrect = '0';
 
     // Crear array de observables para todas las páginas
     const pageRequests = [];
@@ -222,29 +228,29 @@ export class ServiceTableComponent implements OnInit {
           // Preparar los datos para Excel con TODOS los campos disponibles
           const excelData = allData.map((item) => ({
             // Información básica
-            'ID': item.Id || '',
-            'Agencia': item.agencyName || '',
+            ID: item.Id || '',
+            Agencia: item.agencyName || '',
             'ID Agencia': item.idAgency || '',
-            
+
             // Datos del Servicio
             'Orden DMS': item.order_dms || '',
             'Fecha de Servicio': item.service_date || '',
             'Tipo de Servicio': item.service_type || '',
-            'Monto': item.amount || '',
-            'VIN': item.vin || '',
-            'Kilometraje': item.km || '',
-            'Estado': item.status || '',
-            'Etapa': item.stage_name || '',
-            
+            Monto: item.amount || '',
+            VIN: item.vin || '',
+            Kilometraje: item.km || '',
+            Estado: item.status || '',
+            Etapa: item.stage_name || '',
+
             // Salesforce
             'Enviado a SF': item.sendedSalesForce === '1' ? 'Sí' : 'No',
             'ID Salesforce': item.idSalesForce || '',
             'Resultado SF': item.resultSF || '',
             'Insertado Correctamente': item.insertCorrect === '1' ? 'Sí' : 'No',
-            
+
             // Timestamps
             'Timestamp DMS': item.timestamp_dms || '',
-            'Timestamp': item.timestamp || '',
+            Timestamp: item.timestamp || '',
             'Timestamp SF': item.timestamp_sales_force || ''
           }));
 

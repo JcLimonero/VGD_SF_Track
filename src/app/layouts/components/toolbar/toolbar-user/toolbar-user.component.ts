@@ -10,10 +10,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
 
 @Component({
-    selector: 'vex-toolbar-user',
-    templateUrl: './toolbar-user.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [MatRippleModule, MatIconModule]
+  selector: 'vex-toolbar-user',
+  templateUrl: './toolbar-user.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MatRippleModule, MatIconModule]
 })
 export class ToolbarUserComponent implements OnInit {
   dropdownOpen: boolean = false;

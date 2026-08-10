@@ -1,13 +1,17 @@
 import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogModule
+} from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 
 @Component({
-    selector: 'vex-leads-modal',
-    imports: [CommonModule, MatDialogModule, MatButtonModule],
-    templateUrl: './leads-modal.component.html',
-    styleUrl: './leads-modal.component.scss'
+  selector: 'vex-leads-modal',
+  imports: [CommonModule, MatDialogModule, MatButtonModule],
+  templateUrl: './leads-modal.component.html',
+  styleUrl: './leads-modal.component.scss'
 })
 export class LeadsModalComponent {
   constructor(

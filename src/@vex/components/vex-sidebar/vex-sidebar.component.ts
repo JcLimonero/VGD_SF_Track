@@ -1,6 +1,5 @@
 import { Component, Inject, Input, OnDestroy, DOCUMENT } from '@angular/core';
 
-
 @Component({
   selector: 'vex-sidebar',
   templateUrl: './vex-sidebar.component.html',

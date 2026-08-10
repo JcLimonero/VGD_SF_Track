@@ -22,9 +22,9 @@ interface DetailEntry {
  * vacíos.
  */
 @Component({
-    selector: 'vex-generic-detail-modal',
-    imports: [CommonModule, MatDialogModule, MatButtonModule],
-    template: `
+  selector: 'vex-generic-detail-modal',
+  imports: [CommonModule, MatDialogModule, MatButtonModule],
+  template: `
     <h2 mat-dialog-title class="title text-xl">{{ title }}</h2>
 
     <mat-dialog-content>
@@ -42,8 +42,8 @@ interface DetailEntry {
       <button mat-button (click)="onClose()">Cerrar</button>
     </mat-dialog-actions>
   `,
-    styles: [
-        `
+  styles: [
+    `
       .title {
         text-decoration: underline;
         text-decoration-color: #ff5c20;
@@ -88,7 +88,7 @@ interface DetailEntry {
         overflow-y: auto;
       }
     `
-    ]
+  ]
 })
 export class GenericDetailModalComponent {
   title = 'Detalles del registro';

@@ -1,4 +1,10 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GenericTableComponent } from '../../generic-table/generic-table.component';
 import { GenericDetailModalComponent } from '../../generic-table/generic-detail-modal.component';
@@ -9,10 +15,10 @@ import { SalesforceFilters } from '../salesforce-filter/salesforce-filter.compon
 import * as XLSX from 'xlsx';
 
 @Component({
-    selector: 'vex-salesforce-table',
-    imports: [CommonModule, GenericTableComponent],
-    templateUrl: './salesforce-table.component.html',
-    styleUrl: './salesforce-table.component.scss'
+  selector: 'vex-salesforce-table',
+  imports: [CommonModule, GenericTableComponent],
+  templateUrl: './salesforce-table.component.html',
+  styleUrl: './salesforce-table.component.scss'
 })
 export class SalesforceTableComponent implements OnInit, OnChanges {
   /** Tabla de `vgd_dwh_prod` que se está mostrando */
@@ -137,7 +143,8 @@ export class SalesforceTableComponent implements OnInit, OnChanges {
           this.loading = false;
         },
         error: () => {
-          this.error = 'No se pudo cargar la información. Por favor, intenta de nuevo.';
+          this.error =
+            'No se pudo cargar la información. Por favor, intenta de nuevo.';
           this.data = [];
           this.total = 0;
           this.loading = false;

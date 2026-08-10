@@ -14,10 +14,10 @@ export interface SalesforceSubTab {
  * cuyo nombre contiene "honda".
  */
 @Component({
-    selector: 'vex-salesforce-subtabs',
-    imports: [CommonModule],
-    templateUrl: './salesforce-subtabs.component.html',
-    styleUrl: './salesforce-subtabs.component.scss'
+  selector: 'vex-salesforce-subtabs',
+  imports: [CommonModule],
+  templateUrl: './salesforce-subtabs.component.html',
+  styleUrl: './salesforce-subtabs.component.scss'
 })
 export class SalesforceSubtabsComponent implements OnInit {
   @Output() tabChanged = new EventEmitter<string>();

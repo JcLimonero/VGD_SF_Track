@@ -4,13 +4,12 @@ import { CommonModule } from '@angular/common';
 import { VanguardiaApiService } from '../../../services/vanguardia-api.service';
 
 @Component({
-    selector: 'vex-service-filter',
-    imports: [CommonModule, ReactiveFormsModule],
-    templateUrl: './service-filter.component.html',
-    styleUrl: './service-filter.component.scss'
+  selector: 'vex-service-filter',
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './service-filter.component.html',
+  styleUrl: './service-filter.component.scss'
 })
 export class ServiceFilterComponent implements OnInit {
-
   @Output() filterChange = new EventEmitter<{
     order_dms?: string;
     vin?: string;
@@ -31,7 +30,10 @@ export class ServiceFilterComponent implements OnInit {
   selectedAgency: string = ''; // Nombre mostrado en UI
   selectedAgencyId: string = ''; // ID para enviar a la API
 
-  constructor(private fb: FormBuilder, private vanguardiaApi: VanguardiaApiService) {
+  constructor(
+    private fb: FormBuilder,
+    private vanguardiaApi: VanguardiaApiService
+  ) {
     this.filterForm = this.fb.group({
       order_dms: [''],
       vin: [''],
@@ -60,11 +62,14 @@ export class ServiceFilterComponent implements OnInit {
   onAgencySelect(agency: any, event: Event): void {
     const input = event.target as HTMLInputElement | null;
     if (!input) return;
-    
+
     if (input.checked) {
       this.selectedAgency = agency.name;
       this.selectedAgencyId = agency.idAgency;
-      this.filterForm.patchValue({ idAgency: agency.idAgency }, { emitEvent: false });
+      this.filterForm.patchValue(
+        { idAgency: agency.idAgency },
+        { emitEvent: false }
+      );
     } else if (this.selectedAgency === agency.name) {
       this.selectedAgency = '';
       this.selectedAgencyId = '';
@@ -73,23 +78,25 @@ export class ServiceFilterComponent implements OnInit {
   }
 
   onFilter(): void {
-    const { order_dms, vin, idAgency, sendedSalesForce, insertado, error } = this.filterForm
-      .value as {
-      order_dms?: string;
-      vin?: string;
-      idAgency?: string;
-      sendedSalesForce?: string;
-      insertado?: boolean;
-      error?: boolean;
-    };
+    const { order_dms, vin, idAgency, sendedSalesForce, insertado, error } =
+      this.filterForm.value as {
+        order_dms?: string;
+        vin?: string;
+        idAgency?: string;
+        sendedSalesForce?: string;
+        insertado?: boolean;
+        error?: boolean;
+      };
 
     const payload = {
       order_dms,
       vin,
       idAgency,
-      sendedSalesForce: sendedSalesForce ? (sendedSalesForce as '1' | '0') : undefined,
+      sendedSalesForce: sendedSalesForce
+        ? (sendedSalesForce as '1' | '0')
+        : undefined,
       insertado,
-      error,
+      error
     };
     this.filterChange.emit(payload);
   }
@@ -114,7 +121,7 @@ export class ServiceFilterComponent implements OnInit {
       idAgency: undefined,
       sendedSalesForce: undefined,
       insertado: false,
-      error: false,
+      error: false
     };
 
     this.filterChange.emit(emptyPayload);
@@ -123,7 +130,9 @@ export class ServiceFilterComponent implements OnInit {
   closeDropdown(event: Event): void {
     const target = event.target as HTMLElement | null;
     if (!target) return;
-    const details = target.closest('details.dropdown') as HTMLDetailsElement | null;
+    const details = target.closest(
+      'details.dropdown'
+    ) as HTMLDetailsElement | null;
     if (details) {
       // Close after the form state settles
       setTimeout(() => {
@@ -138,7 +147,10 @@ export class ServiceFilterComponent implements OnInit {
     const current = this.filterForm.get('sendedSalesForce')?.value as string;
     // If unchecking the currently selected value, clear; otherwise set the new value
     const next = input.checked ? value : current === value ? '' : current;
-    this.filterForm.patchValue({ sendedSalesForce: next }, { emitEvent: false });
+    this.filterForm.patchValue(
+      { sendedSalesForce: next },
+      { emitEvent: false }
+    );
   }
 
   onInsertToggle(kind: 'insertado' | 'error', event: Event): void {

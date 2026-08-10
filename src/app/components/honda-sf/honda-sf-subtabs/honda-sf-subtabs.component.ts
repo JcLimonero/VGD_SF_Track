@@ -9,10 +9,10 @@ import { HONDA_SF_TABLES, HondaSfTable } from '../honda-sf.catalog';
  * enumere las tablas disponibles; los siete nombres se verificaron a mano.
  */
 @Component({
-    selector: 'vex-honda-sf-subtabs',
-    imports: [CommonModule],
-    templateUrl: './honda-sf-subtabs.component.html',
-    styleUrl: './honda-sf-subtabs.component.scss'
+  selector: 'vex-honda-sf-subtabs',
+  imports: [CommonModule],
+  templateUrl: './honda-sf-subtabs.component.html',
+  styleUrl: './honda-sf-subtabs.component.scss'
 })
 export class HondaSfSubtabsComponent {
   @Output() tabChanged = new EventEmitter<string>();

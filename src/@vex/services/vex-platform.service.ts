@@ -1,7 +1,6 @@
 import { Inject, Injectable, RendererFactory2, DOCUMENT } from '@angular/core';
 import { Platform } from '@angular/cdk/platform';
 
-
 @Injectable({
   providedIn: 'root'
 })

@@ -4,13 +4,12 @@ import { CommonModule } from '@angular/common';
 import { VanguardiaApiService } from '../../../services/vanguardia-api.service';
 
 @Component({
-    selector: 'vex-inventory-filter',
-    imports: [CommonModule, ReactiveFormsModule],
-    templateUrl: './inventory-filter.component.html',
-    styleUrl: './inventory-filter.component.scss'
+  selector: 'vex-inventory-filter',
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './inventory-filter.component.html',
+  styleUrl: './inventory-filter.component.scss'
 })
 export class InventoryFilterComponent implements OnInit {
-
   @Output() filterChange = new EventEmitter<{
     vin?: string;
     idAgency?: string;
@@ -34,7 +33,10 @@ export class InventoryFilterComponent implements OnInit {
   selectedStatus: string = ''; // Estado seleccionado
   selectedType: string = ''; // Tipo seleccionado
 
-  constructor(private fb: FormBuilder, private vanguardiaApi: VanguardiaApiService) {
+  constructor(
+    private fb: FormBuilder,
+    private vanguardiaApi: VanguardiaApiService
+  ) {
     this.filterForm = this.fb.group({
       vin: [''],
       idAgency: [''],
@@ -64,14 +66,27 @@ export class InventoryFilterComponent implements OnInit {
   onAgencySelect(agency: any, event: Event): void {
     const input = event.target as HTMLInputElement | null;
     if (!input) return;
-    
-    console.log('Agencia seleccionada:', agency.name, 'ID:', agency.idAgency, 'checked:', input.checked);
-    
+
+    console.log(
+      'Agencia seleccionada:',
+      agency.name,
+      'ID:',
+      agency.idAgency,
+      'checked:',
+      input.checked
+    );
+
     if (input.checked) {
       this.selectedAgency = agency.name;
       this.selectedAgencyId = agency.idAgency;
-      this.filterForm.patchValue({ idAgency: agency.idAgency }, { emitEvent: false });
-      console.log('Agencia guardada en formulario - ID:', this.filterForm.get('idAgency')?.value);
+      this.filterForm.patchValue(
+        { idAgency: agency.idAgency },
+        { emitEvent: false }
+      );
+      console.log(
+        'Agencia guardada en formulario - ID:',
+        this.filterForm.get('idAgency')?.value
+      );
     } else if (this.selectedAgency === agency.name) {
       this.selectedAgency = '';
       this.selectedAgencyId = '';
@@ -81,8 +96,15 @@ export class InventoryFilterComponent implements OnInit {
   }
 
   onFilter(): void {
-    const { vin, idAgency, statusDescription,typeDescription, sendedSalesForce, insertado, error } = this.filterForm
-      .value as {
+    const {
+      vin,
+      idAgency,
+      statusDescription,
+      typeDescription,
+      sendedSalesForce,
+      insertado,
+      error
+    } = this.filterForm.value as {
       vin?: string;
       idAgency?: string;
       statusDescription?: string;
@@ -97,9 +119,11 @@ export class InventoryFilterComponent implements OnInit {
       idAgency,
       statusDescription,
       typeDescription,
-      sendedSalesForce: sendedSalesForce ? (sendedSalesForce as '1' | '0') : undefined,
+      sendedSalesForce: sendedSalesForce
+        ? (sendedSalesForce as '1' | '0')
+        : undefined,
       insertado,
-      error,
+      error
     };
     this.filterChange.emit(payload);
   }
@@ -128,7 +152,7 @@ export class InventoryFilterComponent implements OnInit {
       typeDescription: undefined,
       sendedSalesForce: undefined,
       insertado: false,
-      error: false,
+      error: false
     };
 
     this.filterChange.emit(emptyPayload);
@@ -137,7 +161,9 @@ export class InventoryFilterComponent implements OnInit {
   closeDropdown(event: Event): void {
     const target = event.target as HTMLElement | null;
     if (!target) return;
-    const details = target.closest('details.dropdown') as HTMLDetailsElement | null;
+    const details = target.closest(
+      'details.dropdown'
+    ) as HTMLDetailsElement | null;
     if (details) {
       // Close after the form state settles
       setTimeout(() => {
@@ -152,7 +178,10 @@ export class InventoryFilterComponent implements OnInit {
     const current = this.filterForm.get('sendedSalesForce')?.value as string;
     // If unchecking the currently selected value, clear; otherwise set the new value
     const next = input.checked ? value : current === value ? '' : current;
-    this.filterForm.patchValue({ sendedSalesForce: next }, { emitEvent: false });
+    this.filterForm.patchValue(
+      { sendedSalesForce: next },
+      { emitEvent: false }
+    );
   }
 
   onInsertToggle(kind: 'insertado' | 'error', event: Event): void {
@@ -169,16 +198,22 @@ export class InventoryFilterComponent implements OnInit {
   onStatusToggle(statusValue: string, event: Event): void {
     const input = event.target as HTMLInputElement | null;
     if (!input) return;
-    
+
     const current = this.filterForm.get('statusDescription')?.value as string;
-    
+
     if (input.checked) {
       this.selectedStatus = statusValue;
-      this.filterForm.patchValue({ statusDescription: statusValue }, { emitEvent: false });
+      this.filterForm.patchValue(
+        { statusDescription: statusValue },
+        { emitEvent: false }
+      );
       console.log('Estado seleccionado:', statusValue);
     } else if (current === statusValue) {
       this.selectedStatus = '';
-      this.filterForm.patchValue({ statusDescription: '' }, { emitEvent: false });
+      this.filterForm.patchValue(
+        { statusDescription: '' },
+        { emitEvent: false }
+      );
       console.log('Estado deseleccionado');
     }
   }
@@ -186,12 +221,15 @@ export class InventoryFilterComponent implements OnInit {
   onTypeToggle(typeValue: string, event: Event): void {
     const input = event.target as HTMLInputElement | null;
     if (!input) return;
-    
+
     const current = this.filterForm.get('typeDescription')?.value as string;
-    
+
     if (input.checked) {
       this.selectedType = typeValue;
-      this.filterForm.patchValue({ typeDescription: typeValue }, { emitEvent: false });
+      this.filterForm.patchValue(
+        { typeDescription: typeValue },
+        { emitEvent: false }
+      );
       console.log('Tipo seleccionado:', typeValue);
     } else if (current === typeValue) {
       this.selectedType = '';
@@ -199,5 +237,4 @@ export class InventoryFilterComponent implements OnInit {
       console.log('Tipo deseleccionado');
     }
   }
-
 }

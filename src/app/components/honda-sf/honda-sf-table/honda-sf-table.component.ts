@@ -1,4 +1,10 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GenericTableComponent } from '../../generic-table/generic-table.component';
 import { GenericDetailModalComponent } from '../../generic-table/generic-detail-modal.component';
@@ -18,10 +24,10 @@ import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
 
 @Component({
-    selector: 'vex-honda-sf-table',
-    imports: [CommonModule, GenericTableComponent],
-    templateUrl: './honda-sf-table.component.html',
-    styleUrl: './honda-sf-table.component.scss'
+  selector: 'vex-honda-sf-table',
+  imports: [CommonModule, GenericTableComponent],
+  templateUrl: './honda-sf-table.component.html',
+  styleUrl: './honda-sf-table.component.scss'
 })
 export class HondaSfTableComponent implements OnInit, OnChanges {
   /** Endpoint de la sub-pestaña activa (ver `honda-sf.catalog.ts`) */
@@ -127,7 +133,8 @@ export class HondaSfTableComponent implements OnInit, OnChanges {
           this.loading = false;
         },
         error: () => {
-          this.error = 'No se pudo cargar la información. Por favor, intenta de nuevo.';
+          this.error =
+            'No se pudo cargar la información. Por favor, intenta de nuevo.';
           this.data = [];
           this.total = 0;
           this.loading = false;
@@ -213,7 +220,10 @@ export class HondaSfTableComponent implements OnInit, OnChanges {
         }
       },
       error: (error) => {
-        console.error('⚠️ Error al obtener datos de Honda SF para Excel:', error);
+        console.error(
+          '⚠️ Error al obtener datos de Honda SF para Excel:',
+          error
+        );
         this.isDownloadingExcel = false;
       }
     });
@@ -322,7 +332,10 @@ export class HondaSfTableComponent implements OnInit, OnChanges {
   private blankZeroDates(row: any): any {
     const cleaned: any = { ...row };
     Object.keys(cleaned).forEach((field) => {
-      if (typeof cleaned[field] === 'string' && /^0000-00-00/.test(cleaned[field])) {
+      if (
+        typeof cleaned[field] === 'string' &&
+        /^0000-00-00/.test(cleaned[field])
+      ) {
         cleaned[field] = '';
       }
     });
