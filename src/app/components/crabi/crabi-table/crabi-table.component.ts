@@ -9,11 +9,10 @@ import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
 
 @Component({
-  selector: 'vex-crabi-table',
-  standalone: true,
-  imports: [CommonModule, GenericTableComponent],
-  templateUrl: './crabi-table.component.html',
-  styleUrl: './crabi-table.component.scss'
+    selector: 'vex-crabi-table',
+    imports: [CommonModule, GenericTableComponent],
+    templateUrl: './crabi-table.component.html',
+    styleUrl: './crabi-table.component.scss'
 })
 export class CrabiTableComponent implements OnInit {
   data: any[] = [];

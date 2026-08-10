@@ -11,20 +11,19 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 
 @Component({
-  selector: 'vex-toolbar-notifications-dropdown',
-  templateUrl: './toolbar-notifications-dropdown.component.html',
-  styleUrls: ['./toolbar-notifications-dropdown.component.scss'],
-  standalone: true,
-  imports: [
-    MatButtonModule,
-    MatMenuModule,
-    MatIconModule,
-    NgFor,
-    MatRippleModule,
-    RouterLink,
-    NgClass,
-    VexDateFormatRelativePipe
-  ]
+    selector: 'vex-toolbar-notifications-dropdown',
+    templateUrl: './toolbar-notifications-dropdown.component.html',
+    styleUrls: ['./toolbar-notifications-dropdown.component.scss'],
+    imports: [
+        MatButtonModule,
+        MatMenuModule,
+        MatIconModule,
+        NgFor,
+        MatRippleModule,
+        RouterLink,
+        NgClass,
+        VexDateFormatRelativePipe
+    ]
 })
 export class ToolbarNotificationsDropdownComponent implements OnInit {
   notifications: Notification[] = [

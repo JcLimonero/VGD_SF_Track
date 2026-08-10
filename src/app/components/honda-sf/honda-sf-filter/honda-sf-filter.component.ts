@@ -31,11 +31,10 @@ interface FilterOption {
  * nada, y sin error: la API simplemente responde cero registros.
  */
 @Component({
-  selector: 'vex-honda-sf-filter',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './honda-sf-filter.component.html',
-  styleUrl: './honda-sf-filter.component.scss'
+    selector: 'vex-honda-sf-filter',
+    imports: [CommonModule, ReactiveFormsModule],
+    templateUrl: './honda-sf-filter.component.html',
+    styleUrl: './honda-sf-filter.component.scss'
 })
 export class HondaSfFilterComponent implements OnInit, OnChanges {
   /** Campos de la sub-pestaña activa */

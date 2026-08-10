@@ -10,11 +10,10 @@ import { CustomerModalComponent } from '../customer/customer-modal/customer-moda
 import { ServiceModalComponent } from '../servicios/service-modal/service-modal.component';
 import { LeadsModalComponent } from '../leads/leads-modal/leads-modal.component';
 @Component({
-  selector: 'vex-generic-table',
-  standalone: true,
-  imports: [CommonModule, FormsModule, MatTableModule, MatButtonModule, MatDialogModule],
-  templateUrl: './generic-table.component.html',
-  styleUrls: ['./generic-table.component.scss']
+    selector: 'vex-generic-table',
+    imports: [CommonModule, FormsModule, MatTableModule, MatButtonModule, MatDialogModule],
+    templateUrl: './generic-table.component.html',
+    styleUrls: ['./generic-table.component.scss']
 })
 
 export class GenericTableComponent implements OnInit, OnChanges {
@@ -395,10 +394,9 @@ export class GenericTableComponent implements OnInit, OnChanges {
 
 // Modal component defined in the same file
 @Component({
-  selector: 'modal-dialog',
-  standalone: true,
-  imports: [MatDialogModule, MatButtonModule, CommonModule],
-  template: `
+    selector: 'modal-dialog',
+    imports: [MatDialogModule, MatButtonModule, CommonModule],
+    template: `
     <h2 mat-dialog-title class="title text-xl">Detalles de la orden</h2>
 
     <mat-dialog-content >
@@ -459,7 +457,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
       <button mat-button (click)="onNoClick()">Cerrar</button>
     </mat-dialog-actions>
   `,
-  styles: [`
+    styles: [`
 
     .title{
       text-decoration: underline;
@@ -507,10 +505,9 @@ export class ModalDialogComponent {
 
 // JSON Modal component
 @Component({
-  selector: 'json-modal',
-  standalone: true,
-  imports: [MatDialogModule, MatButtonModule, CommonModule],
-  template: `
+    selector: 'json-modal',
+    imports: [MatDialogModule, MatButtonModule, CommonModule],
+    template: `
     <h2 mat-dialog-title>{{ title }}</h2>
 
     <mat-dialog-content class="mat-typography">
@@ -532,7 +529,7 @@ export class ModalDialogComponent {
       <button mat-button (click)="onNoClick()">Cerrar</button>
     </mat-dialog-actions>
   `,
-  styles: [`
+    styles: [`
     .json-section + .json-section {
       margin-top: 16px;
     }

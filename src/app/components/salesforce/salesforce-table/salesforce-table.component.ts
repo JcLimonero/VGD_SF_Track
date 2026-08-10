@@ -9,11 +9,10 @@ import { SalesforceFilters } from '../salesforce-filter/salesforce-filter.compon
 import * as XLSX from 'xlsx';
 
 @Component({
-  selector: 'vex-salesforce-table',
-  standalone: true,
-  imports: [CommonModule, GenericTableComponent],
-  templateUrl: './salesforce-table.component.html',
-  styleUrl: './salesforce-table.component.scss'
+    selector: 'vex-salesforce-table',
+    imports: [CommonModule, GenericTableComponent],
+    templateUrl: './salesforce-table.component.html',
+    styleUrl: './salesforce-table.component.scss'
 })
 export class SalesforceTableComponent implements OnInit, OnChanges {
   /** Tabla de `vgd_dwh_prod` que se está mostrando */

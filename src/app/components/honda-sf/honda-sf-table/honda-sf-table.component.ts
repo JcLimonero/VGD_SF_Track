@@ -18,11 +18,10 @@ import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
 
 @Component({
-  selector: 'vex-honda-sf-table',
-  standalone: true,
-  imports: [CommonModule, GenericTableComponent],
-  templateUrl: './honda-sf-table.component.html',
-  styleUrl: './honda-sf-table.component.scss'
+    selector: 'vex-honda-sf-table',
+    imports: [CommonModule, GenericTableComponent],
+    templateUrl: './honda-sf-table.component.html',
+    styleUrl: './honda-sf-table.component.scss'
 })
 export class HondaSfTableComponent implements OnInit, OnChanges {
   /** Endpoint de la sub-pestaña activa (ver `honda-sf.catalog.ts`) */

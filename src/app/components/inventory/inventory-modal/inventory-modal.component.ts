@@ -4,11 +4,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'vex-inventory-modal',
-  standalone: true,
-  imports: [MatDialogModule, MatButtonModule, CommonModule],
-  templateUrl: './inventory-modal.component.html',
-  styleUrl: './inventory-modal.component.scss'
+    selector: 'vex-inventory-modal',
+    imports: [MatDialogModule, MatButtonModule, CommonModule],
+    templateUrl: './inventory-modal.component.html',
+    styleUrl: './inventory-modal.component.scss'
 })
 export class InventoryModalComponent {
 

@@ -4,11 +4,10 @@ import { CommonModule } from '@angular/common';
 import { VanguardiaApiService } from '../../../services/vanguardia-api.service';
 
 @Component({
-  selector: 'vex-dwh-filters',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './dwh-filters.component.html',
-  styleUrl: './dwh-filters.component.scss'
+    selector: 'vex-dwh-filters',
+    imports: [CommonModule, ReactiveFormsModule],
+    templateUrl: './dwh-filters.component.html',
+    styleUrl: './dwh-filters.component.scss'
 })
 export class DwhFiltersComponent implements OnInit {
 

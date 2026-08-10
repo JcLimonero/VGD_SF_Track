@@ -7,11 +7,10 @@ import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
 
 @Component({
-  selector: 'vex-customer-table',
-  standalone: true,
-  imports: [CommonModule, GenericTableComponent],
-  templateUrl: './customer-table.component.html',
-  styleUrl: './customer-table.component.scss'
+    selector: 'vex-customer-table',
+    imports: [CommonModule, GenericTableComponent],
+    templateUrl: './customer-table.component.html',
+    styleUrl: './customer-table.component.scss'
 })
 export class CustomerTableComponent implements OnInit {
   data: any[] = []; ///objeto de datos

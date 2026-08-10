@@ -4,11 +4,10 @@ import { CommonModule } from '@angular/common';
 import { VanguardiaApiService } from '../../../services/vanguardia-api.service';
 
 @Component({
-  selector: 'vex-customer-filter',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './customer-filter.component.html',
-  styleUrl: './customer-filter.component.scss'
+    selector: 'vex-customer-filter',
+    imports: [CommonModule, ReactiveFormsModule],
+    templateUrl: './customer-filter.component.html',
+    styleUrl: './customer-filter.component.scss'
 })
 export class CustomerFilterComponent {
 

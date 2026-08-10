@@ -8,11 +8,10 @@ import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
 
 @Component({
-  selector: 'vex-inventory-table',
-  standalone: true,
-  imports: [CommonModule, GenericTableComponent],
-  templateUrl: './inventory-table.component.html',
-  styleUrls: ['./inventory-table.component.scss']
+    selector: 'vex-inventory-table',
+    imports: [CommonModule, GenericTableComponent],
+    templateUrl: './inventory-table.component.html',
+    styleUrls: ['./inventory-table.component.scss']
 })
 export class InventoryTableComponent implements OnInit {
 

@@ -26,36 +26,35 @@ import { HondaSfSubtabsComponent } from '../components/honda-sf/honda-sf-subtabs
 import { HONDA_SF_TABLES, findHondaSfTable } from '../components/honda-sf/honda-sf.catalog';
 import { MockDataService } from '../services/mock-data.service';
 @Component({
-  selector: 'vex-home',
-  standalone: true,
-  imports: [
-    VexPageLayoutComponent,
-    MenuComponent,
-    CommonModule,
-    InvoiceTableComponent,
-    InvoiceFilterComponent,
-    TabsComponent,
-    InventoryTableComponent,
-    InventoryFilterComponent,
-    CustomerTableComponent,
-    CustomerFilterComponent,
-    ServiceTableComponent,
-    ServiceFilterComponent,
-    DwhTableComponent,
-    DwhFiltersComponent,
-    LeadsTableComponent,
-    LeadsFilterComponent,
-    CrabiTableComponent,
-    CrabiFilterComponent,
-    SalesforceTableComponent,
-    SalesforceFilterComponent,
-    SalesforceSubtabsComponent,
-    HondaSfTableComponent,
-    HondaSfFilterComponent,
-    HondaSfSubtabsComponent
-],
-  templateUrl: './home.component.html',
-  styleUrl: './home.component.scss'
+    selector: 'vex-home',
+    imports: [
+        VexPageLayoutComponent,
+        MenuComponent,
+        CommonModule,
+        InvoiceTableComponent,
+        InvoiceFilterComponent,
+        TabsComponent,
+        InventoryTableComponent,
+        InventoryFilterComponent,
+        CustomerTableComponent,
+        CustomerFilterComponent,
+        ServiceTableComponent,
+        ServiceFilterComponent,
+        DwhTableComponent,
+        DwhFiltersComponent,
+        LeadsTableComponent,
+        LeadsFilterComponent,
+        CrabiTableComponent,
+        CrabiFilterComponent,
+        SalesforceTableComponent,
+        SalesforceFilterComponent,
+        SalesforceSubtabsComponent,
+        HondaSfTableComponent,
+        HondaSfFilterComponent,
+        HondaSfSubtabsComponent
+    ],
+    templateUrl: './home.component.html',
+    styleUrl: './home.component.scss'
 })
 
 export class HomeComponent {

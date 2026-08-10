@@ -23,22 +23,21 @@ export interface OnlineStatus {
 }
 
 @Component({
-  selector: 'vex-toolbar-user-dropdown',
-  templateUrl: './toolbar-user-dropdown.component.html',
-  styleUrls: ['./toolbar-user-dropdown.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
-  imports: [
-    MatIconModule,
-    MatButtonModule,
-    MatTooltipModule,
-    MatMenuModule,
-    NgFor,
-    MatRippleModule,
-    RouterLink,
-    NgClass,
-    NgIf
-  ]
+    selector: 'vex-toolbar-user-dropdown',
+    templateUrl: './toolbar-user-dropdown.component.html',
+    styleUrls: ['./toolbar-user-dropdown.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        MatIconModule,
+        MatButtonModule,
+        MatTooltipModule,
+        MatMenuModule,
+        NgFor,
+        MatRippleModule,
+        RouterLink,
+        NgClass,
+        NgIf
+    ]
 })
 export class ToolbarUserDropdownComponent implements OnInit {
   items: MenuItem[] = [

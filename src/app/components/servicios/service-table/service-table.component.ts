@@ -7,11 +7,10 @@ import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
 
 @Component({
-  selector: 'vex-service-table',
-  standalone: true,
-  imports: [CommonModule, GenericTableComponent],
-  templateUrl: './service-table.component.html',
-  styleUrl: './service-table.component.scss'
+    selector: 'vex-service-table',
+    imports: [CommonModule, GenericTableComponent],
+    templateUrl: './service-table.component.html',
+    styleUrl: './service-table.component.scss'
 })
 export class ServiceTableComponent implements OnInit {
   data: any[] = [];

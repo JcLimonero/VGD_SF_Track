@@ -21,28 +21,27 @@ import { VexProgressBarComponent } from '@vex/components/vex-progress-bar/vex-pr
 import { VexConfig } from '@vex/config/vex-config.interface';
 
 @Component({
-  selector: 'vex-layout',
-  templateUrl: './layout.component.html',
-  styleUrls: ['./layout.component.scss'],
-  imports: [
-    BaseLayoutComponent,
-    NgIf,
-    AsyncPipe,
-    SidenavComponent,
-    ToolbarComponent,
-    FooterComponent,
-    QuickpanelComponent,
-    ConfigPanelToggleComponent,
-    VexSidebarComponent,
-    ConfigPanelComponent,
-    MatDialogModule,
-    MatSidenavModule,
-    NgTemplateOutlet,
-    RouterOutlet,
-    SearchComponent,
-    VexProgressBarComponent
-  ],
-  standalone: true
+    selector: 'vex-layout',
+    templateUrl: './layout.component.html',
+    styleUrls: ['./layout.component.scss'],
+    imports: [
+        BaseLayoutComponent,
+        NgIf,
+        AsyncPipe,
+        SidenavComponent,
+        ToolbarComponent,
+        FooterComponent,
+        QuickpanelComponent,
+        ConfigPanelToggleComponent,
+        VexSidebarComponent,
+        ConfigPanelComponent,
+        MatDialogModule,
+        MatSidenavModule,
+        NgTemplateOutlet,
+        RouterOutlet,
+        SearchComponent,
+        VexProgressBarComponent
+    ]
 })
 export class LayoutComponent {
   config$: Observable<VexConfig> = this.configService.config$;

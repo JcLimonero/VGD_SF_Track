@@ -4,11 +4,10 @@ import { CommonModule } from '@angular/common';
 import { VanguardiaApiService } from '../../services/vanguardia-api.service';
 
 @Component({
-  selector: 'vex-invoice-filter',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './invoice-filter.component.html',
-  styleUrl: './invoice-filter.component.scss'
+    selector: 'vex-invoice-filter',
+    imports: [CommonModule, ReactiveFormsModule],
+    templateUrl: './invoice-filter.component.html',
+    styleUrl: './invoice-filter.component.scss'
 })
 export class InvoiceFilterComponent implements OnInit {
 

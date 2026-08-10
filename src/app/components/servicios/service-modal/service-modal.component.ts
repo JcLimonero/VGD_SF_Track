@@ -4,11 +4,10 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 
 @Component({
-  selector: 'vex-service-modal',
-  standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule],
-  templateUrl: './service-modal.component.html',
-  styleUrl: './service-modal.component.scss'
+    selector: 'vex-service-modal',
+    imports: [CommonModule, MatDialogModule, MatButtonModule],
+    templateUrl: './service-modal.component.html',
+    styleUrl: './service-modal.component.scss'
 })
 export class ServiceModalComponent {
   constructor(

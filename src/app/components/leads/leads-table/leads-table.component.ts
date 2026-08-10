@@ -7,11 +7,10 @@ import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
 
 @Component({
-  selector: 'vex-leads-table',
-  standalone: true,
-  imports: [CommonModule, GenericTableComponent],
-  templateUrl: './leads-table.component.html',
-  styleUrl: './leads-table.component.scss'
+    selector: 'vex-leads-table',
+    imports: [CommonModule, GenericTableComponent],
+    templateUrl: './leads-table.component.html',
+    styleUrl: './leads-table.component.scss'
 })
 export class LeadsTableComponent implements OnInit {
   data: any[] = [];

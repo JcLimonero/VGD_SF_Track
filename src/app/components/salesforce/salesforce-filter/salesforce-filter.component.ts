@@ -9,11 +9,10 @@ export interface SalesforceFilters {
 }
 
 @Component({
-  selector: 'vex-salesforce-filter',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './salesforce-filter.component.html',
-  styleUrl: './salesforce-filter.component.scss'
+    selector: 'vex-salesforce-filter',
+    imports: [CommonModule, ReactiveFormsModule],
+    templateUrl: './salesforce-filter.component.html',
+    styleUrl: './salesforce-filter.component.scss'
 })
 export class SalesforceFilterComponent {
   @Output() filterChange = new EventEmitter<SalesforceFilters>();

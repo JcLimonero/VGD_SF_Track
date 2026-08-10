@@ -4,11 +4,10 @@ import { CommonModule } from '@angular/common';
 import { VanguardiaApiService } from '../../../services/vanguardia-api.service';
 
 @Component({
-  selector: 'vex-inventory-filter',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './inventory-filter.component.html',
-  styleUrl: './inventory-filter.component.scss'
+    selector: 'vex-inventory-filter',
+    imports: [CommonModule, ReactiveFormsModule],
+    templateUrl: './inventory-filter.component.html',
+    styleUrl: './inventory-filter.component.scss'
 })
 export class InventoryFilterComponent implements OnInit {
 

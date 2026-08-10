@@ -7,11 +7,10 @@ import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
 
 @Component({
-  selector: 'vex-dwh-table',
-  standalone: true,
-  imports: [CommonModule, GenericTableComponent],
-  templateUrl: './dwh-table.component.html',
-  styleUrl: './dwh-table.component.scss'
+    selector: 'vex-dwh-table',
+    imports: [CommonModule, GenericTableComponent],
+    templateUrl: './dwh-table.component.html',
+    styleUrl: './dwh-table.component.scss'
 })
 export class DwhTableComponent implements OnInit {
   data: any[] = [];

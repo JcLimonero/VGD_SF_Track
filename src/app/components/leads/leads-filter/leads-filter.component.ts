@@ -4,11 +4,10 @@ import { CommonModule } from '@angular/common';
 import { VanguardiaApiService } from '../../../services/vanguardia-api.service';
 
 @Component({
-  selector: 'vex-leads-filter',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './leads-filter.component.html',
-  styleUrl: './leads-filter.component.scss'
+    selector: 'vex-leads-filter',
+    imports: [CommonModule, ReactiveFormsModule],
+    templateUrl: './leads-filter.component.html',
+    styleUrl: './leads-filter.component.scss'
 })
 export class LeadsFilterComponent implements OnInit {
 

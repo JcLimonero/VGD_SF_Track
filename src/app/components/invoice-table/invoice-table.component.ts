@@ -8,11 +8,10 @@ import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
 
 @Component({
-  selector: 'vex-invoice-table',
-  standalone: true,
-  imports: [CommonModule, GenericTableComponent],
-  templateUrl: './invoice-table.component.html',
-  styleUrls: ['./invoice-table.component.scss']
+    selector: 'vex-invoice-table',
+    imports: [CommonModule, GenericTableComponent],
+    templateUrl: './invoice-table.component.html',
+    styleUrls: ['./invoice-table.component.scss']
 })
 
 export class InvoiceTableComponent implements OnInit {

@@ -4,11 +4,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'vex-modal-generic',
-  standalone: true,
-  imports: [MatDialogModule, MatButtonModule, CommonModule],
-  templateUrl: './modal-generic.component.html',
-  styleUrl: './modal-generic.component.scss'
+    selector: 'vex-modal-generic',
+    imports: [MatDialogModule, MatButtonModule, CommonModule],
+    templateUrl: './modal-generic.component.html',
+    styleUrl: './modal-generic.component.scss'
 })
 export class ModalGenericComponent {
 

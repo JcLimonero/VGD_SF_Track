@@ -4,11 +4,10 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 
 @Component({
-  selector: 'vex-leads-modal',
-  standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule],
-  templateUrl: './leads-modal.component.html',
-  styleUrl: './leads-modal.component.scss'
+    selector: 'vex-leads-modal',
+    imports: [CommonModule, MatDialogModule, MatButtonModule],
+    templateUrl: './leads-modal.component.html',
+    styleUrl: './leads-modal.component.scss'
 })
 export class LeadsModalComponent {
   constructor(

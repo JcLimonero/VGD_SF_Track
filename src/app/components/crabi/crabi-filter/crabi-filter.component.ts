@@ -16,11 +16,10 @@ export interface CrabiFilters {
 }
 
 @Component({
-  selector: 'vex-crabi-filter',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './crabi-filter.component.html',
-  styleUrl: './crabi-filter.component.scss'
+    selector: 'vex-crabi-filter',
+    imports: [CommonModule, ReactiveFormsModule],
+    templateUrl: './crabi-filter.component.html',
+    styleUrl: './crabi-filter.component.scss'
 })
 export class CrabiFilterComponent implements OnInit {
   @Output() filterChange = new EventEmitter<CrabiFilters>();

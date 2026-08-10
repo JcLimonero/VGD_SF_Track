@@ -12,12 +12,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 @Component({
-  selector: 'vex-toolbar-notifications',
-  templateUrl: './toolbar-notifications.component.html',
-  styleUrls: ['./toolbar-notifications.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
-  imports: [MatButtonModule, MatIconModule]
+    selector: 'vex-toolbar-notifications',
+    templateUrl: './toolbar-notifications.component.html',
+    styleUrls: ['./toolbar-notifications.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [MatButtonModule, MatIconModule]
 })
 export class ToolbarNotificationsComponent implements OnInit {
   @ViewChild('originRef', { static: true, read: ElementRef })
