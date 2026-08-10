@@ -7,11 +7,19 @@ import {
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
 
-// First, initialize the Angular testing environment.
+/**
+ * Inicializa el entorno de pruebas de Angular.
+ *
+ * Sin `teardown: { destroyAfterEach: false }`, que estaba puesto desde el
+ * template: era la opcion de compatibilidad de Angular 12 y desde la 13 el
+ * valor por defecto es destruir el componente despues de cada prueba.
+ *
+ * Con `false`, los componentes de una prueba seguian vivos durante las
+ * siguientes: sus nodos se quedaban en el DOM y sus suscripciones abiertas.
+ * Eso deja pasar pruebas que en realidad dependen del estado que dejo otra, y
+ * hace que el orden importe.
+ */
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting(),
-  {
-    teardown: { destroyAfterEach: false }
-  }
+  platformBrowserDynamicTesting()
 );
