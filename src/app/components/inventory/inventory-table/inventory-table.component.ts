@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GenericTableComponent } from '../../generic-table/generic-table.component';
 import { VanguardiaApiService } from '../../../services/vanguardia-api.service';
+import { NotificationService } from '../../../services/notification.service';
 import { TableColumn } from '../../../../@vex/interfaces/table-column.interface';
 import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
@@ -63,7 +64,10 @@ export class InventoryTableComponent implements OnInit {
     );
   }
 
-  constructor(private vanguardiaApi: VanguardiaApiService) {}
+  constructor(
+    private vanguardiaApi: VanguardiaApiService,
+    private notifications: NotificationService
+  ) {}
 
   ngOnInit(): void {
     this.loadPage(this.pageIndex, this.defaultPageSize);
@@ -147,7 +151,7 @@ export class InventoryTableComponent implements OnInit {
    */
   resendToSalesForce(row: any): void {
     if (!row.id) {
-      alert('Error: No se encontró el ID del registro');
+      this.notifications.error('No se encontró el ID del registro');
       return;
     }
 
@@ -161,11 +165,15 @@ export class InventoryTableComponent implements OnInit {
 
     this.vanguardiaApi.updateInventory(row.id, data).subscribe({
       next: (response) => {
-        alert(`Vehículo ${row.vin} marcado para reenvío a Salesforce`);
+        this.notifications.success(
+          `Vehículo ${row.vin} marcado para reenvío a Salesforce`
+        );
         this.loadPage(this.pageIndex, this.currentPageSize);
       },
       error: (error) => {
-        alert(`Error al actualizar: ${error.error?.message || 'Error desconocido'}`);
+        this.notifications.error(
+          `Error al actualizar: ${error.error?.message || 'Error desconocido'}`
+        );
       }
     });
   }
