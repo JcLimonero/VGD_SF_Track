@@ -117,7 +117,7 @@ export class DwhTableComponent implements OnInit {
     });
   }
 
-  applyFilter(filters: { idAgency?: string }): void {
+  applyFilter(filters: { idAgency?: string; type?: string }): void {
     //guardar filtros y reiniciar a primera página
     this.currentFilters = { ...filters };
     this.pageIndex = 0;
@@ -157,6 +157,7 @@ export class DwhTableComponent implements OnInit {
     // Aplicar los mismos filtros que están actualmente activos
     if (this.currentFilters.idAgency)
       baseParams.idAgency = this.currentFilters.idAgency;
+    if (this.currentFilters.type) baseParams.type = this.currentFilters.type;
 
     // Crear array de observables para todas las páginas
     const pageRequests = [];
