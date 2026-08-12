@@ -43,20 +43,93 @@ html {
   }
 }
 
+/*
+  Cada color va declarado DOS VECES, con los dos nombres de token.
+
+  Material 17 los llama --mdc-snackbar-*; Material 20 los renombro a
+  --mat-snack-bar-*. Hoy el repositorio esta en 17 y la rama que sube a 20 ya
+  esta abierta, asi que declarar solo uno de los dos pares deja los avisos
+  grises en cuanto se mezcle: no falla nada, no avisa nadie, simplemente se
+  pierden el verde, el rojo y el naranja.
+
+  El par que no corresponde a la version instalada es una variable CSS que
+  nadie lee. No pesa ni estorba, y a cambio el orden de mezcla deja de
+  importar. Cuando 17 quede atras se pueden borrar los --mdc-snackbar-*.
+
+  --mat-snack-bar-button-color no aparece duplicado porque ese nombre no
+  cambio entre las dos versiones.
+*/
 .vgd-notif-exito {
   --mdc-snackbar-container-color: #2e7d32;
   --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-snack-bar-container-color: #2e7d32;
+  --mat-snack-bar-supporting-text-color: #ffffff;
   --mat-snack-bar-button-color: #ffffff;
 }
 
 .vgd-notif-error {
   --mdc-snackbar-container-color: #c62828;
   --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-snack-bar-container-color: #c62828;
+  --mat-snack-bar-supporting-text-color: #ffffff;
   --mat-snack-bar-button-color: #ffffff;
 }
 
 .vgd-notif-aviso {
   --mdc-snackbar-container-color: #ef6c00;
   --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-snack-bar-container-color: #ef6c00;
+  --mat-snack-bar-supporting-text-color: #ffffff;
   --mat-snack-bar-button-color: #ffffff;
+}
+
+/*
+  Pantalla de "no hay datos" / "error al cargar".
+
+  Vivia en generic-table.component.scss, que tiene encapsulacion por defecto,
+  pero estas clases las escriben NUEVE plantillas de fuera de ese componente
+  (customer, inventory, leads, service, invoice, crabi, honda-sf, dwh y
+  salesforce), asi que a ninguna le llegaban los estilos: el icono salia
+  pegado al borde izquierdo y el texto sin centrar ni tarjeta.
+
+  Como solo se pinta cuando la carga falla o vuelve vacia, el fallo llevaba
+  tiempo ahi sin que nadie lo viera.
+
+  Va aqui, en global, porque es el unico sitio que alcanza a las diez
+  plantillas con UNA sola definicion.
+*/
+.no-data-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  background-color: #fafafa;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.no-data-content {
+  text-align: center;
+  max-width: 400px;
+}
+
+.no-data-icon {
+  font-size: 64px;
+  color: #bdbdbd;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.no-data-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #424242;
+  margin: 0 0 12px 0;
+}
+
+.no-data-subtitle {
+  font-size: 16px;
+  color: #757575;
+  line-height: 1.5;
+  margin: 0;
 }
