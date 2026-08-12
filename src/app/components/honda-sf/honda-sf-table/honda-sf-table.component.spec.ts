@@ -10,6 +10,7 @@ import { HondaSfTableComponent } from './honda-sf-table.component';
 import { GenericTableComponent } from '../../generic-table/generic-table.component';
 import { GenericDetailModalComponent } from '../../generic-table/generic-detail-modal.component';
 import { HONDA_SF_LABELS, HONDA_SF_TABLES } from '../honda-sf.catalog';
+import { NotificationService } from '../../../services/notification.service';
 
 const BASE = environment.api.baseUrl;
 const CUSTOMERS = `${BASE}/vgd/portalhondacustomers`;
@@ -17,7 +18,11 @@ const LEADS = `${BASE}/vgd/portalhondaleads`;
 
 /** Envoltorio con el que responden todos los endpoints `/vgd/*`. */
 function apiPage(items: any[], total = items.length) {
-  return { status: 200, message: 'ok', data: { data: items, total_rows: total } };
+  return {
+    status: 200,
+    message: 'ok',
+    data: { data: items, total_rows: total }
+  };
 }
 
 const ROWS = [
@@ -57,6 +62,7 @@ describe('HondaSfTableComponent', () => {
   let component: HondaSfTableComponent;
   let fixture: ComponentFixture<HondaSfTableComponent>;
   let httpMock: HttpTestingController;
+  let notifications: NotificationService;
 
   const isAgencies = (r: HttpRequest<any>) => r.url.includes('agenciesfilter');
 
@@ -87,6 +93,7 @@ describe('HondaSfTableComponent', () => {
     fixture = TestBed.createComponent(HondaSfTableComponent);
     component = fixture.componentInstance;
     httpMock = TestBed.inject(HttpTestingController);
+    notifications = TestBed.inject(NotificationService);
   });
 
   afterEach(() => {
@@ -136,7 +143,9 @@ describe('HondaSfTableComponent', () => {
     fixture.detectChanges();
     httpMock
       .match(isAgencies)
-      .forEach((req) => req.flush('nope', { status: 500, statusText: 'Server Error' }));
+      .forEach((req) =>
+        req.flush('nope', { status: 500, statusText: 'Server Error' })
+      );
     flushRows();
 
     expect(component.data.length).toBe(2);
@@ -281,9 +290,10 @@ describe('HondaSfTableComponent', () => {
       // El modal cae en `humanizeFieldName` para lo que no esté etiquetado, y lo
       // muestra en inglés ("Loan Term"). Se revisan las siete tablas de una vez.
       const untranslated = HONDA_SF_TABLES.flatMap((table) =>
-        [...table.columns, ...table.filters.map((filter) => filter.field)].filter(
-          (field) => !HONDA_SF_LABELS[field]
-        )
+        [
+          ...table.columns,
+          ...table.filters.map((filter) => filter.field)
+        ].filter((field) => !HONDA_SF_LABELS[field])
       );
 
       expect(untranslated).toEqual([]);
@@ -319,13 +329,16 @@ describe('HondaSfTableComponent', () => {
     });
 
     it('asks the user to filter instead of downloading 200 pages', () => {
-      const alerted = spyOn(window, 'alert');
+      // Va por `warning` y no por `error`: no ha fallado nada, es una
+      // instrucción para el usuario, y por eso este aviso no caduca solo.
+      const asked = spyOn(notifications, 'warning');
       start(199480);
 
       component.downloadExcel();
 
-      expect(alerted).toHaveBeenCalled();
-      expect(alerted.calls.mostRecent().args[0]).toContain('199,480');
+      expect(asked).toHaveBeenCalled();
+      expect(asked.calls.mostRecent().args[0]).toContain('199,480');
+      expect(asked.calls.mostRecent().args[0]).toContain('Aplica un filtro');
       httpMock.expectNone((r) => r.url === CUSTOMERS);
       expect(component.isDownloadingExcel).toBeFalse();
     });
@@ -342,10 +355,16 @@ describe('HondaSfTableComponent', () => {
       const pages = httpMock.match((r) => r.url === CUSTOMERS);
       expect(pages.length).toBe(3);
       expect(pages[0].request.params.get('perpage')).toBe('1000');
-      expect(pages.map((p) => p.request.params.get('page'))).toEqual(['1', '2', '3']);
+      expect(pages.map((p) => p.request.params.get('page'))).toEqual([
+        '1',
+        '2',
+        '3'
+      ]);
 
       // El filtro activo se respeta en todas las páginas
-      pages.forEach((p) => expect(p.request.params.get('dealer_id')).toBe('10017'));
+      pages.forEach((p) =>
+        expect(p.request.params.get('dealer_id')).toBe('10017')
+      );
 
       // Sin ordenar: la API no desempata el ORDER BY, así que pedir las páginas
       // ordenadas devolvía filas repetidas y otras faltantes

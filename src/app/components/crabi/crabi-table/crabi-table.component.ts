@@ -4,6 +4,7 @@ import { GenericTableComponent } from '../../generic-table/generic-table.compone
 import { GenericDetailModalComponent } from '../../generic-table/generic-detail-modal.component';
 import { TableColumn } from '../../../../@vex/interfaces/table-column.interface';
 import { VanguardiaApiService } from '../../../services/vanguardia-api.service';
+import { NotificationService } from '../../../services/notification.service';
 import { CrabiFilters } from '../crabi-filter/crabi-filter.component';
 import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
@@ -182,7 +183,10 @@ export class CrabiTableComponent implements OnInit {
     );
   }
 
-  constructor(private vanguardiaApi: VanguardiaApiService) {}
+  constructor(
+    private vanguardiaApi: VanguardiaApiService,
+    private notifications: NotificationService
+  ) {}
 
   ngOnInit(): void {
     this.loadAgencies();
@@ -236,17 +240,21 @@ export class CrabiTableComponent implements OnInit {
    */
   resendToCrabi(row: any): void {
     if (!row.id) {
-      alert('Error: No se encontró el ID del registro');
+      this.notifications.error('No se encontró el ID del registro');
       return;
     }
 
     this.vanguardiaApi.updateCrabiOrder(row.id, { isSend: 0 }).subscribe({
       next: () => {
-        alert(`Orden ${row.order_dms} marcada para reenvío a Crabi`);
+        this.notifications.success(
+          `Orden ${row.order_dms} marcada para reenvío a Crabi`
+        );
         this.loadPage(this.pageIndex, this.currentPageSize);
       },
       error: (error) => {
-        alert(`Error al actualizar: ${error.error?.message || 'Error desconocido'}`);
+        this.notifications.error(
+          `Error al actualizar: ${error.error?.message || 'Error desconocido'}`
+        );
       }
     });
   }

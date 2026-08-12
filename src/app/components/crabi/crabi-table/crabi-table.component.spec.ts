@@ -5,12 +5,17 @@ import { httpTestProviders } from '@testing/test-providers';
 import { environment } from '../../../../environments/environment';
 
 import { CrabiTableComponent } from './crabi-table.component';
+import { NotificationService } from '../../../services/notification.service';
 
 const BASE = environment.api.baseUrl;
 
 /** Envoltorio con el que responden todos los endpoints `/vgd/*`. */
 function apiPage(items: any[], total = items.length) {
-  return { status: 200, message: 'ok', data: { data: items, total_rows: total } };
+  return {
+    status: 200,
+    message: 'ok',
+    data: { data: items, total_rows: total }
+  };
 }
 
 /**
@@ -81,6 +86,7 @@ describe('CrabiTableComponent', () => {
   let component: CrabiTableComponent;
   let fixture: ComponentFixture<CrabiTableComponent>;
   let httpMock: HttpTestingController;
+  let notifications: NotificationService;
 
   const isOrders = (r: HttpRequest<any>) => r.url === `${BASE}/vgd/orderscrabi`;
   const isAgencies = (r: HttpRequest<any>) => r.url.includes('agenciesfilter');
@@ -106,6 +112,7 @@ describe('CrabiTableComponent', () => {
     fixture = TestBed.createComponent(CrabiTableComponent);
     component = fixture.componentInstance;
     httpMock = TestBed.inject(HttpTestingController);
+    notifications = TestBed.inject(NotificationService);
   });
 
   afterEach(() => {
@@ -292,7 +299,7 @@ describe('CrabiTableComponent', () => {
   });
 
   it('marks an order for resend with a PUT of isSend 0', () => {
-    spyOn(window, 'alert');
+    const ok = spyOn(notifications, 'success');
     fixture.detectChanges();
     flushAgencies();
     flushOrders();
@@ -306,10 +313,12 @@ describe('CrabiTableComponent', () => {
 
     // Tras actualizar se recarga la página actual
     flushOrders();
+
+    expect(ok).toHaveBeenCalledWith('Orden 2160 marcada para reenvío a Crabi');
   });
 
   it('does not call the API when the row has no id', () => {
-    const alerted = spyOn(window, 'alert');
+    const failed = spyOn(notifications, 'error');
     fixture.detectChanges();
     flushAgencies();
     flushOrders();
@@ -317,7 +326,26 @@ describe('CrabiTableComponent', () => {
     component.resendToCrabi({ order_dms: '99' });
 
     httpMock.expectNone((r) => r.method === 'PUT');
-    expect(alerted).toHaveBeenCalled();
+    expect(failed).toHaveBeenCalledWith('No se encontró el ID del registro');
+  });
+
+  it('reports a failed resend instead of leaving it silent', () => {
+    // Antes esto era un alert() nativo: bloqueaba la pestaña y anteponía
+    // "localhost dice:" al mensaje. Ahora es un aviso de MatSnackBar.
+    const failed = spyOn(notifications, 'error');
+    fixture.detectChanges();
+    flushAgencies();
+    flushOrders();
+
+    component.resendToCrabi(ORDERS[0]);
+    httpMock
+      .expectOne(`${BASE}/vgd/orderscrabi/1`)
+      .flush(
+        { message: 'sin permisos' },
+        { status: 403, statusText: 'Forbidden' }
+      );
+
+    expect(failed).toHaveBeenCalledWith('Error al actualizar: sin permisos');
   });
 
   it('shows an error message when the request fails', () => {
@@ -369,7 +397,11 @@ describe('CrabiTableComponent', () => {
 
     const pages = httpMock.match(isOrders);
     expect(pages.length).toBe(3);
-    expect(pages.map((p) => p.request.params.get('page'))).toEqual(['1', '2', '3']);
+    expect(pages.map((p) => p.request.params.get('page'))).toEqual([
+      '1',
+      '2',
+      '3'
+    ]);
     expect(pages[0].request.params.get('perpage')).toBe('100');
 
     // Sin ordenar: `captured_at` tiene empates y la API no desempata, asi que

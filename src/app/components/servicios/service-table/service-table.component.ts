@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { GenericTableComponent } from '../../generic-table/generic-table.component';
 import { TableColumn } from '../../../../@vex/interfaces/table-column.interface';
 import { VanguardiaApiService } from '../../../services/vanguardia-api.service';
+import { NotificationService } from '../../../services/notification.service';
 import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
 
@@ -78,7 +79,10 @@ export class ServiceTableComponent implements OnInit {
     );
   }
 
-  constructor(private vanguardiaApi: VanguardiaApiService) {}
+  constructor(
+    private vanguardiaApi: VanguardiaApiService,
+    private notifications: NotificationService
+  ) {}
 
   ngOnInit(): void {
     this.loadPage(this.pageIndex, this.defaultPageSize);
@@ -152,7 +156,7 @@ export class ServiceTableComponent implements OnInit {
 
   resendToSalesForce(row: any): void {
     if (!row.Id) {
-      alert('Error: No se encontró el ID del registro');
+      this.notifications.error('No se encontró el ID del registro');
       return;
     }
 
@@ -163,11 +167,15 @@ export class ServiceTableComponent implements OnInit {
 
     this.vanguardiaApi.updateService(row.Id, data).subscribe({
       next: (response) => {
-        alert(`Orden ${row.order_dms} marcado para reenvío a Salesforce`);
+        this.notifications.success(
+          `Orden ${row.order_dms} marcada para reenvío a Salesforce`
+        );
         this.loadPage(this.pageIndex, this.currentPageSize);
       },
       error: (error) => {
-        alert(`Error al actualizar: ${error.error?.message || 'Error desconocido'}`);
+        this.notifications.error(
+          `Error al actualizar: ${error.error?.message || 'Error desconocido'}`
+        );
       }
     });
   }
