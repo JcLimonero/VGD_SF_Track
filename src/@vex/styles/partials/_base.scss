@@ -1,41 +1,60 @@
-html {
-  box-sizing: border-box;
-  font-size: 16px;
-  height: 100%;
-  overflow: hidden;
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "salt", "calt", "case";
-  @apply font-sans leading-normal antialiased;
-}
+// Estilos base de la plantilla, envueltos en `@layer base`.
+//
+// Antes este archivo se cargaba con un @import colocado A PROPOSITO entre
+// `tailwindcss/base` y `tailwindcss/components`, de modo que sus reglas salian
+// DESPUES del preflight de Tailwind y por tanto le ganaban.
+//
+// Al pasar a `@use` esa posicion ya no se puede conservar: las reglas @use
+// tienen que ir al principio del archivo, asi que este CSS se emitia ANTES del
+// preflight y perdia. Se comprobo en el bundle: el `html{box-sizing...}` de
+// aqui aparecia delante del `*,:before,:after{--tw-...}` de Tailwind, y el
+// `margin:0` que el preflight pone a blockquote se comia el `@apply my-3` de
+// mas abajo.
+//
+// `@layer base` lo arregla sin depender de la posicion: Tailwind saca el bloque
+// de donde este y lo reinserta en su capa base, detras del preflight. Es justo
+// el orden que habia antes.
+@layer base {
+  html {
+    box-sizing: border-box;
+    font-size: 16px;
+    height: 100%;
+    overflow: hidden;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "salt", "calt",
+      "case";
+    @apply font-sans leading-normal antialiased;
+  }
 
-body {
-  height: 100%;
-  letter-spacing: -0.006em;
-  @apply text-sm text-default;
-}
+  body {
+    height: 100%;
+    letter-spacing: -0.006em;
+    @apply text-sm text-default;
+  }
 
-div {
-  box-sizing: border-box;
-}
+  div {
+    box-sizing: border-box;
+  }
 
-input,
-textarea {
-  @apply leading-normal;
-}
+  input,
+  textarea {
+    @apply leading-normal;
+  }
 
-button:focus {
-  outline: unset !important;
-}
+  button:focus {
+    outline: unset !important;
+  }
 
-code {
-  @apply font-mono text-default bg-app-bar rounded text-sm px-2 py-1;
-}
+  code {
+    @apply font-mono text-default bg-app-bar rounded text-sm px-2 py-1;
+  }
 
-blockquote {
-  background: rgb(var(--vex-color-primary-600) / 0.1);
-  border-left: 3px solid theme("backgroundColor.primary.600");
-  @apply my-3 px-4 py-2;
+  blockquote {
+    background: rgb(var(--vex-color-primary-600) / 0.1);
+    border-left: 3px solid theme("backgroundColor.primary.600");
+    @apply my-3 px-4 py-2;
 
-  > * {
-    margin: 0;
+    > * {
+      margin: 0;
+    }
   }
 }

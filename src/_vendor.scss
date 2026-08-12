@@ -1,0 +1,21 @@
+// CSS de terceros que se carga tal cual, sin pasar por Sass.
+//
+// Este @import NO es de los que caducan: la URL acaba en .css, asi que Sass lo
+// trata como un @import de CSS plano, lo deja pasar y no avisa. Dart Sass 3
+// sigue admitiendolos.
+//
+// Esta en un parcial propio por una razon de colocacion. En styles.scss tenia
+// que ir el primero para que el CSS de simplebar se emitiera antes que el de
+// Vex, pero las reglas @use tienen que ir antes que CUALQUIER otra regla del
+// archivo ("@use rules must be written before any other rules"), asi que un
+// @import en la linea 1 impide usar @use en la 3.
+//
+// Metiendolo aqui y poniendo `@use "vendor"` como primera regla de styles.scss
+// se consiguen las dos cosas: styles.scss empieza por @use, y este CSS se sigue
+// emitiendo primero, en el mismo sitio exacto de antes.
+//
+// La alternativa era llevarlo al array `styles` de angular.json. Se probo y se
+// descarto: el build de produccion salia igual, pero el servidor de desarrollo
+// dejaba de incluirlo (0 apariciones de "simplebar" en styles.css frente a 41),
+// o sea que desarrollo y produccion dejaban de coincidir.
+@import "~simplebar/dist/simplebar.css";

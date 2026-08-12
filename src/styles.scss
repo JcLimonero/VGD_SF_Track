@@ -1,6 +1,9 @@
-@import "~simplebar/dist/simplebar.css";
+// CSS de terceros (simplebar). Ver el comentario de _vendor.scss: va ahi y no
+// aqui para que este archivo pueda empezar por @use sin mover el orden de
+// emision.
+@use "vendor";
 // Vex Core
-@import "./@vex/styles/core";
+@use "./@vex/styles/core";
 
 /*
   You can override any CSS Variable or style here
