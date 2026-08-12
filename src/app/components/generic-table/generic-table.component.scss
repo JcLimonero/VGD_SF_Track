@@ -347,39 +347,8 @@ th.mat-column-OemLeadId {
   margin-top: 4px;
 }
 
-/* Mensaje de no datos encontrados */
-.no-data-message {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 60px 20px;
-  background-color: #fafafa;
-  border-radius: 8px;
-  margin: 20px 0;
-}
-
-.no-data-content {
-  text-align: center;
-  max-width: 400px;
-}
-
-.no-data-icon {
-  font-size: 64px;
-  color: #bdbdbd;
-  margin-bottom: 16px;
-  display: block;
-}
-
-.no-data-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #424242;
-  margin: 0 0 12px 0;
-}
-
-.no-data-subtitle {
-  font-size: 16px;
-  color: #757575;
-  line-height: 1.5;
-  margin: 0;
-}
+/*
+  El bloque .no-data-* vivia aqui, pero lo usan nueve plantillas de fuera de
+  este componente y la encapsulacion no se lo dejaba llegar. Esta ahora en
+  src/styles.scss; ver el comentario de alli.
+*/
