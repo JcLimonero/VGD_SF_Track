@@ -5,13 +5,11 @@ import { VanguardiaApiService } from '../../services/vanguardia-api.service';
 
 @Component({
   selector: 'vex-invoice-filter',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './invoice-filter.component.html',
   styleUrl: './invoice-filter.component.scss'
 })
 export class InvoiceFilterComponent implements OnInit {
-
   @Output() filterChange = new EventEmitter<{
     order_dms?: string;
     vin?: string;
@@ -32,7 +30,10 @@ export class InvoiceFilterComponent implements OnInit {
   agencies: any[] = [];
   selectedAgency: string = '';
 
-  constructor(private fb: FormBuilder, private vanguardiaApi: VanguardiaApiService) {
+  constructor(
+    private fb: FormBuilder,
+    private vanguardiaApi: VanguardiaApiService
+  ) {
     this.filterForm = this.fb.group({
       order_dms: [''],
       vin: [''],
@@ -62,13 +63,16 @@ export class InvoiceFilterComponent implements OnInit {
   onAgencySelect(agencyName: string, event: Event): void {
     const input = event.target as HTMLInputElement | null;
     if (!input) return;
-    
+
     console.log('Agencia seleccionada:', agencyName, 'checked:', input.checked);
-    
+
     if (input.checked) {
       this.selectedAgency = agencyName;
       this.filterForm.patchValue({ agencyName }, { emitEvent: false });
-      console.log('Agencia guardada en formulario:', this.filterForm.get('agencyName')?.value);
+      console.log(
+        'Agencia guardada en formulario:',
+        this.filterForm.get('agencyName')?.value
+      );
     } else if (this.selectedAgency === agencyName) {
       this.selectedAgency = '';
       this.filterForm.patchValue({ agencyName: '' }, { emitEvent: false });
@@ -77,11 +81,21 @@ export class InvoiceFilterComponent implements OnInit {
   }
 
   onFilter(): void {
-    console.log('Filtro activado - valores del formulario:', this.filterForm.value);
+    console.log(
+      'Filtro activado - valores del formulario:',
+      this.filterForm.value
+    );
     console.log('🔍selectedAgency actual:', this.selectedAgency);
-    
-    const { order_dms, vin, reference, agencyName, sendedSalesForce, insertado, error } = this.filterForm
-      .value as {
+
+    const {
+      order_dms,
+      vin,
+      reference,
+      agencyName,
+      sendedSalesForce,
+      insertado,
+      error
+    } = this.filterForm.value as {
       order_dms?: string;
       vin?: string;
       reference?: string;
@@ -96,9 +110,11 @@ export class InvoiceFilterComponent implements OnInit {
       vin,
       reference,
       agencyName,
-      sendedSalesForce: sendedSalesForce ? (sendedSalesForce as '1' | '0') : undefined,
+      sendedSalesForce: sendedSalesForce
+        ? (sendedSalesForce as '1' | '0')
+        : undefined,
       insertado,
-      error,
+      error
     };
 
     console.log('InvoiceFilter -> onFilter(), emitiendo payload:', payload);
@@ -128,17 +144,22 @@ export class InvoiceFilterComponent implements OnInit {
       agencyName: undefined,
       sendedSalesForce: undefined,
       insertado: false,
-      error: false,
+      error: false
     };
 
-    console.log('InvoiceFilter -> onClearFilters(), emitiendo filtros vacíos:', emptyPayload);
+    console.log(
+      'InvoiceFilter -> onClearFilters(), emitiendo filtros vacíos:',
+      emptyPayload
+    );
     this.filterChange.emit(emptyPayload);
   }
 
   closeDropdown(event: Event): void {
     const target = event.target as HTMLElement | null;
     if (!target) return;
-    const details = target.closest('details.dropdown') as HTMLDetailsElement | null;
+    const details = target.closest(
+      'details.dropdown'
+    ) as HTMLDetailsElement | null;
     if (details) {
       // Close after the form state settles
       setTimeout(() => {
@@ -153,7 +174,10 @@ export class InvoiceFilterComponent implements OnInit {
     const current = this.filterForm.get('sendedSalesForce')?.value as string;
     // If unchecking the currently selected value, clear; otherwise set the new value
     const next = input.checked ? value : current === value ? '' : current;
-    this.filterForm.patchValue({ sendedSalesForce: next }, { emitEvent: false });
+    this.filterForm.patchValue(
+      { sendedSalesForce: next },
+      { emitEvent: false }
+    );
   }
 
   onInsertToggle(kind: 'insertado' | 'error', event: Event): void {
@@ -166,5 +190,4 @@ export class InvoiceFilterComponent implements OnInit {
       this.filterForm.patchValue({ insertado: false }, { emitEvent: false });
     }
   }
-
 }

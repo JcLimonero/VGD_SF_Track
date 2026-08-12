@@ -9,7 +9,6 @@ import { NavigationItem } from '../../../core/navigation/navigation-item.interfa
   selector: 'vex-navigation',
   templateUrl: './navigation.component.html',
   styleUrls: ['./navigation.component.scss'],
-  standalone: true,
   imports: [NgFor, NavigationItemComponent, AsyncPipe]
 })
 export class NavigationComponent {

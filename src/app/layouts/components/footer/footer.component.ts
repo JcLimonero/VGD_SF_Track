@@ -6,7 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
   selector: 'vex-footer',
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.scss'],
-  standalone: true,
   imports: [MatButtonModule, MatIconModule]
 })
 export class FooterComponent implements OnInit, OnDestroy {

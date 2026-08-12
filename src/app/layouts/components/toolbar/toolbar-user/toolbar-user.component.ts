@@ -13,7 +13,6 @@ import { MatRippleModule } from '@angular/material/core';
   selector: 'vex-toolbar-user',
   templateUrl: './toolbar-user.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [MatRippleModule, MatIconModule]
 })
 export class ToolbarUserComponent implements OnInit {

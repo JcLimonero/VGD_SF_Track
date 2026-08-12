@@ -5,13 +5,11 @@ import { VanguardiaApiService } from '../../../services/vanguardia-api.service';
 
 @Component({
   selector: 'vex-dwh-filters',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './dwh-filters.component.html',
   styleUrl: './dwh-filters.component.scss'
 })
 export class DwhFiltersComponent implements OnInit {
-
   @Output() filterChange = new EventEmitter<{
     idAgency?: string;
     type?: string;
@@ -29,7 +27,10 @@ export class DwhFiltersComponent implements OnInit {
   selectedAgencyId: string = ''; // ID para enviar a la API
   selectedType: string = ''; // Tipo seleccionado
 
-  constructor(private fb: FormBuilder, private vanguardiaApi: VanguardiaApiService) {
+  constructor(
+    private fb: FormBuilder,
+    private vanguardiaApi: VanguardiaApiService
+  ) {
     this.filterForm = this.fb.group({
       idAgency: [''],
       type: ['']
@@ -54,11 +55,14 @@ export class DwhFiltersComponent implements OnInit {
   onAgencySelect(agency: any, event: Event): void {
     const input = event.target as HTMLInputElement | null;
     if (!input) return;
-    
+
     if (input.checked) {
       this.selectedAgency = agency.name;
       this.selectedAgencyId = agency.idAgency;
-      this.filterForm.patchValue({ idAgency: agency.idAgency }, { emitEvent: false });
+      this.filterForm.patchValue(
+        { idAgency: agency.idAgency },
+        { emitEvent: false }
+      );
     } else if (this.selectedAgency === agency.name) {
       this.selectedAgency = '';
       this.selectedAgencyId = '';
@@ -67,15 +71,14 @@ export class DwhFiltersComponent implements OnInit {
   }
 
   onFilter(): void {
-    const { idAgency, type } = this.filterForm
-      .value as {
+    const { idAgency, type } = this.filterForm.value as {
       idAgency?: string;
       type?: string;
     };
 
     const payload = {
       idAgency,
-      type,
+      type
     };
     this.filterChange.emit(payload);
   }
@@ -102,7 +105,9 @@ export class DwhFiltersComponent implements OnInit {
   closeDropdown(event: Event): void {
     const target = event.target as HTMLElement | null;
     if (!target) return;
-    const details = target.closest('details.dropdown') as HTMLDetailsElement | null;
+    const details = target.closest(
+      'details.dropdown'
+    ) as HTMLDetailsElement | null;
     if (details) {
       // Close after the form state settles
       setTimeout(() => {
@@ -114,9 +119,9 @@ export class DwhFiltersComponent implements OnInit {
   onTypeToggle(typeValue: string, event: Event): void {
     const input = event.target as HTMLInputElement | null;
     if (!input) return;
-    
+
     const current = this.filterForm.get('type')?.value as string;
-    
+
     if (input.checked) {
       this.selectedType = typeValue;
       this.filterForm.patchValue({ type: typeValue }, { emitEvent: false });

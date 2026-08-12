@@ -5,13 +5,11 @@ import { VanguardiaApiService } from '../../../services/vanguardia-api.service';
 
 @Component({
   selector: 'vex-customer-filter',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './customer-filter.component.html',
   styleUrl: './customer-filter.component.scss'
 })
 export class CustomerFilterComponent {
-
   @Output() filterChange = new EventEmitter<{
     idAgency?: string;
     mail?: string;
@@ -32,7 +30,10 @@ export class CustomerFilterComponent {
   selectedAgency: string = ''; // Nombre mostrado en UI
   selectedAgencyId: string = ''; // ID para enviar a la API
 
-  constructor(private fb: FormBuilder, private vanguardiaApi: VanguardiaApiService) {
+  constructor(
+    private fb: FormBuilder,
+    private vanguardiaApi: VanguardiaApiService
+  ) {
     this.filterForm = this.fb.group({
       idAgency: [''],
       mail: [''],
@@ -61,11 +62,14 @@ export class CustomerFilterComponent {
   onAgencySelect(agency: any, event: Event): void {
     const input = event.target as HTMLInputElement | null;
     if (!input) return;
-        
+
     if (input.checked) {
       this.selectedAgency = agency.name;
       this.selectedAgencyId = agency.idAgency;
-      this.filterForm.patchValue({ idAgency: agency.idAgency }, { emitEvent: false });
+      this.filterForm.patchValue(
+        { idAgency: agency.idAgency },
+        { emitEvent: false }
+      );
     } else if (this.selectedAgency === agency.name) {
       this.selectedAgency = '';
       this.selectedAgencyId = '';
@@ -74,23 +78,25 @@ export class CustomerFilterComponent {
   }
 
   onFilter(): void {
-    const { idAgency, mail, mobile_phone, sendedSalesForce, insertado, error } = this.filterForm
-      .value as {
-      idAgency?: string;
-      mail?: string;
-      mobile_phone?: string;
-      sendedSalesForce?: string;
-      insertado?: boolean;
-      error?: boolean;
-    };
+    const { idAgency, mail, mobile_phone, sendedSalesForce, insertado, error } =
+      this.filterForm.value as {
+        idAgency?: string;
+        mail?: string;
+        mobile_phone?: string;
+        sendedSalesForce?: string;
+        insertado?: boolean;
+        error?: boolean;
+      };
 
     const payload = {
       idAgency,
       mail,
       mobile_phone,
-      sendedSalesForce: sendedSalesForce ? (sendedSalesForce as '1' | '0') : undefined,
+      sendedSalesForce: sendedSalesForce
+        ? (sendedSalesForce as '1' | '0')
+        : undefined,
       insertado,
-      error,
+      error
     };
     this.filterChange.emit(payload);
   }
@@ -115,7 +121,7 @@ export class CustomerFilterComponent {
       mobile_phone: undefined,
       sendedSalesForce: undefined,
       insertado: false,
-      error: false,
+      error: false
     };
 
     this.filterChange.emit(emptyPayload);
@@ -124,7 +130,9 @@ export class CustomerFilterComponent {
   closeDropdown(event: Event): void {
     const target = event.target as HTMLElement | null;
     if (!target) return;
-    const details = target.closest('details.dropdown') as HTMLDetailsElement | null;
+    const details = target.closest(
+      'details.dropdown'
+    ) as HTMLDetailsElement | null;
     if (details) {
       // Close after the form state settles
       setTimeout(() => {
@@ -139,7 +147,10 @@ export class CustomerFilterComponent {
     const current = this.filterForm.get('sendedSalesForce')?.value as string;
     // If unchecking the currently selected value, clear; otherwise set the new value
     const next = input.checked ? value : current === value ? '' : current;
-    this.filterForm.patchValue({ sendedSalesForce: next }, { emitEvent: false });
+    this.filterForm.patchValue(
+      { sendedSalesForce: next },
+      { emitEvent: false }
+    );
   }
 
   onInsertToggle(kind: 'insertado' | 'error', event: Event): void {

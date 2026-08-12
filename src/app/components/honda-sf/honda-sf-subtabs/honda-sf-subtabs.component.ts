@@ -10,7 +10,6 @@ import { HONDA_SF_TABLES, HondaSfTable } from '../honda-sf.catalog';
  */
 @Component({
   selector: 'vex-honda-sf-subtabs',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './honda-sf-subtabs.component.html',
   styleUrl: './honda-sf-subtabs.component.scss'

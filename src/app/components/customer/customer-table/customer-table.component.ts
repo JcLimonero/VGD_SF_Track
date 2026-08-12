@@ -9,7 +9,6 @@ import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'vex-customer-table',
-  standalone: true,
   imports: [CommonModule, GenericTableComponent],
   templateUrl: './customer-table.component.html',
   styleUrl: './customer-table.component.scss'
@@ -35,7 +34,10 @@ export class CustomerTableComponent implements OnInit {
     error?: boolean;
   } = {};
   isDownloadingExcel = false;
-  currentSort: { column: string; direction: 'asc' | 'desc' } | null = { column: 'timestamp_sales_force', direction: 'desc' };
+  currentSort: { column: string; direction: 'asc' | 'desc' } | null = {
+    column: 'timestamp_sales_force',
+    direction: 'desc'
+  };
 
   // Columnas para tabla de clientes
   columns: TableColumn<any>[] = [
@@ -45,11 +47,11 @@ export class CustomerTableComponent implements OnInit {
     { property: 'phone', label: 'Teléfono', type: 'text' },
     { property: 'mail', label: 'Email', type: 'text' },
     { property: 'sendedSalesForce', label: 'Envio SF', type: 'text' },
-    { property: 'timestamp_sales_force',label: 'Fecha SF',  type: 'text' },
-    { property: 'resultSF',label: 'Estado SF',  type: 'text' },
-    { property: 'sf_jsonRequest',label: 'Datos',  type: 'button' },
-    { property: 'sf_link',label: 'Ver SF',  type: 'button' },
-    { property: 'resend',label: 'Reenviar',  type: 'button' },
+    { property: 'timestamp_sales_force', label: 'Fecha SF', type: 'text' },
+    { property: 'resultSF', label: 'Estado SF', type: 'text' },
+    { property: 'sf_jsonRequest', label: 'Datos', type: 'button' },
+    { property: 'sf_link', label: 'Ver SF', type: 'button' },
+    { property: 'resend', label: 'Reenviar', type: 'button' },
     { property: 'actions', label: 'Detalles', type: 'button' }
   ];
 
@@ -99,10 +101,13 @@ export class CustomerTableComponent implements OnInit {
     };
 
     // Map current filters to params
-    if (this.currentFilters.idAgency) params.idAgency = this.currentFilters.idAgency;
+    if (this.currentFilters.idAgency)
+      params.idAgency = this.currentFilters.idAgency;
     if (this.currentFilters.mail) params.mail = this.currentFilters.mail;
-    if (this.currentFilters.mobile_phone) params.mobile_phone = this.currentFilters.mobile_phone;
-    if (this.currentFilters.sendedSalesForce) params.sendedSalesForce = this.currentFilters.sendedSalesForce;
+    if (this.currentFilters.mobile_phone)
+      params.mobile_phone = this.currentFilters.mobile_phone;
+    if (this.currentFilters.sendedSalesForce)
+      params.sendedSalesForce = this.currentFilters.sendedSalesForce;
     if (this.currentFilters.insertado) params.insertCorrect = '1';
     if (this.currentFilters.error) params.insertCorrect = '0';
 
@@ -121,7 +126,8 @@ export class CustomerTableComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        this.error = 'No se pudo cargar la información. Por favor, intenta de nuevo.';
+        this.error =
+          'No se pudo cargar la información. Por favor, intenta de nuevo.';
         this.data = [];
         this.total = 0;
         this.loading = false;
@@ -153,7 +159,6 @@ export class CustomerTableComponent implements OnInit {
     this.pageIndex = 0;
     this.loadPage(this.pageIndex, this.defaultPageSize);
   }
-
 
   resendToSalesForce(row: any): void {
     if (!row.id) {
@@ -193,7 +198,6 @@ export class CustomerTableComponent implements OnInit {
     const maxPerPage = 100;
     const totalPages = Math.ceil(this.total / maxPerPage);
 
-
     // Preparar parámetros base
     const baseParams: any = {
       perpage: maxPerPage
@@ -202,16 +206,13 @@ export class CustomerTableComponent implements OnInit {
     // Aplicar los mismos filtros que están actualmente activos
     if (this.currentFilters.idAgency)
       baseParams.idAgency = this.currentFilters.idAgency;
-    if (this.currentFilters.mail)
-      baseParams.mail = this.currentFilters.mail;
+    if (this.currentFilters.mail) baseParams.mail = this.currentFilters.mail;
     if (this.currentFilters.mobile_phone)
       baseParams.mobile_phone = this.currentFilters.mobile_phone;
     if (this.currentFilters.sendedSalesForce)
       baseParams.sendedSalesForce = this.currentFilters.sendedSalesForce;
-    if (this.currentFilters.insertado)
-      baseParams.insertCorrect = '1';
-    if (this.currentFilters.error)
-      baseParams.insertCorrect = '0';
+    if (this.currentFilters.insertado) baseParams.insertCorrect = '1';
+    if (this.currentFilters.error) baseParams.insertCorrect = '0';
 
     // Crear array de observables para todas las páginas
     const pageRequests = [];
@@ -233,62 +234,62 @@ export class CustomerTableComponent implements OnInit {
           // Preparar los datos para Excel con TODOS los campos disponibles
           const excelData = allData.map((item) => ({
             // Información de Agencia
-            'Agencia': item.agencyName || '',
+            Agencia: item.agencyName || '',
             'ID Agencia': item.idAgency || '',
-            
+
             // Datos del Cliente
             'No. Cliente DMS': item.ndClientDMS || '',
-            'Nombre': item.name || '',
+            Nombre: item.name || '',
             'Segundo Nombre': item.second_name || '',
-            'Apellidos': item.last_name || '',
+            Apellidos: item.last_name || '',
             'Nombre Comercial': item.bussines_name || '',
-            'RFC': item.rfc || '',
-            'CURP': item.curp || '',
+            RFC: item.rfc || '',
+            CURP: item.curp || '',
             'Fecha de Nacimiento': item.birthay_date || '',
-            'Género': item.gender || '',
-            'Saludo': item.salutation || '',
+            Género: item.gender || '',
+            Saludo: item.salutation || '',
             'Tipo de Cliente': item.costumer_type || '',
-            
+
             // Contacto
             'Teléfono Móvil': item.mobile_phone || '',
-            'Teléfono': item.phone || '',
+            Teléfono: item.phone || '',
             'Otro Teléfono': item.other_phone || '',
             'Tel. Asistente': item.assitant_phone || '',
             'Tel. Oficina': item.office_phone || '',
-            'Email': item.mail || '',
-            
+            Email: item.mail || '',
+
             // Dirección
-            'Calle': item.street || '',
+            Calle: item.street || '',
             'No. Exterior': item.external_number || '',
             'No. Interior': item.internal_number || '',
             'Entre Calles': item.between_streets || '',
             'Código Postal': item.zipcode || '',
-            'Colonia': item.settlement || '',
+            Colonia: item.settlement || '',
             'Delegación/Municipio': item.deputation || '',
-            'Ciudad': item.city || '',
-            'Estado': item.state || '',
-            'País': item.country || '',
-            
+            Ciudad: item.city || '',
+            Estado: item.state || '',
+            País: item.country || '',
+
             // Datos Adicionales
-            'Ocupación': item.activitie || '',
+            Ocupación: item.activitie || '',
             'Cargo/Nombramiento': item.appointment || '',
             'Permite Contacto': item.allow_contact === '1' ? 'Sí' : 'No',
-            'Clasificación': item.clasification || '',
-            
+            Clasificación: item.clasification || '',
+
             // Vendedor
             'No. Vendedor': item.ndSeller || '',
             'Nombre Vendedor': item.seller_Name || '',
             'Última Venta': item.last_sale || '',
-            
+
             // Salesforce
             'Enviado a SF': item.sendedSalesForce === '1' ? 'Sí' : 'No',
             'ID Salesforce': item.idSalesForce || '',
             'Resultado SF': item.resultSF || '',
             'Timestamp SF': item.timestamp_sales_force || '',
-            
+
             // Timestamps
             'Timestamp DMS': item.timestamp_dms || '',
-            'Timestamp': item.timestamp || ''
+            Timestamp: item.timestamp || ''
           }));
 
           // Crear libro de Excel

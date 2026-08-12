@@ -10,28 +10,37 @@ import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'vex-inventory-table',
-  standalone: true,
   imports: [CommonModule, GenericTableComponent],
   templateUrl: './inventory-table.component.html',
   styleUrls: ['./inventory-table.component.scss']
 })
 export class InventoryTableComponent implements OnInit {
-
   data: any[] = [];
   loading = false;
   error: string | null = null;
   total: number | null = null;
-  
+
   // Paginación - respetando el default de la API
   pageIndex = 0;
   defaultPageSize = 5; // API devuelve 5 por defecto
   currentPageSize = 5; // Mantenemos el pageSize actual
-  
+
   // Filtros activos
-  currentFilters: { vin?: string; idAgency?: string; statusDescription?: string; typeDescription?: string; sendedSalesForce?: '1'|'0'; insertado?: boolean; error?: boolean } = {};
+  currentFilters: {
+    vin?: string;
+    idAgency?: string;
+    statusDescription?: string;
+    typeDescription?: string;
+    sendedSalesForce?: '1' | '0';
+    insertado?: boolean;
+    error?: boolean;
+  } = {};
   isDownloadingExcel = false;
-  currentSort: { column: string; direction: 'asc' | 'desc' } | null = { column: 'timestamp_sales_force', direction: 'desc' };
-  
+  currentSort: { column: string; direction: 'asc' | 'desc' } | null = {
+    column: 'timestamp_sales_force',
+    direction: 'desc'
+  };
+
   // Columnas para inventario
   columns: TableColumn<any>[] = [
     { property: 'agencyName', label: 'Agencia', type: 'text' },
@@ -42,15 +51,30 @@ export class InventoryTableComponent implements OnInit {
     { property: 'year', label: 'Año', type: 'text' },
     { property: 'model', label: 'Modelo', type: 'text' },
     { property: 'sendedSalesForce', label: 'Envio SF', type: 'text' },
-    { property: 'timestamp_sales_force',label: 'Fecha SF',  type: 'text' },
-    { property: 'resultSF',label: 'Estado SF',  type: 'text' },
-    { property: 'sf_jsonRequest',label: 'Datos',  type: 'button' },
-    { property: 'sf_link',label: 'Ver SF',  type: 'button' },
-    { property: 'resend',label: 'Reenviar',  type: 'button' },
-    { property: 'actions',label: 'Detalles',  type: 'button' }
+    { property: 'timestamp_sales_force', label: 'Fecha SF', type: 'text' },
+    { property: 'resultSF', label: 'Estado SF', type: 'text' },
+    { property: 'sf_jsonRequest', label: 'Datos', type: 'button' },
+    { property: 'sf_link', label: 'Ver SF', type: 'button' },
+    { property: 'resend', label: 'Reenviar', type: 'button' },
+    { property: 'actions', label: 'Detalles', type: 'button' }
   ];
 
-  displayedColumns: string[] = ['agencyName', 'vin', 'statusDescription', 'typeDescription', 'brand', 'year', 'model','sendedSalesForce','timestamp_sales_force','resultSF', 'sf_jsonRequest', 'sf_link', 'resend', 'actions'];
+  displayedColumns: string[] = [
+    'agencyName',
+    'vin',
+    'statusDescription',
+    'typeDescription',
+    'brand',
+    'year',
+    'model',
+    'sendedSalesForce',
+    'timestamp_sales_force',
+    'resultSF',
+    'sf_jsonRequest',
+    'sf_link',
+    'resend',
+    'actions'
+  ];
 
   get hasActiveFilters(): boolean {
     return !!(
@@ -82,18 +106,24 @@ export class InventoryTableComponent implements OnInit {
 
     // Server-side pagination - igual que invoice-table
     const params: any = {
-      page: pageIndex + 1,  // API usa 1-indexed
-      perpage: pageSize     // Tamaño de página
+      page: pageIndex + 1, // API usa 1-indexed
+      perpage: pageSize // Tamaño de página
     };
 
     // Map current filters to params
     if (this.currentFilters.vin) params.vin = this.currentFilters.vin;
-    if (this.currentFilters.idAgency) params.idAgency = this.currentFilters.idAgency;
-    if (this.currentFilters.statusDescription) params.statusDescription = this.currentFilters.statusDescription;
-    if (this.currentFilters.typeDescription) params.typeDescription = this.currentFilters.typeDescription;
-    if (this.currentFilters.sendedSalesForce) params.sendedSalesForce = this.currentFilters.sendedSalesForce;
-    if (this.currentFilters.insertado && !this.currentFilters.error) params.insertCorrect = '1';
-    if (this.currentFilters.error && !this.currentFilters.insertado) params.insertCorrect = '0';
+    if (this.currentFilters.idAgency)
+      params.idAgency = this.currentFilters.idAgency;
+    if (this.currentFilters.statusDescription)
+      params.statusDescription = this.currentFilters.statusDescription;
+    if (this.currentFilters.typeDescription)
+      params.typeDescription = this.currentFilters.typeDescription;
+    if (this.currentFilters.sendedSalesForce)
+      params.sendedSalesForce = this.currentFilters.sendedSalesForce;
+    if (this.currentFilters.insertado && !this.currentFilters.error)
+      params.insertCorrect = '1';
+    if (this.currentFilters.error && !this.currentFilters.insertado)
+      params.insertCorrect = '0';
 
     // Agregar ordenamiento si existe
     if (this.currentSort && this.currentSort.column) {
@@ -110,7 +140,8 @@ export class InventoryTableComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        this.error = 'No se pudo cargar la información. Por favor, intenta de nuevo.';
+        this.error =
+          'No se pudo cargar la información. Por favor, intenta de nuevo.';
         this.data = [];
         this.total = 0;
         this.loading = false;
@@ -126,7 +157,15 @@ export class InventoryTableComponent implements OnInit {
     this.loadPage(event.pageIndex, event.pageSize);
   }
 
-  applyFilter(filters: { vin?: string; idAgency?: string; statusDescription?: string; typeDescription?: string; sendedSalesForce?: '1' | '0'; insertado?: boolean; error?: boolean }): void {
+  applyFilter(filters: {
+    vin?: string;
+    idAgency?: string;
+    statusDescription?: string;
+    typeDescription?: string;
+    sendedSalesForce?: '1' | '0';
+    insertado?: boolean;
+    error?: boolean;
+  }): void {
     // Guardar filtros y reiniciar a primera página
     this.currentFilters = { ...filters };
     this.pageIndex = 0;
@@ -136,7 +175,9 @@ export class InventoryTableComponent implements OnInit {
   /**
    * Maneja el cambio de ordenamiento
    */
-  onSortChange(sort: { column: string; direction: 'asc' | 'desc' } | null): void {
+  onSortChange(
+    sort: { column: string; direction: 'asc' | 'desc' } | null
+  ): void {
     if (!sort || !sort.column) {
       this.currentSort = null;
     } else {
@@ -188,12 +229,14 @@ export class InventoryTableComponent implements OnInit {
     }
 
     this.isDownloadingExcel = true;
-    
+
     // Calcular cuántas páginas necesitamos (asumiendo límite de 100 por página)
     const maxPerPage = 100;
     const totalPages = Math.ceil(this.total / maxPerPage);
-    
-    console.log(`📥 Descargando ${this.total} registros de inventario en ${totalPages} páginas`);
+
+    console.log(
+      `📥 Descargando ${this.total} registros de inventario en ${totalPages} páginas`
+    );
 
     // Preparar parámetros base
     const baseParams: any = {
@@ -202,12 +245,18 @@ export class InventoryTableComponent implements OnInit {
 
     // Aplicar los mismos filtros que están actualmente activos
     if (this.currentFilters.vin) baseParams.vin = this.currentFilters.vin;
-    if (this.currentFilters.idAgency) baseParams.idAgency = this.currentFilters.idAgency;
-    if (this.currentFilters.statusDescription) baseParams.statusDescription = this.currentFilters.statusDescription;
-    if (this.currentFilters.typeDescription) baseParams.typeDescription = this.currentFilters.typeDescription;
-    if (this.currentFilters.sendedSalesForce) baseParams.sendedSalesForce = this.currentFilters.sendedSalesForce;
-    if (this.currentFilters.insertado && !this.currentFilters.error) baseParams.insertCorrect = '1';
-    if (this.currentFilters.error && !this.currentFilters.insertado) baseParams.insertCorrect = '0';
+    if (this.currentFilters.idAgency)
+      baseParams.idAgency = this.currentFilters.idAgency;
+    if (this.currentFilters.statusDescription)
+      baseParams.statusDescription = this.currentFilters.statusDescription;
+    if (this.currentFilters.typeDescription)
+      baseParams.typeDescription = this.currentFilters.typeDescription;
+    if (this.currentFilters.sendedSalesForce)
+      baseParams.sendedSalesForce = this.currentFilters.sendedSalesForce;
+    if (this.currentFilters.insertado && !this.currentFilters.error)
+      baseParams.insertCorrect = '1';
+    if (this.currentFilters.error && !this.currentFilters.insertado)
+      baseParams.insertCorrect = '0';
 
     // Crear array de observables para todas las páginas
     const pageRequests = [];
@@ -218,78 +267,86 @@ export class InventoryTableComponent implements OnInit {
 
     // Ejecutar todas las peticiones en paralelo
     forkJoin(pageRequests).subscribe({
-        next: (responses) => {
-          try {
-            // Combinar todos los resultados
-            const allData: any[] = [];
-            responses.forEach(response => {
-              allData.push(...response.items);
-            });
+      next: (responses) => {
+        try {
+          // Combinar todos los resultados
+          const allData: any[] = [];
+          responses.forEach((response) => {
+            allData.push(...response.items);
+          });
 
-            console.log(`Datos de inventario obtenidos para Excel: ${allData.length} registros de ${this.total} esperados`);
+          console.log(
+            `Datos de inventario obtenidos para Excel: ${allData.length} registros de ${this.total} esperados`
+          );
 
-            // Preparar los datos para Excel con TODOS los campos disponibles
-            const excelData = allData.map(item => ({
-              // Campos básicos de identificación
-              'Agencia': item.agencyName || '',
-              'VIN': item.vin || '',
-              'Estado:': item.statusDescription || '',
-              'Tipo': item.typeDescription || '',
-              'Marca': item.brand || '',
-              'Año': item.year || '',
-              'Modelo': item.model || '',
-              'Versión': item.version || '',
-              
-              // Información adicional del inventario
-              'Estado': item.state || '',
-              'Color interior': item.interior_color || '',
-              'Color exterior': item.exterior_color || '',
-              'Cantidad': item.amount || '',
-              'Kilometraje': item.km || '',
-              
-              // Información de Salesforce
-              'Enviado a SF': item.sendedSalesForce === '1' ? 'Sí' : 'No',
-              'ID Salesforce': item.idSalesForce || '',
-              'Resultado SF': item.resultSF || '',
-              'Insertado Correctamente': item.insertCorrect === '1' ? 'Sí' : 'No',
-              
-              // Timestamps
-              'Timestamp DMS': item.timestamp_dms || '',
-              'Timestamp': item.timestamp || '',
-              'Timestamp SalesForce': item.timestamp_sales_force || '',
-            }));
+          // Preparar los datos para Excel con TODOS los campos disponibles
+          const excelData = allData.map((item) => ({
+            // Campos básicos de identificación
+            Agencia: item.agencyName || '',
+            VIN: item.vin || '',
+            'Estado:': item.statusDescription || '',
+            Tipo: item.typeDescription || '',
+            Marca: item.brand || '',
+            Año: item.year || '',
+            Modelo: item.model || '',
+            Versión: item.version || '',
 
-            // Crear libro de Excel
-            const worksheet = XLSX.utils.json_to_sheet(excelData);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Inventario');
+            // Información adicional del inventario
+            Estado: item.state || '',
+            'Color interior': item.interior_color || '',
+            'Color exterior': item.exterior_color || '',
+            Cantidad: item.amount || '',
+            Kilometraje: item.km || '',
 
-            // Configurar el ancho de las columnas
-            const columnWidths = excelData.length > 0 ? 
-              Object.keys(excelData[0]).map(() => ({ wch: 15 })) : [];
-            worksheet['!cols'] = columnWidths;
+            // Información de Salesforce
+            'Enviado a SF': item.sendedSalesForce === '1' ? 'Sí' : 'No',
+            'ID Salesforce': item.idSalesForce || '',
+            'Resultado SF': item.resultSF || '',
+            'Insertado Correctamente': item.insertCorrect === '1' ? 'Sí' : 'No',
 
-            // Generar nombre del archivo con timestamp y total de registros
-            const now = new Date();
-            const timestamp = now.toISOString().slice(0, 19).replace(/[:-]/g, '');
-            const fileName = `inventario_${allData.length}_registros_${timestamp}.xlsx`;
+            // Timestamps
+            'Timestamp DMS': item.timestamp_dms || '',
+            Timestamp: item.timestamp || '',
+            'Timestamp SalesForce': item.timestamp_sales_force || ''
+          }));
 
-            // Descargar el archivo
-            XLSX.writeFile(workbook, fileName);
+          // Crear libro de Excel
+          const worksheet = XLSX.utils.json_to_sheet(excelData);
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, 'Inventario');
 
-            console.log(`Excel de inventario generado exitosamente: ${fileName}`);
-            console.log(`${excelData.length} registros exportados con todos los campos`);
+          // Configurar el ancho de las columnas
+          const columnWidths =
+            excelData.length > 0
+              ? Object.keys(excelData[0]).map(() => ({ wch: 15 }))
+              : [];
+          worksheet['!cols'] = columnWidths;
 
-          } catch (error) {
-            console.error('⚠️ Error al generar Excel de inventario:', error);
-          } finally {
-            this.isDownloadingExcel = false;
-          }
-        },
-        error: (error) => {
-          console.error('⚠️ Error al obtener datos de inventario para Excel:', error);
+          // Generar nombre del archivo con timestamp y total de registros
+          const now = new Date();
+          const timestamp = now.toISOString().slice(0, 19).replace(/[:-]/g, '');
+          const fileName = `inventario_${allData.length}_registros_${timestamp}.xlsx`;
+
+          // Descargar el archivo
+          XLSX.writeFile(workbook, fileName);
+
+          console.log(`Excel de inventario generado exitosamente: ${fileName}`);
+          console.log(
+            `${excelData.length} registros exportados con todos los campos`
+          );
+        } catch (error) {
+          console.error('⚠️ Error al generar Excel de inventario:', error);
+        } finally {
           this.isDownloadingExcel = false;
         }
-      });
+      },
+      error: (error) => {
+        console.error(
+          '⚠️ Error al obtener datos de inventario para Excel:',
+          error
+        );
+        this.isDownloadingExcel = false;
+      }
+    });
   }
 }

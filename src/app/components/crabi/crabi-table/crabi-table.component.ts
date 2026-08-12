@@ -11,7 +11,6 @@ import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'vex-crabi-table',
-  standalone: true,
   imports: [CommonModule, GenericTableComponent],
   templateUrl: './crabi-table.component.html',
   styleUrl: './crabi-table.component.scss'
@@ -197,21 +196,24 @@ export class CrabiTableComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this.vanguardiaApi.getCrabiOrders(this.buildParams(pageIndex, pageSize)).subscribe({
-      next: (res) => {
-        this.data = this.withAgencyName(res.items || []);
-        this.total = res.total || 0;
-        this.pageIndex = pageIndex;
-        this.currentPageSize = pageSize;
-        this.loading = false;
-      },
-      error: () => {
-        this.error = 'No se pudo cargar la información. Por favor, intenta de nuevo.';
-        this.data = [];
-        this.total = 0;
-        this.loading = false;
-      }
-    });
+    this.vanguardiaApi
+      .getCrabiOrders(this.buildParams(pageIndex, pageSize))
+      .subscribe({
+        next: (res) => {
+          this.data = this.withAgencyName(res.items || []);
+          this.total = res.total || 0;
+          this.pageIndex = pageIndex;
+          this.currentPageSize = pageSize;
+          this.loading = false;
+        },
+        error: () => {
+          this.error =
+            'No se pudo cargar la información. Por favor, intenta de nuevo.';
+          this.data = [];
+          this.total = 0;
+          this.loading = false;
+        }
+      });
   }
 
   applyFilter(filters: CrabiFilters): void {
@@ -282,7 +284,11 @@ export class CrabiTableComponent implements OnInit {
     const pageRequests = [];
     for (let page = 1; page <= totalPages; page++) {
       pageRequests.push(
-        this.vanguardiaApi.getCrabiOrders({ ...baseParams, page, perpage: maxPerPage })
+        this.vanguardiaApi.getCrabiOrders({
+          ...baseParams,
+          page,
+          perpage: maxPerPage
+        })
       );
     }
 
@@ -312,7 +318,9 @@ export class CrabiTableComponent implements OnInit {
             `crabi_${excelData.length}_registros_${timestamp}.xlsx`
           );
 
-          console.log(`Excel de Crabi generado exitosamente: ${excelData.length} registros`);
+          console.log(
+            `Excel de Crabi generado exitosamente: ${excelData.length} registros`
+          );
         } catch (error) {
           console.error('⚠️ Error al generar Excel de Crabi:', error);
         } finally {

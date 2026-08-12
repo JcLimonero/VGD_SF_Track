@@ -17,7 +17,6 @@ export interface CrabiFilters {
 
 @Component({
   selector: 'vex-crabi-filter',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './crabi-filter.component.html',
   styleUrl: './crabi-filter.component.scss'
@@ -41,7 +40,10 @@ export class CrabiFilterComponent implements OnInit {
     { label: 'Pendiente de envío', value: '0' }
   ];
 
-  constructor(private fb: FormBuilder, private vanguardiaApi: VanguardiaApiService) {
+  constructor(
+    private fb: FormBuilder,
+    private vanguardiaApi: VanguardiaApiService
+  ) {
     this.filterForm = this.fb.group({
       order_dms: [''],
       vin: [''],
@@ -109,7 +111,10 @@ export class CrabiFilterComponent implements OnInit {
 
     if (input.checked) {
       this.selectedSent = option.label;
-      this.filterForm.patchValue({ isSend: option.value }, { emitEvent: false });
+      this.filterForm.patchValue(
+        { isSend: option.value },
+        { emitEvent: false }
+      );
     } else if (this.selectedSent === option.label) {
       this.selectedSent = '';
       this.filterForm.patchValue({ isSend: '' }, { emitEvent: false });
@@ -119,7 +124,9 @@ export class CrabiFilterComponent implements OnInit {
   closeDropdown(event: Event): void {
     const target = event.target as HTMLElement | null;
     if (!target) return;
-    const details = target.closest('details.dropdown') as HTMLDetailsElement | null;
+    const details = target.closest(
+      'details.dropdown'
+    ) as HTMLDetailsElement | null;
     if (details) {
       // Se cierra una vez que el formulario terminó de actualizarse
       setTimeout(() => {

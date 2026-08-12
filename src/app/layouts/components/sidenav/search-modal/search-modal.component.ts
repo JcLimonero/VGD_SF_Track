@@ -5,7 +5,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
 
 @Component({
-  standalone: true,
   imports: [CommonModule, MatIconModule, MatButtonModule, MatRippleModule],
   selector: 'vex-search-modal',
   template: `

@@ -32,7 +32,6 @@ interface FilterOption {
  */
 @Component({
   selector: 'vex-honda-sf-filter',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './honda-sf-filter.component.html',
   styleUrl: './honda-sf-filter.component.scss'
@@ -131,7 +130,9 @@ export class HondaSfFilterComponent implements OnInit, OnChanges {
   closeDropdown(event: Event): void {
     const target = event.target as HTMLElement | null;
     if (!target) return;
-    const details = target.closest('details.dropdown') as HTMLDetailsElement | null;
+    const details = target.closest(
+      'details.dropdown'
+    ) as HTMLDetailsElement | null;
     if (details) {
       // Se cierra una vez que el formulario terminó de actualizarse
       setTimeout(() => {

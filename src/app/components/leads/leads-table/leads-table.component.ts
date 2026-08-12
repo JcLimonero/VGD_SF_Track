@@ -9,7 +9,6 @@ import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'vex-leads-table',
-  standalone: true,
   imports: [CommonModule, GenericTableComponent],
   templateUrl: './leads-table.component.html',
   styleUrl: './leads-table.component.scss'
@@ -35,7 +34,10 @@ export class LeadsTableComponent implements OnInit {
     error?: boolean;
   } = {};
   isDownloadingExcel = false;
-  currentSort: { column: string; direction: 'asc' | 'desc' } | null = { column: 'timestamp_dms', direction: 'desc' };
+  currentSort: { column: string; direction: 'asc' | 'desc' } | null = {
+    column: 'timestamp_dms',
+    direction: 'desc'
+  };
 
   // Columnas para tabla de Leads
   columns: TableColumn<any>[] = [
@@ -51,7 +53,7 @@ export class LeadsTableComponent implements OnInit {
     { property: 'resultSF', label: 'Estado SF', type: 'text' },
     { property: 'sf_jsonRequest', label: 'Datos', type: 'button' },
     { property: 'sf_link', label: 'Ver SF', type: 'button' },
-    { property: 'resend',label: 'Reenviar',  type: 'button' },
+    { property: 'resend', label: 'Reenviar', type: 'button' },
     { property: 'actions', label: 'Detalles', type: 'button' }
   ];
 
@@ -102,12 +104,17 @@ export class LeadsTableComponent implements OnInit {
     };
 
     // Map current filters to params
-    if (this.currentFilters.idAgency) params.idAgency = this.currentFilters.idAgency;
+    if (this.currentFilters.idAgency)
+      params.idAgency = this.currentFilters.idAgency;
     if (this.currentFilters.LeadNo) params.LeadNo = this.currentFilters.LeadNo;
-    if (this.currentFilters.FullName) params.FullName = this.currentFilters.FullName;
-    if (this.currentFilters.sendedSalesForce) params.sendedSalesForce = this.currentFilters.sendedSalesForce;
-    if (this.currentFilters.insertado && !this.currentFilters.error) params.insertCorrect = '1';
-    if (this.currentFilters.error && !this.currentFilters.insertado) params.insertCorrect = '0';
+    if (this.currentFilters.FullName)
+      params.FullName = this.currentFilters.FullName;
+    if (this.currentFilters.sendedSalesForce)
+      params.sendedSalesForce = this.currentFilters.sendedSalesForce;
+    if (this.currentFilters.insertado && !this.currentFilters.error)
+      params.insertCorrect = '1';
+    if (this.currentFilters.error && !this.currentFilters.insertado)
+      params.insertCorrect = '0';
 
     // Agregar ordenamiento si existe
     if (this.currentSort && this.currentSort.column) {
@@ -123,7 +130,8 @@ export class LeadsTableComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        this.error = 'No se pudo cargar la información. Por favor, intenta de nuevo.';
+        this.error =
+          'No se pudo cargar la información. Por favor, intenta de nuevo.';
         this.data = [];
         this.total = 0;
         this.loading = false;
@@ -154,7 +162,6 @@ export class LeadsTableComponent implements OnInit {
     this.pageIndex = 0;
     this.loadPage(this.pageIndex, this.defaultPageSize);
   }
-
 
   resendToSalesForce(row: any): void {
     if (!row.id) {
@@ -198,12 +205,18 @@ export class LeadsTableComponent implements OnInit {
     };
 
     // Aplicar los mismos filtros activos
-    if (this.currentFilters.idAgency) baseParams.idAgency = this.currentFilters.idAgency;
-    if (this.currentFilters.LeadNo) baseParams.LeadNo = this.currentFilters.LeadNo;
-    if (this.currentFilters.FullName) baseParams.FullName = this.currentFilters.FullName;
-    if (this.currentFilters.sendedSalesForce) baseParams.sendedSalesForce = this.currentFilters.sendedSalesForce;
-    if (this.currentFilters.insertado && !this.currentFilters.error) baseParams.insertCorrect = '1';
-    if (this.currentFilters.error && !this.currentFilters.insertado) baseParams.insertCorrect = '0';
+    if (this.currentFilters.idAgency)
+      baseParams.idAgency = this.currentFilters.idAgency;
+    if (this.currentFilters.LeadNo)
+      baseParams.LeadNo = this.currentFilters.LeadNo;
+    if (this.currentFilters.FullName)
+      baseParams.FullName = this.currentFilters.FullName;
+    if (this.currentFilters.sendedSalesForce)
+      baseParams.sendedSalesForce = this.currentFilters.sendedSalesForce;
+    if (this.currentFilters.insertado && !this.currentFilters.error)
+      baseParams.insertCorrect = '1';
+    if (this.currentFilters.error && !this.currentFilters.insertado)
+      baseParams.insertCorrect = '0';
 
     const pageRequests = [];
     for (let page = 1; page <= totalPages; page++) {
@@ -220,21 +233,21 @@ export class LeadsTableComponent implements OnInit {
           });
 
           const excelData = allData.map((item) => ({
-            'Agencia': item.agencyName || '',
+            Agencia: item.agencyName || '',
             'Lead No': item.LeadNo || '',
             'OEM Lead ID': item.OemLeadId || '',
             'Nombre Completo': item.FullName || '',
-            'Teléfono': item.Phone || '',
-            'Email': item.Email || '',
-            'Nombre': item.FirstName || '',
-            'Apellido': item.LastName || '',
-            'Saludo': item.Salutation || '',
-            'Campaña': item.Campaign || '',
-            'OEM': item.Oem || '',
-            'Tipo': item.Type || '',
+            Teléfono: item.Phone || '',
+            Email: item.Email || '',
+            Nombre: item.FirstName || '',
+            Apellido: item.LastName || '',
+            Saludo: item.Salutation || '',
+            Campaña: item.Campaign || '',
+            OEM: item.Oem || '',
+            Tipo: item.Type || '',
             'Fecha Límite': item.DueDate || '',
-            'Marca': item.Brand || '',
-            'Modelo': item.Model || '',
+            Marca: item.Brand || '',
+            Modelo: item.Model || '',
             'Fecha DMS': item.timestamp_dms || '',
             'Enviado SF': item.sendedSalesForce || '',
             'ID Salesforce': item.idSalesForce || '',
@@ -248,9 +261,10 @@ export class LeadsTableComponent implements OnInit {
           const workbook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(workbook, worksheet, 'Leads');
 
-          const columnWidths = excelData.length > 0
-            ? Object.keys(excelData[0]).map(() => ({ wch: 20 }))
-            : [];
+          const columnWidths =
+            excelData.length > 0
+              ? Object.keys(excelData[0]).map(() => ({ wch: 20 }))
+              : [];
           worksheet['!cols'] = columnWidths;
 
           const now = new Date();

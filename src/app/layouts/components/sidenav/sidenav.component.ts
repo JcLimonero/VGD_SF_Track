@@ -20,7 +20,6 @@ import { AsyncPipe, NgFor, NgIf } from '@angular/common';
   selector: 'vex-sidenav',
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss'],
-  standalone: true,
   imports: [
     NgIf,
     MatButtonModule,

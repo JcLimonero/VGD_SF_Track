@@ -27,7 +27,6 @@ export interface OnlineStatus {
   templateUrl: './toolbar-user-dropdown.component.html',
   styleUrls: ['./toolbar-user-dropdown.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     MatIconModule,
     MatButtonModule,

@@ -41,8 +41,7 @@ import { VexConfig } from '@vex/config/vex-config.interface';
     RouterOutlet,
     SearchComponent,
     VexProgressBarComponent
-  ],
-  standalone: true
+  ]
 })
 export class LayoutComponent {
   config$: Observable<VexConfig> = this.configService.config$;

@@ -15,7 +15,6 @@ import { LoadingBarRouterModule } from '@ngx-loading-bar/router';
   templateUrl: './vex-progress-bar.component.html',
   styleUrls: ['./vex-progress-bar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     MatProgressBarModule,
     LoadingBarModule,

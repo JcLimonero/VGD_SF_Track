@@ -16,7 +16,6 @@ import { MatButtonModule } from '@angular/material/button';
   templateUrl: './toolbar-notifications.component.html',
   styleUrls: ['./toolbar-notifications.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [MatButtonModule, MatIconModule]
 })
 export class ToolbarNotificationsComponent implements OnInit {

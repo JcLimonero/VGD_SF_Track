@@ -14,7 +14,6 @@ import { MatButtonModule } from '@angular/material/button';
   selector: 'vex-toolbar-notifications-dropdown',
   templateUrl: './toolbar-notifications-dropdown.component.html',
   styleUrls: ['./toolbar-notifications-dropdown.component.scss'],
-  standalone: true,
   imports: [
     MatButtonModule,
     MatMenuModule,

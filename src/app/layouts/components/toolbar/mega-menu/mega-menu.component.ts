@@ -19,7 +19,6 @@ export interface MegaMenuPage {
 @Component({
   selector: 'vex-mega-menu',
   templateUrl: './mega-menu.component.html',
-  standalone: true,
   imports: [MatButtonModule, NgFor, RouterLink, MatIconModule]
 })
 export class MegaMenuComponent implements OnInit {

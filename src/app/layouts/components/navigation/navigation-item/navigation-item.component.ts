@@ -22,7 +22,6 @@ import {
   selector: 'vex-navigation-item',
   templateUrl: './navigation-item.component.html',
   styleUrls: ['./navigation-item.component.scss'],
-  standalone: true,
   imports: [
     NgIf,
     MatRippleModule,

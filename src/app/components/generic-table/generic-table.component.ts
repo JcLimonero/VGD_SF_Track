@@ -1,9 +1,23 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, Inject, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+  Inject,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import {
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+  MAT_DIALOG_DATA
+} from '@angular/material/dialog';
 import { TableColumn } from '../../../@vex/interfaces/table-column.interface';
 import { InventoryModalComponent } from '../inventory/inventory-modal/inventory-modal.component';
 import { CustomerModalComponent } from '../customer/customer-modal/customer-modal.component';
@@ -11,12 +25,16 @@ import { ServiceModalComponent } from '../servicios/service-modal/service-modal.
 import { LeadsModalComponent } from '../leads/leads-modal/leads-modal.component';
 @Component({
   selector: 'vex-generic-table',
-  standalone: true,
-  imports: [CommonModule, FormsModule, MatTableModule, MatButtonModule, MatDialogModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatTableModule,
+    MatButtonModule,
+    MatDialogModule
+  ],
   templateUrl: './generic-table.component.html',
   styleUrls: ['./generic-table.component.scss']
 })
-
 export class GenericTableComponent implements OnInit, OnChanges {
   @Input() columns: TableColumn<any>[] = [];
   @Input() displayedColumns: string[] = [];
@@ -24,7 +42,8 @@ export class GenericTableComponent implements OnInit, OnChanges {
   @Input() total: number | null = null;
   @Input() initialPageSize: number = 10;
   @Input() currentPageIndex: number = 0; // Página actual desde el componente padre
-  @Input() initialSort: { column: string; direction: 'asc' | 'desc' } | null = null; // Estado inicial de ordenamiento
+  @Input() initialSort: { column: string; direction: 'asc' | 'desc' } | null =
+    null; // Estado inicial de ordenamiento
   @Input() hasActiveFilters: boolean = false; // Indica si hay filtros activos
   @Input() onRow: ((row: any) => void) | null = null;
   @Input() onResend: ((row: any) => void) | null = null; // Función para reenviar registro
@@ -34,7 +53,8 @@ export class GenericTableComponent implements OnInit, OnChanges {
   // Traducción de los valores codificados dentro del modal de detalles, por
   // campo: { isSend: { '1': 'Enviado a Crabi' } }. La tabla ya pinta algunos
   // como icono, pero el modal los mostraría como el número que llega.
-  @Input() detailValueLabels: Record<string, Record<string, string>> | null = null;
+  @Input() detailValueLabels: Record<string, Record<string, string>> | null =
+    null;
   @Input() sortableColumns: string[] | null = null; // Columnas ordenables; si es null se usa la lista por defecto
   @Input() sendField: string = 'sendedSalesForce'; // Campo que indica si el registro ya se envió; Crabi usa 'isSend'
   @Input() jsonField: string = 'sf_jsonRequest'; // Columna que abre el modal de JSON; Crabi usa 'json_data'
@@ -42,28 +62,34 @@ export class GenericTableComponent implements OnInit, OnChanges {
   // Campos que muestra el modal de JSON. Si es null se muestra solo `jsonField`,
   // que es el caso de los módulos que mandan a Salesforce.
   @Input() jsonFields: { field: string; label: string }[] | null = null;
-  @Output() pageChanged = new EventEmitter<{ pageIndex: number; pageSize: number }>();
-  @Output() sortChanged = new EventEmitter<{ column: string; direction: 'asc' | 'desc' }>();
-  
+  @Output() pageChanged = new EventEmitter<{
+    pageIndex: number;
+    pageSize: number;
+  }>();
+  @Output() sortChanged = new EventEmitter<{
+    column: string;
+    direction: 'asc' | 'desc';
+  }>();
+
   dataSource = new MatTableDataSource<any>([]);
-  
+
   // Paginación personalizada
   currentPage = 0;
   pageSize = 5;
   totalPages = 0;
   Math = Math; // Para usar Math.min en el template
   pageSizeOptions = [5, 10, 25, 50, 100];
-  
+
   // Ordenamiento
   sortColumn: string | null = null;
   sortDirection: 'asc' | 'desc' | null = null;
-  
+
   constructor(public dialog: MatDialog) {}
-  
+
   ngOnInit() {
     this.dataSource.data = this.data || [];
     this.updatePagination();
-    
+
     // Inicializar estado de ordenamiento si se proporciona
     if (this.initialSort) {
       this.sortColumn = this.initialSort.column;
@@ -180,11 +206,13 @@ export class GenericTableComponent implements OnInit, OnChanges {
       return this.sortableColumns.includes(column);
     }
 
-    return column === 'order_dms' ||
-           column === 'timestamp_sales_force' ||
-           column === 'billing_date' ||
-           column === 'colDate' ||
-           column === 'timestamp_dms';
+    return (
+      column === 'order_dms' ||
+      column === 'timestamp_sales_force' ||
+      column === 'billing_date' ||
+      column === 'colDate' ||
+      column === 'timestamp_dms'
+    );
   }
 
   cellValue(row: any, property: string) {
@@ -207,22 +235,22 @@ export class GenericTableComponent implements OnInit, OnChanges {
   getResultSFStatus(element: any): 'success' | 'warning' | 'error' {
     const sendedSalesForce = this.cellValue(element, 'sendedSalesForce');
     const insertCorrectValue = this.cellValue(element, 'insertCorrect');
-    
+
     // Prioridad 1: Si no se ha enviado a Salesforce (sendedSalesForce = 0)
     if (sendedSalesForce === '0' || sendedSalesForce === 0) {
       return 'warning';
     }
-    
+
     // Prioridad 2: Si se envió y fue exitoso (insertCorrect = 1)
     if (insertCorrectValue === '1' || insertCorrectValue === 1) {
       return 'success';
     }
-    
+
     // Prioridad 3: Si se envió pero hubo error (insertCorrect = 0)
     if (insertCorrectValue === '0' || insertCorrectValue === 0) {
       return 'error';
     }
-    
+
     // Fallback: warning si no hay información clara
     return 'warning';
   }
@@ -231,10 +259,11 @@ export class GenericTableComponent implements OnInit, OnChanges {
     // Solo habilitado si insertCorrect = 1 y tiene idSalesForce
     const insertCorrectValue = this.cellValue(element, 'insertCorrect');
     const idSalesForce = this.cellValue(element, 'idSalesForce');
-    
+
     const isSuccess = insertCorrectValue === '1' || insertCorrectValue === 1;
-    const hasIdSalesForce = idSalesForce && idSalesForce !== null && idSalesForce !== '';
-    
+    const hasIdSalesForce =
+      idSalesForce && idSalesForce !== null && idSalesForce !== '';
+
     return isSuccess && hasIdSalesForce;
   }
 
@@ -250,11 +279,14 @@ export class GenericTableComponent implements OnInit, OnChanges {
 
     // Usar la API del Clipboard si está disponible
     if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(errorMessage).then(() => {
-        console.log('Error copiado al portapapeles:', errorMessage);
-      }).catch(err => {
-        console.error('Error al copiar al portapapeles:', err);
-      });
+      navigator.clipboard
+        .writeText(errorMessage)
+        .then(() => {
+          console.log('Error copiado al portapapeles:', errorMessage);
+        })
+        .catch((err) => {
+          console.error('Error al copiar al portapapeles:', err);
+        });
     } else {
       // Fallback para navegadores antiguos o contextos no seguros
       const textArea = document.createElement('textarea');
@@ -276,7 +308,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
   getUpdateStatusColor(element: any): string {
     const colDate = this.cellValue(element, 'colDate');
     if (!colDate) return 'red';
-    
+
     const recordDate = new Date(colDate);
     const currentDate = new Date();
     const diffInMs = currentDate.getTime() - recordDate.getTime();
@@ -296,10 +328,10 @@ export class GenericTableComponent implements OnInit, OnChanges {
       console.warn('Salesforce link not available for this element');
       return;
     }
-    
+
     const idSalesForce = this.cellValue(element, 'idSalesForce');
     const url = `https://grupovanguardiamx.lightning.force.com/lightning/r/Opportunity/${idSalesForce}/view`;
-    
+
     console.log('Opening Salesforce URL:', url);
     window.open(url, '_blank');
   }
@@ -325,7 +357,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
     const isServiceData = this.isServiceData(rowData);
     const isInventoryData = this.isInventoryData(rowData);
     const isCustomerData = this.isCustomerData(rowData);
-    
+
     // Seleccionar el componente de modal apropiado
     let modalComponent: any;
     if (isLeadsData) {
@@ -339,22 +371,25 @@ export class GenericTableComponent implements OnInit, OnChanges {
     } else {
       modalComponent = ModalDialogComponent;
     }
-    
+
     const dialogRef = this.dialog.open(modalComponent, {
       data: rowData,
       width: '80%',
       maxWidth: '800px'
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       console.log('Modal closed with result:', result);
     });
   }
-  
+
   // Metodo para detectar si los datos son de inventario
   private isInventoryData(data: any): boolean {
-    return !!(data?.statusDescription || data?.typeDescription || 
-             (data?.brand && data?.model && !data?.order_dms));
+    return !!(
+      data?.statusDescription ||
+      data?.typeDescription ||
+      (data?.brand && data?.model && !data?.order_dms)
+    );
   }
 
   // Metodo para detectar si los datos son de cliente
@@ -364,8 +399,11 @@ export class GenericTableComponent implements OnInit, OnChanges {
 
   // Metodo para detectar si los datos son de servicio
   private isServiceData(data: any): boolean {
-    return !!(data?.service_type || data?.service_date || 
-             (data?.order_dms && !data?.invoice_reference && !data?.brand));
+    return !!(
+      data?.service_type ||
+      data?.service_date ||
+      (data?.order_dms && !data?.invoice_reference && !data?.brand)
+    );
   }
 
   // Metodo para detectar si los datos son de leads
@@ -387,7 +425,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
       maxHeight: '80vh'
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       console.log('JSON Modal closed');
     });
   }
@@ -396,28 +434,23 @@ export class GenericTableComponent implements OnInit, OnChanges {
 // Modal component defined in the same file
 @Component({
   selector: 'modal-dialog',
-  standalone: true,
   imports: [MatDialogModule, MatButtonModule, CommonModule],
   template: `
     <h2 mat-dialog-title class="title text-xl">Detalles de la orden</h2>
 
-    <mat-dialog-content >
+    <mat-dialog-content>
       <div class="invoice-details">
-      
         <div class="detail-row">
           <strong>Nombre de Agencia:</strong> {{ data?.agencyName }}
         </div>
         <div class="detail-row">
           <strong>Número de Orden:</strong> {{ data?.order_dms }}
         </div>
+        <div class="detail-row"><strong>Estado:</strong> {{ data?.state }}</div>
+        <div class="detail-row"><strong>VIN:</strong> {{ data?.vin }}</div>
         <div class="detail-row">
-          <strong>Estado:</strong> {{ data?.state }}
-        </div>
-        <div class="detail-row">
-          <strong>VIN:</strong> {{ data?.vin }}
-        </div>
-        <div class="detail-row">
-          <strong>Fecha de Inicio de Garantía:</strong> {{ data?.warranty_init_date || 'N/A' }}
+          <strong>Fecha de Inicio de Garantía:</strong>
+          {{ data?.warranty_init_date || 'N/A' }}
         </div>
         <div class="detail-row">
           <strong>Placas:</strong> {{ data?.plates || 'N/A' }}
@@ -447,7 +480,8 @@ export class GenericTableComponent implements OnInit, OnChanges {
           <strong>Timestamp DMS:</strong> {{ data?.timestamp_dms }}
         </div>
         <div class="detail-row">
-          <strong>Timestamp SalesForce:</strong> {{ data?.timestamp_sales_force }}
+          <strong>Timestamp SalesForce:</strong>
+          {{ data?.timestamp_sales_force }}
         </div>
         <div class="detail-row">
           <strong>Envío a SalesForce cada:</strong> 30 minutos
@@ -459,40 +493,41 @@ export class GenericTableComponent implements OnInit, OnChanges {
       <button mat-button (click)="onNoClick()">Cerrar</button>
     </mat-dialog-actions>
   `,
-  styles: [`
+  styles: [
+    `
+      .title {
+        text-decoration: underline;
+        text-decoration-color: #ff5c20;
+        text-decoration-thickness: 3px;
+        align-self: center;
+      }
 
-    .title{
-      text-decoration: underline;
-      text-decoration-color: #FF5C20;
-      text-decoration-thickness: 3px;
-      align-self: center;
-    }
+      .invoice-details {
+        max-height: 400px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
 
-    .invoice-details {
-      max-height: 400px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-    }
+      .detail-row {
+        border-bottom: 1px solid #e0e0e0;
+      }
 
-    .detail-row {
-      border-bottom: 1px solid #e0e0e0;
-    }
+      .detail-row:last-child {
+        border-bottom: none;
+      }
 
-    .detail-row:last-child {
-      border-bottom: none;
-    }
+      .detail-row strong {
+        color: #1b1a1aff;
+        margin-right: 8px;
+      }
 
-    .detail-row strong {
-      color: #1b1a1aff;
-      margin-right: 8px;
-    }
-
-    mat-dialog-content {
-      max-height: 550px;
-      overflow-y: auto;
-    }
-  `]
+      mat-dialog-content {
+        max-height: 550px;
+        overflow-y: auto;
+      }
+    `
+  ]
 })
 export class ModalDialogComponent {
   constructor(
@@ -508,7 +543,6 @@ export class ModalDialogComponent {
 // JSON Modal component
 @Component({
   selector: 'json-modal',
-  standalone: true,
   imports: [MatDialogModule, MatButtonModule, CommonModule],
   template: `
     <h2 mat-dialog-title>{{ title }}</h2>
@@ -523,53 +557,64 @@ export class ModalDialogComponent {
     </mat-dialog-content>
 
     <mat-dialog-actions align="end">
-      <button (click)="copyToClipboard()" class="flex flex-row items-center bg-black text-white p-[0.45rem] rounded-2xl">
-        <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#ffffff"  class="mr-[0.2rem]">
-          <path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z"/>
+      <button
+        (click)="copyToClipboard()"
+        class="flex flex-row items-center bg-black text-white p-[0.45rem] rounded-2xl">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="20px"
+          viewBox="0 -960 960 960"
+          width="20px"
+          fill="#ffffff"
+          class="mr-[0.2rem]">
+          <path
+            d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z" />
         </svg>
         {{ copyButtonText }}
       </button>
       <button mat-button (click)="onNoClick()">Cerrar</button>
     </mat-dialog-actions>
   `,
-  styles: [`
-    .json-section + .json-section {
-      margin-top: 16px;
-    }
+  styles: [
+    `
+      .json-section + .json-section {
+        margin-top: 16px;
+      }
 
-    .json-label {
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: #1b1a1a;
-    }
+      .json-label {
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #1b1a1a;
+      }
 
-    .json-container {
-      background-color: #f5f5f5;
-      border-radius: 4px;
-      padding: 16px;
-      overflow: auto;
-      max-height: 500px;
-    }
+      .json-container {
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        padding: 16px;
+        overflow: auto;
+        max-height: 500px;
+      }
 
-    .json-content {
-      margin: 0;
-      font-family: 'Courier New', monospace;
-      font-size: 13px;
-      line-height: 1.5;
-      color: #333;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
+      .json-content {
+        margin: 0;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        line-height: 1.5;
+        color: #333;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
 
-    mat-dialog-content {
-      max-height: 60vh;
-      overflow-y: auto;
-    }
+      mat-dialog-content {
+        max-height: 60vh;
+        overflow-y: auto;
+      }
 
-    mat-dialog-actions button {
-      margin-left: 8px;
-    }
-  `]
+      mat-dialog-actions button {
+        margin-left: 8px;
+      }
+    `
+  ]
 })
 export class JsonModalComponent {
   title = 'JSON Request - SalesForce';
@@ -600,7 +645,9 @@ export class JsonModalComponent {
   get formattedJson(): string {
     return this.sections
       .map((section) =>
-        section.label ? `${section.label}:\n${section.content}` : section.content
+        section.label
+          ? `${section.label}:\n${section.content}`
+          : section.content
       )
       .join('\n\n');
   }
@@ -627,18 +674,20 @@ export class JsonModalComponent {
   }
 
   copyToClipboard(): void {
-    navigator.clipboard.writeText(this.formattedJson).then(() => {
-      this.copyButtonText = 'Copiado';
-      setTimeout(() => {
-        this.copyButtonText = 'Copiar';
-      }, 2000);
-    }).catch(err => {
-      console.error('Error al copiar al portapapeles:', err);
-      this.copyButtonText = '✗ Error';
-      setTimeout(() => {
-        this.copyButtonText = 'Copiar';
-      }, 2000);
-    });
+    navigator.clipboard
+      .writeText(this.formattedJson)
+      .then(() => {
+        this.copyButtonText = 'Copiado';
+        setTimeout(() => {
+          this.copyButtonText = 'Copiar';
+        }, 2000);
+      })
+      .catch((err) => {
+        console.error('Error al copiar al portapapeles:', err);
+        this.copyButtonText = '✗ Error';
+        setTimeout(() => {
+          this.copyButtonText = 'Copiar';
+        }, 2000);
+      });
   }
 }
-

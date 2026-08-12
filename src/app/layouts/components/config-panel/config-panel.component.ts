@@ -33,7 +33,6 @@ import { VEX_THEMES } from '@vex/config/config.token';
   selector: 'vex-config-panel',
   templateUrl: './config-panel.component.html',
   styleUrls: ['./config-panel.component.scss'],
-  standalone: true,
   imports: [
     NgIf,
     MatIconModule,

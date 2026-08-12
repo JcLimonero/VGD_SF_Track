@@ -23,7 +23,6 @@ interface DetailEntry {
  */
 @Component({
   selector: 'vex-generic-detail-modal',
-  standalone: true,
   imports: [CommonModule, MatDialogModule, MatButtonModule],
   template: `
     <h2 mat-dialog-title class="title text-xl">{{ title }}</h2>

@@ -9,7 +9,6 @@ export interface TabItem {
 
 @Component({
   selector: 'vex-tabs',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './tabs.component.html',
   styleUrl: './tabs.component.scss'

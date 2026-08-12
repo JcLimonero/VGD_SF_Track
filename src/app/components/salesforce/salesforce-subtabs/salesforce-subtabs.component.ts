@@ -15,7 +15,6 @@ export interface SalesforceSubTab {
  */
 @Component({
   selector: 'vex-salesforce-subtabs',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './salesforce-subtabs.component.html',
   styleUrl: './salesforce-subtabs.component.scss'

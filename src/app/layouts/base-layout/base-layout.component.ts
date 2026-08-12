@@ -5,7 +5,8 @@ import {
   DestroyRef,
   inject,
   Inject,
-  OnInit
+  OnInit,
+  DOCUMENT
 } from '@angular/core';
 import { VexLayoutService } from '@vex/services/vex-layout.service';
 import {
@@ -22,7 +23,7 @@ import {
 import { filter, map, startWith, withLatestFrom } from 'rxjs/operators';
 import { combineLatest, Observable } from 'rxjs';
 import { checkRouterChildsData } from '@vex/utils/check-router-childs-data';
-import { AsyncPipe, DOCUMENT, NgIf, NgTemplateOutlet } from '@angular/common';
+import { AsyncPipe, NgIf, NgTemplateOutlet } from '@angular/common';
 import { VexConfigService } from '@vex/config/vex-config.service';
 import { SearchComponent } from '../components/toolbar/search/search.component';
 import { VexProgressBarComponent } from '@vex/components/vex-progress-bar/vex-progress-bar.component';
@@ -34,7 +35,6 @@ import { VexConfig } from '@vex/config/vex-config.interface';
   selector: 'vex-base-layout',
   templateUrl: './base-layout.component.html',
   styleUrls: ['./base-layout.component.scss'],
-  standalone: true,
   imports: [
     VexProgressBarComponent,
     SearchComponent,

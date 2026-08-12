@@ -6,7 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
   selector: 'vex-config-panel-toggle',
   templateUrl: './config-panel-toggle.component.html',
   styleUrls: ['./config-panel-toggle.component.scss'],
-  standalone: true,
   imports: [MatButtonModule, MatIconModule]
 })
 export class ConfigPanelToggleComponent implements OnInit {

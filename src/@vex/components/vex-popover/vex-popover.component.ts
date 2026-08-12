@@ -13,7 +13,6 @@ import {
   templateUrl: './vex-popover.component.html',
   styleUrls: ['./vex-popover.component.scss'],
   animations: [popoverAnimation],
-  standalone: true,
   imports: [NgSwitch, NgSwitchCase, NgTemplateOutlet, NgComponentOutlet]
 })
 export class VexPopoverComponent implements OnInit {

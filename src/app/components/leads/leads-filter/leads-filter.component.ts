@@ -5,13 +5,11 @@ import { VanguardiaApiService } from '../../../services/vanguardia-api.service';
 
 @Component({
   selector: 'vex-leads-filter',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './leads-filter.component.html',
   styleUrl: './leads-filter.component.scss'
 })
 export class LeadsFilterComponent implements OnInit {
-
   @Output() filterChange = new EventEmitter<{
     idAgency?: string;
     LeadNo?: string;
@@ -30,7 +28,10 @@ export class LeadsFilterComponent implements OnInit {
   selectedAgency: string = '';
   selectedAgencyId: string = '';
 
-  constructor(private fb: FormBuilder, private vanguardiaApi: VanguardiaApiService) {
+  constructor(
+    private fb: FormBuilder,
+    private vanguardiaApi: VanguardiaApiService
+  ) {
     this.filterForm = this.fb.group({
       LeadNo: [''],
       FullName: [''],
@@ -59,11 +60,14 @@ export class LeadsFilterComponent implements OnInit {
   onAgencySelect(agency: any, event: Event): void {
     const input = event.target as HTMLInputElement | null;
     if (!input) return;
-    
+
     if (input.checked) {
       this.selectedAgency = agency.name;
       this.selectedAgencyId = agency.idAgency;
-      this.filterForm.patchValue({ idAgency: agency.idAgency }, { emitEvent: false });
+      this.filterForm.patchValue(
+        { idAgency: agency.idAgency },
+        { emitEvent: false }
+      );
     } else if (this.selectedAgency === agency.name) {
       this.selectedAgency = '';
       this.selectedAgencyId = '';
@@ -72,23 +76,25 @@ export class LeadsFilterComponent implements OnInit {
   }
 
   onFilter(): void {
-    const { LeadNo, FullName, idAgency, sendedSalesForce, insertado, error } = this.filterForm
-      .value as {
-      LeadNo?: string;
-      FullName?: string;
-      idAgency?: string;
-      sendedSalesForce?: string;
-      insertado?: boolean;
-      error?: boolean;
-    };
+    const { LeadNo, FullName, idAgency, sendedSalesForce, insertado, error } =
+      this.filterForm.value as {
+        LeadNo?: string;
+        FullName?: string;
+        idAgency?: string;
+        sendedSalesForce?: string;
+        insertado?: boolean;
+        error?: boolean;
+      };
 
     const payload = {
       LeadNo,
       FullName,
       idAgency,
-      sendedSalesForce: sendedSalesForce ? (sendedSalesForce as '1' | '0') : undefined,
+      sendedSalesForce: sendedSalesForce
+        ? (sendedSalesForce as '1' | '0')
+        : undefined,
       insertado,
-      error,
+      error
     };
     this.filterChange.emit(payload);
   }
@@ -111,7 +117,7 @@ export class LeadsFilterComponent implements OnInit {
       idAgency: undefined,
       sendedSalesForce: undefined,
       insertado: false,
-      error: false,
+      error: false
     };
 
     this.filterChange.emit(emptyPayload);
@@ -120,7 +126,9 @@ export class LeadsFilterComponent implements OnInit {
   closeDropdown(event: Event): void {
     const target = event.target as HTMLElement | null;
     if (!target) return;
-    const details = target.closest('details.dropdown') as HTMLDetailsElement | null;
+    const details = target.closest(
+      'details.dropdown'
+    ) as HTMLDetailsElement | null;
     if (details) {
       setTimeout(() => {
         details.open = false;
@@ -133,7 +141,10 @@ export class LeadsFilterComponent implements OnInit {
     if (!input) return;
     const current = this.filterForm.get('sendedSalesForce')?.value as string;
     const next = input.checked ? value : current === value ? '' : current;
-    this.filterForm.patchValue({ sendedSalesForce: next }, { emitEvent: false });
+    this.filterForm.patchValue(
+      { sendedSalesForce: next },
+      { emitEvent: false }
+    );
   }
 
   onInsertToggle(kind: 'insertado' | 'error', event: Event): void {

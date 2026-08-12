@@ -10,7 +10,6 @@ export interface SalesforceFilters {
 
 @Component({
   selector: 'vex-salesforce-filter',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './salesforce-filter.component.html',
   styleUrl: './salesforce-filter.component.scss'
@@ -71,14 +70,19 @@ export class SalesforceFilterComponent {
       );
     } else if (this.selectedSent === option.label) {
       this.selectedSent = '';
-      this.filterForm.patchValue({ sendedSalesForce: '' }, { emitEvent: false });
+      this.filterForm.patchValue(
+        { sendedSalesForce: '' },
+        { emitEvent: false }
+      );
     }
   }
 
   closeDropdown(event: Event): void {
     const target = event.target as HTMLElement | null;
     if (!target) return;
-    const details = target.closest('details.dropdown') as HTMLDetailsElement | null;
+    const details = target.closest(
+      'details.dropdown'
+    ) as HTMLDetailsElement | null;
     if (details) {
       // Se cierra una vez que el formulario terminó de actualizarse
       setTimeout(() => {
