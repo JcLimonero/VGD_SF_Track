@@ -27,3 +27,36 @@ html {
   // --vex-color-warn: yellow;
   // --vex-color-warn-contrast: black;
 }
+
+/*
+  Avisos de NotificationService (los que antes eran alert()).
+
+  Van aquí y no en el servicio porque MatSnackBar se pinta en el overlay del
+  CDK, fuera del árbol del componente: un estilo encapsulado no lo alcanza.
+
+  `pre-line` es necesario para el aviso de límite de descarga, que es el único
+  mensaje con saltos de línea; sin esto se leería como un párrafo corrido.
+*/
+.vgd-notif {
+  .mdc-snackbar__label {
+    white-space: pre-line;
+  }
+}
+
+.vgd-notif-exito {
+  --mdc-snackbar-container-color: #2e7d32;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #ffffff;
+}
+
+.vgd-notif-error {
+  --mdc-snackbar-container-color: #c62828;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #ffffff;
+}
+
+.vgd-notif-aviso {
+  --mdc-snackbar-container-color: #ef6c00;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #ffffff;
+}

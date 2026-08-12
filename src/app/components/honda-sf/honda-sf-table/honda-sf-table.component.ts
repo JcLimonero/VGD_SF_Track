@@ -14,6 +14,7 @@ import {
 } from '../../generic-table/dynamic-columns.util';
 import { TableColumn } from '../../../../@vex/interfaces/table-column.interface';
 import { VanguardiaApiService } from '../../../services/vanguardia-api.service';
+import { NotificationService } from '../../../services/notification.service';
 import {
   HONDA_SF_LABELS,
   HONDA_SF_TABLES,
@@ -96,7 +97,10 @@ export class HondaSfTableComponent implements OnInit, OnChanges {
     return Object.values(this.currentFilters).some((value) => !!value);
   }
 
-  constructor(private vanguardiaApi: VanguardiaApiService) {}
+  constructor(
+    private vanguardiaApi: VanguardiaApiService,
+    private notifications: NotificationService
+  ) {}
 
   ngOnInit(): void {
     this.currentSort = { ...this.config.defaultSort };
@@ -161,7 +165,11 @@ export class HondaSfTableComponent implements OnInit, OnChanges {
     }
 
     if (this.total > this.excelRowLimit) {
-      alert(
+      // `warning` y no `error`: no falló nada, es el usuario quien tiene que
+      // hacer algo. Por eso este aviso no caduca solo, a diferencia de los
+      // demás: si desapareciera a los segundos, se quedaría sin saber que lo
+      // que le falta es filtrar.
+      this.notifications.warning(
         `El resultado tiene ${this.total.toLocaleString('es-MX')} registros y ` +
           `el máximo por descarga es ${this.excelRowLimit.toLocaleString('es-MX')}.\n\n` +
           'Aplica un filtro (distribuidor, cliente, VIN...) y vuelve a intentarlo.'
