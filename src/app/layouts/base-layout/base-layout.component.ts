@@ -13,20 +13,12 @@ import {
   MatSidenavContainer,
   MatSidenavModule
 } from '@angular/material/sidenav';
-import {
-  Event,
-  NavigationEnd,
-  Router,
-  RouterOutlet,
-  Scroll
-} from '@angular/router';
+import { Event, NavigationEnd, Router, Scroll } from '@angular/router';
 import { filter, map, startWith, withLatestFrom } from 'rxjs/operators';
 import { combineLatest, Observable } from 'rxjs';
 import { checkRouterChildsData } from '@vex/utils/check-router-childs-data';
-import { AsyncPipe, NgIf, NgTemplateOutlet } from '@angular/common';
+import { AsyncPipe, NgIf } from '@angular/common';
 import { VexConfigService } from '@vex/config/vex-config.service';
-import { SearchComponent } from '../components/toolbar/search/search.component';
-import { VexProgressBarComponent } from '@vex/components/vex-progress-bar/vex-progress-bar.component';
 import { isNil } from '@vex/utils/is-nil';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { VexConfig } from '@vex/config/vex-config.interface';
@@ -35,15 +27,10 @@ import { VexConfig } from '@vex/config/vex-config.interface';
   selector: 'vex-base-layout',
   templateUrl: './base-layout.component.html',
   styleUrls: ['./base-layout.component.scss'],
-  imports: [
-    VexProgressBarComponent,
-    SearchComponent,
-    MatSidenavModule,
-    NgTemplateOutlet,
-    RouterOutlet,
-    AsyncPipe,
-    NgIf
-  ]
+  // Solo lo que usa la plantilla: *ngIf, el pipe async y <ng-content>. La barra
+  // de progreso, el buscador y el <router-outlet> los pinta layout.component,
+  // que los importa por su cuenta; aqui solo generaban avisos NG8113.
+  imports: [MatSidenavModule, AsyncPipe, NgIf]
 })
 export class BaseLayoutComponent implements OnInit, AfterViewInit {
   config$: Observable<VexConfig> = this.configService.config$;
