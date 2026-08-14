@@ -1,4 +1,6 @@
+import { Type } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { httpTestProviders } from '@testing/test-providers';
 
 import { HomeComponent } from './home.component';
@@ -78,6 +80,53 @@ describe('HomeComponent', () => {
       expect(component.activeSalesforceTable).toBe(
         subtabs.componentInstance.activeTab
       );
+    });
+  });
+
+  // El *ngIf destruye y recrea el componente de sub-pestanas cada vez que se
+  // sale de la pestana y se vuelve, pero el home conserva la tabla abierta.
+  // Cuando la sub-pestana marcada era estado interno del hijo, al volver
+  // saltaba a la primera y la tabla se quedaba en la anterior; encima el guard
+  // de selectTab daba por activa la pildora marcada, asi que pulsarla no hacia
+  // nada y no habia forma de volver a esa tabla desde la interfaz.
+  describe('sub-pestana al volver a la pestana', () => {
+    const subtabsOf = <T>(type: Type<T>): T =>
+      fixture.debugElement.query(By.directive(type as Type<unknown>))
+        .componentInstance as T;
+
+    it('Honda SF keeps the sub-tab that stayed open', () => {
+      component.onTabChanged('hondasf');
+      fixture.detectChanges();
+
+      subtabsOf(HondaSfSubtabsComponent).selectTab('portalhondaleads');
+      fixture.detectChanges();
+      expect(component.activeHondaSfTable).toBe('portalhondaleads');
+
+      component.onTabChanged('dwh');
+      fixture.detectChanges();
+      component.onTabChanged('hondasf');
+      fixture.detectChanges();
+
+      const subtabs = subtabsOf(HondaSfSubtabsComponent);
+      expect(subtabs.activeTab).toBe('portalhondaleads');
+      expect(subtabs.isActive(HONDA_SF_TABLES[0].id)).toBeFalse();
+    });
+
+    it('Integracion SF keeps the sub-tab that stayed open', () => {
+      component.onTabChanged('salesforce');
+      fixture.detectChanges();
+
+      const wanted = subtabsOf(SalesforceSubtabsComponent).tabs[1].id;
+      subtabsOf(SalesforceSubtabsComponent).selectTab(wanted);
+      fixture.detectChanges();
+      expect(component.activeSalesforceTable).toBe(wanted);
+
+      component.onTabChanged('dwh');
+      fixture.detectChanges();
+      component.onTabChanged('salesforce');
+      fixture.detectChanges();
+
+      expect(subtabsOf(SalesforceSubtabsComponent).activeTab).toBe(wanted);
     });
   });
 });

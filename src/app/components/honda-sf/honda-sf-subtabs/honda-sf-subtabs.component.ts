@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HONDA_SF_TABLES, HondaSfTable } from '../honda-sf.catalog';
 
@@ -18,7 +18,19 @@ export class HondaSfSubtabsComponent {
   @Output() tabChanged = new EventEmitter<string>();
 
   readonly tabs: HondaSfTable[] = HONDA_SF_TABLES;
-  activeTab = HONDA_SF_TABLES[0]?.id ?? '';
+
+  /**
+   * Sub-pestaña marcada. La decide el padre a propósito.
+   *
+   * El *ngIf del home destruye y recrea este componente cada vez que se sale de
+   * Honda SF y se vuelve, pero el padre conserva la tabla que estaba abierta.
+   * Cuando el estado vivía solo aquí, al volver la píldora saltaba a la primera
+   * mientras la tabla seguía en la anterior: se veían los filtros de una tabla
+   * sobre los datos de otra. Y no había forma de arreglarlo desde la interfaz,
+   * porque el guard de `selectTab` daba por activa la píldora que se marcaba,
+   * así que pulsarla no hacía nada.
+   */
+  @Input() activeTab = HONDA_SF_TABLES[0]?.id ?? '';
 
   selectTab(tabId: string): void {
     if (this.activeTab === tabId) return;

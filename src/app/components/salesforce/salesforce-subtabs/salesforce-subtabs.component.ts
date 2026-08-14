@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MockDataService } from '../../../services/mock-data.service';
 
@@ -23,7 +23,15 @@ export class SalesforceSubtabsComponent implements OnInit {
   @Output() tabChanged = new EventEmitter<string>();
 
   tabs: SalesforceSubTab[] = [];
-  activeTab = '';
+
+  /**
+   * Sub-pestaña marcada. La decide el padre; ver el comentario equivalente en
+   * `HondaSfSubtabsComponent`, que sufría el mismo desajuste al recrearse.
+   *
+   * Vacío significa "elige tú la primera": el componente sigue funcionando solo
+   * si nadie lo enlaza.
+   */
+  @Input() activeTab = '';
 
   constructor(private mockData: MockDataService) {}
 
@@ -33,7 +41,9 @@ export class SalesforceSubtabsComponent implements OnInit {
       label: this.mockData.getSalesforceTableLabel(table)
     }));
 
-    if (this.tabs.length > 0) {
+    // Solo si el padre no ha dicho ya cuál va marcada. El @Input llega antes
+    // que ngOnInit, así que pisarlo aquí devolvería el fallo que esto arregla.
+    if (!this.activeTab && this.tabs.length > 0) {
       this.activeTab = this.tabs[0].id;
     }
   }
