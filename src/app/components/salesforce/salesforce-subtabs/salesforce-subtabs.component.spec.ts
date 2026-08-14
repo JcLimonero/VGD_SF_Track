@@ -33,6 +33,23 @@ describe('SalesforceSubtabsComponent', () => {
     expect(component.isActive(component.tabs[0].id)).toBeTrue();
   });
 
+  // ngOnInit elige la primera tabla, pero solo si nadie le ha dicho ya cual va
+  // marcada: el @Input llega antes, y pisarlo devolveria el desajuste entre la
+  // pildora y la tabla que se ve.
+  it('keeps the sub-tab the parent passes in instead of the first', () => {
+    const wanted = component.tabs[1].id;
+
+    const other = TestBed.createComponent(SalesforceSubtabsComponent);
+    other.componentRef.setInput('activeTab', wanted);
+    other.detectChanges();
+
+    expect(other.componentInstance.activeTab).toBe(wanted);
+    expect(other.componentInstance.isActive(wanted)).toBeTrue();
+    expect(
+      other.componentInstance.isActive(other.componentInstance.tabs[0].id)
+    ).toBeFalse();
+  });
+
   it('emits when a different sub-tab is selected', () => {
     const emitted: string[] = [];
     component.tabChanged.subscribe((t) => emitted.push(t));

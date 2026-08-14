@@ -68,7 +68,8 @@
 
   <!-- Contenido de Integración SF (datos de prueba, no hay endpoint) -->
   <div *ngIf="activeTab === 'salesforce'">
-    <vex-salesforce-subtabs (tabChanged)="onSalesforceTableChanged($event)">
+    <vex-salesforce-subtabs [activeTab]="activeSalesforceTable"
+                            (tabChanged)="onSalesforceTableChanged($event)">
     </vex-salesforce-subtabs>
     <vex-salesforce-filter (filterChange)="handleSalesforceFilter($event)"
                            (downloadRequested)="handleSalesforceDownload()"
@@ -80,7 +81,8 @@
 
   <!-- Contenido de Honda SF (una sub-pestaña por tabla de Salesforce) -->
   <div *ngIf="activeTab === 'hondasf'">
-    <vex-honda-sf-subtabs (tabChanged)="onHondaSfTableChanged($event)">
+    <vex-honda-sf-subtabs [activeTab]="activeHondaSfTable"
+                          (tabChanged)="onHondaSfTableChanged($event)">
     </vex-honda-sf-subtabs>
     <vex-honda-sf-filter [fields]="hondaSfFilterFields"
                          (filterChange)="handleHondaSfFilter($event)"

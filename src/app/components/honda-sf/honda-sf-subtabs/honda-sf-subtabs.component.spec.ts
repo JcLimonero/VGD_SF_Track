@@ -43,6 +43,22 @@ describe('HondaSfSubtabsComponent', () => {
     expect(emitted).toEqual(['portalhondaleads']);
   });
 
+  // El padre manda: al recrearse el componente hay que marcar la sub-pestana
+  // que sigue abierta, no siempre la primera.
+  it('marks the sub-tab the parent passes in', () => {
+    fixture.componentRef.setInput('activeTab', 'portalhondaleads');
+    fixture.detectChanges();
+
+    expect(component.isActive('portalhondaleads')).toBeTrue();
+    expect(component.isActive(HONDA_SF_TABLES[0].id)).toBeFalse();
+
+    const marked = fixture.nativeElement.querySelectorAll('button.subtab');
+    const active = [...marked].filter((b: HTMLElement) =>
+      b.classList.contains('active-subtab')
+    );
+    expect(active.length).toBe(1);
+  });
+
   it('does not reload when the active sub-tab is clicked again', () => {
     const emitted: string[] = [];
     component.tabChanged.subscribe((t) => emitted.push(t));
