@@ -98,15 +98,17 @@ export class GenericDetailModalComponent {
     public dialogRef: MatDialogRef<GenericDetailModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    // `vex-generic-table` envía { row, labels, exclude }; también se acepta el
-    // registro directo por si el modal se abre desde otro lugar. Se distingue
-    // por la presencia de la llave `row`, no por su valor: un `row` nulo es
-    // válido y no debe hacer que se listen los campos del propio envoltorio.
+    // `vex-generic-table` envía { row, labels, exclude, title }; también se
+    // acepta el registro directo por si el modal se abre desde otro lugar. Se
+    // distingue por la presencia de la llave `row`, no por su valor: un `row`
+    // nulo es válido y no debe hacer que se listen los campos del envoltorio.
     const isWrapped = !!data && typeof data === 'object' && 'row' in data;
     const row = isWrapped ? data.row : data;
     const labels = (isWrapped ? data.labels : null) ?? {};
     const exclude = (isWrapped ? data.exclude : null) ?? [];
     const valueLabels = (isWrapped ? data.valueLabels : null) ?? {};
+    // Cada modulo nombra su entidad; sin titulo propio se queda el generico
+    this.title = (isWrapped ? data.title : null) || this.title;
     this.entries = this.buildEntries(row, labels, exclude, valueLabels);
   }
 

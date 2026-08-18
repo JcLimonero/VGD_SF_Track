@@ -108,6 +108,13 @@ describe('InvoiceTableComponent', () => {
       expect(component.detailModal).toBe(GenericDetailModalComponent);
     });
 
+    it('is titled after the entity, not after a generic record', () => {
+      // La pestana dice 'Ordenes' y el spinner 'Cargando ordenes...'; el modal
+      // generico diria 'Detalles del registro'. Ademas `order_dms` es unico por
+      // renglon y `invoice_reference` no, asi que un renglon es una orden.
+      expect(component.detailTitle).toBe('Detalles de la Orden');
+    });
+
     it('reuses the label of every visible column', () => {
       component.columns
         .filter((col) => col.type !== 'button')

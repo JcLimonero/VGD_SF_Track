@@ -86,6 +86,16 @@ export class InvoiceTableComponent implements OnInit {
   readonly detailModal = GenericDetailModalComponent;
 
   /**
+   * El modal generico se titula 'Detalles del registro', que no es como se
+   * llama a esto en ningun otro lado: la pestana dice 'Ordenes', el spinner
+   * 'Cargando ordenes...' y el modal viejo de facturas decia 'Detalles de la
+   * orden'. Verificado ademas contra la API: en 200 registros `order_dms` no
+   * se repite ni una vez y `invoice_reference` si, asi que un renglon es una
+   * orden, no una factura.
+   */
+  readonly detailTitle = 'Detalles de la Orden';
+
+  /**
    * Campos que no salen en la tabla pero sí en el detalle.
    *
    * Los visibles no se repiten aquí: sus etiquetas se toman de `columns`. La
