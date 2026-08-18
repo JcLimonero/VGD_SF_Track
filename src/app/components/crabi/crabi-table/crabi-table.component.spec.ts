@@ -30,6 +30,11 @@ function apiPage(items: any[], total = items.length) {
  * (24 de 707), que son las que dejan `sent_at`, `request_body` y `response_body`
  * vacíos. Los colores van vacíos ahí para cubrir el otro hueco del endpoint:
  * 160 filas sin `external_color` ni `internal_color`.
+ *
+ * Los VALORES son inventados: lo que se prueba son las llaves y la forma, no el
+ * contenido. Este repositorio es público, así que aquí no van VIN, RFC ni
+ * números de cliente sacados de producción. El RFC es `XAXX010101000`, el
+ * genérico de público en general, que no identifica a nadie.
  */
 const ORDERS = [
   {
@@ -37,7 +42,7 @@ const ORDERS = [
     idAgency: '88888',
     order_dms: '2160',
     amount: '299990.00',
-    vin: 'LB3F31046TG034231',
+    vin: 'LB3F0000000000001',
     brand: 'GEELY',
     model: 'EMGRAND',
     version: 'GC, SEDAN, 1.5LTS, MANUAL, 4CIL',
@@ -52,7 +57,7 @@ const ORDERS = [
     isSend: '1',
     captured_at: '2026-07-22 15:36:02',
     sent_at: '2026-08-01 21:14:24',
-    request_body: '{"person":{"rfc":"AARR991026762"}}',
+    request_body: '{"person":{"rfc":"XAXX010101000"}}',
     response_body: '{"code":201,"status":"success"}'
   },
   {
@@ -60,7 +65,7 @@ const ORDERS = [
     idAgency: '00000',
     order_dms: '32764',
     amount: '43990.00',
-    vin: '3H1KD1340TD212377',
+    vin: '3H1K0000000000002',
     brand: 'HONDA',
     model: 'XR150LEK',
     version: 'XR150',

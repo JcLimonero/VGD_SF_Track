@@ -32,7 +32,8 @@ describe('InventoryTableComponent', () => {
   });
 
   describe('reenvío a Salesforce', () => {
-    const ROW = { id: 7, vin: 'LB3F31046TG034231' };
+    // VIN inventado: el repositorio es público y la prueba no mira el valor
+    const ROW = { id: 7, vin: 'LB3F0000000000001' };
 
     it('confirms the resend', () => {
       const ok = spyOn(notifications, 'success');
@@ -43,7 +44,7 @@ describe('InventoryTableComponent', () => {
         .flush({ status: 200 });
 
       expect(ok).toHaveBeenCalledWith(
-        'Vehículo LB3F31046TG034231 marcado para reenvío a Salesforce'
+        'Vehículo LB3F0000000000001 marcado para reenvío a Salesforce'
       );
     });
 
