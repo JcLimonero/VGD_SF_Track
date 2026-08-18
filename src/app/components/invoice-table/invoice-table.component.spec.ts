@@ -10,33 +10,37 @@ import { GenericDetailModalComponent } from '../generic-table/generic-detail-mod
 const BASE = environment.api.baseUrl;
 
 /**
- * Los 22 campos que devuelve `/vgd/invoice`, tomados de una respuesta real del
- * 2026-08-18. Es el esquema completo: si la API agrega uno, agregarlo aquí es lo
- * único que hace falta para que la prueba de etiquetas lo exija.
+ * Los 22 campos que devuelve `/vgd/invoice`. Es el esquema completo: si la API
+ * agrega uno, agregarlo aquí es lo único que hace falta para que la prueba de
+ * etiquetas lo exija.
+ *
+ * Los VALORES son inventados a propósito y no salen de producción: las pruebas
+ * solo miran las llaves (`Object.keys`), así que un VIN, un número de cliente o
+ * una agencia reales no aportarían nada y este repositorio es público.
  */
 const INVOICE = {
-  Id: '24382447',
-  idAgency: '10082',
-  agencyName: 'HONDA GONZALEZ GALLO',
-  order_dms: '65',
-  ndClientDMS: '4721',
+  Id: '1',
+  idAgency: '00000',
+  agencyName: 'AGENCIA DE PRUEBA',
+  order_dms: '1001',
+  ndClientDMS: '1234',
   state: 'Facturado',
-  vin: '3HGRZ1837TM000033',
-  warranty_init_date: '2025-06-12',
+  vin: 'VIN00000000000001',
+  warranty_init_date: '2026-01-15',
   plates: '',
-  payment_method: 'CONTADO NUEVOS',
-  invoice_reference: 'GGVI14030',
-  delivery_date: '2025-06-12',
-  billing_date: '2026-08-18',
+  payment_method: 'CONTADO',
+  invoice_reference: 'FAC0001',
+  delivery_date: '2026-01-20',
+  billing_date: '2026-01-10',
   sendedSalesForce: '1',
   idSalesForce: null,
   resultSF: 'No se encontró la oportunidad',
   insertCorrect: '0',
-  sf_jsonRequest: '{"GV_VIN":"3HGRZ1837TM000033"}',
+  sf_jsonRequest: '{"GV_VIN":"VIN00000000000001"}',
   sf_attempts: '0',
-  timestamp_dms: '2025-06-12 00:00:00',
-  timestamp: '2026-03-17 12:27:37',
-  timestamp_sales_force: '2026-04-07 00:20:01'
+  timestamp_dms: '2026-01-10 00:00:00',
+  timestamp: '2026-01-10 12:00:00',
+  timestamp_sales_force: '2026-01-11 00:00:00'
 };
 
 describe('InvoiceTableComponent', () => {
