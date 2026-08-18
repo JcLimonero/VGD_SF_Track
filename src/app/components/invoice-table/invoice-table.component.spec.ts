@@ -115,9 +115,23 @@ describe('InvoiceTableComponent', () => {
       expect(component.detailTitle).toBe('Detalles de la Orden');
     });
 
-    it('reuses the label of every visible column', () => {
+    it('keeps the wording of the modal people already know', () => {
+      // Estas tres se llamaban asi en el modal anterior a esta rama
+      // (modal-generic en la rama clientDMS_in_Invoices) y se conservan a
+      // proposito, aunque el encabezado de la columna diga otra cosa.
+      expect(component.detailLabels['order_dms']).toBe('No.Pedido');
+      expect(component.detailLabels['ndClientDMS']).toBe('No.Cliente');
+      expect(component.detailLabels['invoice_reference']).toBe(
+        'Referencia de Factura'
+      );
+    });
+
+    it('reuses the label of every visible column it does not rename', () => {
+      const renombradas = ['order_dms', 'ndClientDMS', 'invoice_reference'];
+
       component.columns
         .filter((col) => col.type !== 'button')
+        .filter((col) => !renombradas.includes(String(col.property)))
         .forEach((col) => {
           expect(component.detailLabels[col.property]).toBe(col.label);
         });

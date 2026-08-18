@@ -98,14 +98,13 @@ export class InvoiceTableComponent implements OnInit {
   /**
    * Campos que no salen en la tabla pero sí en el detalle.
    *
-   * Los visibles no se repiten aquí: sus etiquetas se toman de `columns`. La
-   * redacción es la que ya usa el Excel de este módulo, para que un mismo campo
-   * no se llame de dos formas según dónde se mire.
+   * Los visibles no se repiten aquí: sus etiquetas se toman de `columns`, salvo
+   * las tres de `labelOverrides`. La redacción es la que ya usa el Excel de
+   * este módulo.
    */
   private readonly extraLabels: Record<string, string> = {
     Id: 'ID',
     idAgency: 'Clave Agencia',
-    ndClientDMS: 'No. Cliente DMS',
     state: 'Estado',
     warranty_init_date: 'Fecha Inicio Garantía',
     delivery_date: 'Fecha Entrega',
@@ -119,8 +118,27 @@ export class InvoiceTableComponent implements OnInit {
   };
 
   /**
-   * Etiquetas de todos los campos del modal de detalles: `columns` más
-   * `extraLabels`, para no declarar dos veces la de un campo visible.
+   * Campos que SÍ salen en la tabla pero que el detalle nombra distinto.
+   *
+   * Es la redacción del modal anterior a esta rama
+   * (modal-generic.component.html en la rama clientDMS_in_Invoices), que es la
+   * que la gente ya está acostumbrada a leer. 'Pedido' además coincide con
+   * `GV_NumPedidoEx`, el nombre que usa Salesforce para `order_dms`.
+   *
+   * Se declaran aparte de `extraLabels` porque no son lo mismo: aquí se está
+   * pisando a propósito el encabezado de la columna, y conviene que se vea.
+   * OJO: mientras esto exista, la tabla dice 'Número de orden' y el detalle
+   * 'No.Pedido' para el mismo campo.
+   */
+  private readonly labelOverrides: Record<string, string> = {
+    order_dms: 'No.Pedido',
+    ndClientDMS: 'No.Cliente',
+    invoice_reference: 'Referencia de Factura'
+  };
+
+  /**
+   * Etiquetas de todos los campos del modal de detalles: `columns`, más
+   * `extraLabels`, más lo que `labelOverrides` renombre.
    */
   readonly detailLabels: Record<string, string> = this.buildDetailLabels();
 
@@ -276,8 +294,9 @@ export class InvoiceTableComponent implements OnInit {
   }
 
   /**
-   * Arma las etiquetas del detalle con las columnas visibles más las extra. Las
-   * de tipo `button` no corresponden a un campo del registro.
+   * Arma las etiquetas del detalle con las columnas visibles más las extra, y
+   * al final renombra las que el detalle nombra distinto. Las columnas de tipo
+   * `button` no corresponden a un campo del registro.
    */
   private buildDetailLabels(): Record<string, string> {
     const fromColumns: Record<string, string> = {};
@@ -285,7 +304,7 @@ export class InvoiceTableComponent implements OnInit {
       .filter((col) => col.type !== 'button')
       .forEach((col) => (fromColumns[col.property] = col.label));
 
-    return { ...fromColumns, ...this.extraLabels };
+    return { ...fromColumns, ...this.extraLabels, ...this.labelOverrides };
   }
 
   /**
