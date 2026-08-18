@@ -61,7 +61,8 @@ describe('GenericTableComponent', () => {
         row,
         labels: { vin: 'VIN' },
         exclude: null,
-        valueLabels: null
+        valueLabels: null,
+        title: null
       });
     });
 
@@ -87,6 +88,19 @@ describe('GenericTableComponent', () => {
 
       const [, config] = open.calls.mostRecent().args as any[];
       expect(config.data.exclude).toEqual(['request_body']);
+    });
+
+    it('forwards the title so each module names its entity', () => {
+      // Sin esto el modal generico se titula 'Detalles del registro', que no es
+      // como el usuario llama a lo que esta viendo
+      const open = spyOn(component.dialog, 'open');
+      component.modalComponent = GenericDetailModalComponent;
+      component.detailTitle = 'Detalles de la Orden';
+
+      component.openModal({ vin: 'VIN1' });
+
+      const [, config] = open.calls.mostRecent().args as any[];
+      expect(config.data.title).toBe('Detalles de la Orden');
     });
 
     it('falls back to shape detection when no modal is given', () => {

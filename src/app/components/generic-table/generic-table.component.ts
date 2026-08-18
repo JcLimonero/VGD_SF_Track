@@ -55,6 +55,12 @@ export class GenericTableComponent implements OnInit, OnChanges {
   // como icono, pero el modal los mostraría como el número que llega.
   @Input() detailValueLabels: Record<string, Record<string, string>> | null =
     null;
+  // Titulo del modal de detalles; si es null el modal usa el suyo por defecto.
+  // Mismo mecanismo que `jsonTitle`, para que cada modulo nombre su entidad:
+  // el generico dice 'Detalles del registro', que no es como el usuario llama
+  // a lo que esta viendo.
+  @Input() detailTitle: string | null = null;
+
   @Input() sortableColumns: string[] | null = null; // Columnas ordenables; si es null se usa la lista por defecto
   @Input() sendField: string = 'sendedSalesForce'; // Campo que indica si el registro ya se envió; Crabi usa 'isSend'
   @Input() jsonField: string = 'sf_jsonRequest'; // Columna que abre el modal de JSON; Crabi usa 'json_data'
@@ -344,7 +350,8 @@ export class GenericTableComponent implements OnInit, OnChanges {
           row: rowData,
           labels: this.detailLabels,
           exclude: this.detailExclude,
-          valueLabels: this.detailValueLabels
+          valueLabels: this.detailValueLabels,
+          title: this.detailTitle
         },
         width: '80%',
         maxWidth: '800px'
