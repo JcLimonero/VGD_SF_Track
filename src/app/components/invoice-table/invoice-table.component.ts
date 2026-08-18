@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GenericTableComponent } from '../generic-table/generic-table.component';
+import { GenericDetailModalComponent } from '../generic-table/generic-detail-modal.component';
 import { TableColumn } from '../../../@vex/interfaces/table-column.interface';
 import { VanguardiaApiService } from '../../services/vanguardia-api.service';
 import { NotificationService } from '../../services/notification.service';
@@ -71,6 +72,69 @@ export class InvoiceTableComponent implements OnInit {
     'resend',
     'actions'
   ];
+
+  /**
+   * Modal de detalles genérico, el mismo que usan Crabi, Integración SF y
+   * Honda SF.
+   *
+   * Sin este `@Input` la tabla genérica adivinaba el modal por la forma del
+   * registro, y como las facturas traen `ndClientDMS` caían en el de Clientes:
+   * se abría 'Detalles del Cliente' con Nombre, RFC y CURP en 'N/A'. El campo
+   * viene con valor en todas las facturas recientes, así que el detalle salía
+   * equivocado en cada renglón de la primera página.
+   */
+  readonly detailModal = GenericDetailModalComponent;
+
+  /**
+   * Campos que no salen en la tabla pero sí en el detalle.
+   *
+   * Los visibles no se repiten aquí: sus etiquetas se toman de `columns`. La
+   * redacción es la que ya usa el Excel de este módulo, para que un mismo campo
+   * no se llame de dos formas según dónde se mire.
+   */
+  private readonly extraLabels: Record<string, string> = {
+    Id: 'ID',
+    idAgency: 'Clave Agencia',
+    ndClientDMS: 'No. Cliente DMS',
+    state: 'Estado',
+    warranty_init_date: 'Fecha Inicio Garantía',
+    delivery_date: 'Fecha Entrega',
+    plates: 'Placas',
+    payment_method: 'Método de Pago',
+    idSalesForce: 'ID Salesforce',
+    insertCorrect: 'Insertado Correctamente',
+    sf_attempts: 'Intentos SF',
+    timestamp_dms: 'Timestamp DMS',
+    timestamp: 'Timestamp'
+  };
+
+  /**
+   * Etiquetas de todos los campos del modal de detalles: `columns` más
+   * `extraLabels`, para no declarar dos veces la de un campo visible.
+   */
+  readonly detailLabels: Record<string, string> = this.buildDetailLabels();
+
+  /**
+   * `sf_jsonRequest` sale del detalle y se ve en el modal de JSON, que es al
+   * que ya lleva el botón 'Datos'. En la lista de renglones ocupaba el modal
+   * entero con el payload sin formato.
+   */
+  readonly detailExclude = ['sf_jsonRequest'];
+
+  /**
+   * En la tabla estos dos se pintan como icono, pero el modal listaría el valor
+   * tal cual y se leería 'Envio SF: 1'.
+   */
+  readonly detailValueLabels: Record<string, Record<string, string>> = {
+    sendedSalesForce: {
+      '1': 'Enviado a Salesforce',
+      '0': 'Pendiente de envío'
+    },
+    insertCorrect: {
+      '1': 'Sí',
+      '0': 'No'
+    }
+  };
 
   constructor(
     private vanguardiaApi: VanguardiaApiService,
@@ -199,6 +263,19 @@ export class InvoiceTableComponent implements OnInit {
         );
       }
     });
+  }
+
+  /**
+   * Arma las etiquetas del detalle con las columnas visibles más las extra. Las
+   * de tipo `button` no corresponden a un campo del registro.
+   */
+  private buildDetailLabels(): Record<string, string> {
+    const fromColumns: Record<string, string> = {};
+    this.columns
+      .filter((col) => col.type !== 'button')
+      .forEach((col) => (fromColumns[col.property] = col.label));
+
+    return { ...fromColumns, ...this.extraLabels };
   }
 
   /**

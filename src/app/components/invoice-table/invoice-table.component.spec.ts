@@ -5,8 +5,39 @@ import { environment } from '../../../environments/environment';
 
 import { InvoiceTableComponent } from './invoice-table.component';
 import { NotificationService } from '../../services/notification.service';
+import { GenericDetailModalComponent } from '../generic-table/generic-detail-modal.component';
 
 const BASE = environment.api.baseUrl;
+
+/**
+ * Los 22 campos que devuelve `/vgd/invoice`, tomados de una respuesta real del
+ * 2026-08-18. Es el esquema completo: si la API agrega uno, agregarlo aquí es lo
+ * único que hace falta para que la prueba de etiquetas lo exija.
+ */
+const INVOICE = {
+  Id: '24382447',
+  idAgency: '10082',
+  agencyName: 'HONDA GONZALEZ GALLO',
+  order_dms: '65',
+  ndClientDMS: '4721',
+  state: 'Facturado',
+  vin: '3HGRZ1837TM000033',
+  warranty_init_date: '2025-06-12',
+  plates: '',
+  payment_method: 'CONTADO NUEVOS',
+  invoice_reference: 'GGVI14030',
+  delivery_date: '2025-06-12',
+  billing_date: '2026-08-18',
+  sendedSalesForce: '1',
+  idSalesForce: null,
+  resultSF: 'No se encontró la oportunidad',
+  insertCorrect: '0',
+  sf_jsonRequest: '{"GV_VIN":"3HGRZ1837TM000033"}',
+  sf_attempts: '0',
+  timestamp_dms: '2025-06-12 00:00:00',
+  timestamp: '2026-03-17 12:27:37',
+  timestamp_sales_force: '2026-04-07 00:20:01'
+};
 
 describe('InvoiceTableComponent', () => {
   let component: InvoiceTableComponent;
@@ -66,6 +97,53 @@ describe('InvoiceTableComponent', () => {
 
       httpMock.expectNone((r) => r.method === 'PUT');
       expect(failed).toHaveBeenCalledWith('No se encontró el ID del registro');
+    });
+  });
+
+  describe('modal de detalles', () => {
+    it('is chosen explicitly instead of by the shape of the record', () => {
+      // Las facturas traen `ndClientDMS`, que es lo que la tabla genérica usa
+      // para reconocer a un cliente: sin este `@Input` el botón 'Detalles'
+      // abría 'Detalles del Cliente' con Nombre, RFC y CURP en 'N/A'.
+      expect(component.detailModal).toBe(GenericDetailModalComponent);
+    });
+
+    it('reuses the label of every visible column', () => {
+      component.columns
+        .filter((col) => col.type !== 'button')
+        .forEach((col) => {
+          expect(component.detailLabels[col.property]).toBe(col.label);
+        });
+    });
+
+    it('labels every field the endpoint returns', () => {
+      // Un campo sin etiqueta sale en el modal con el nombre de la API
+      const untranslated = Object.keys(INVOICE).filter(
+        (field) =>
+          !component.detailLabels[field] &&
+          !component.detailExclude.includes(field)
+      );
+
+      expect(untranslated).toEqual([]);
+    });
+
+    it('translates the codes instead of showing the raw number', () => {
+      // En la tabla son iconos; en el modal se leería 'Envio SF: 1'
+      expect(component.detailValueLabels['sendedSalesForce']).toEqual({
+        '1': 'Enviado a Salesforce',
+        '0': 'Pendiente de envío'
+      });
+      expect(component.detailValueLabels['insertCorrect']).toEqual({
+        '1': 'Sí',
+        '0': 'No'
+      });
+    });
+
+    it('shows in the JSON modal exactly what the detail modal hides', () => {
+      // Si se excluye un campo y no se muestra en otro lado, se pierde. El
+      // botón 'Datos' abre `sf_jsonRequest`, que es el que la tabla genérica
+      // usa por defecto.
+      expect(component.detailExclude).toEqual(['sf_jsonRequest']);
     });
   });
 });
