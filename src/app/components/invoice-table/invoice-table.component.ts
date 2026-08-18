@@ -105,12 +105,13 @@ export class InvoiceTableComponent implements OnInit {
   private readonly extraLabels: Record<string, string> = {
     Id: 'ID',
     idAgency: 'Clave Agencia',
+    ndClientDMS: 'No.Cliente',
     state: 'Estado',
-    warranty_init_date: 'Fecha Inicio Garantía',
-    delivery_date: 'Fecha Entrega',
+    warranty_init_date: 'Fecha de Inicio de Garantía',
+    delivery_date: 'Fecha de Entrega',
     plates: 'Placas',
     payment_method: 'Método de Pago',
-    idSalesForce: 'ID Salesforce',
+    idSalesForce: 'ID SalesForce',
     insertCorrect: 'Insertado Correctamente',
     sf_attempts: 'Intentos SF',
     timestamp_dms: 'Timestamp DMS',
@@ -125,15 +126,21 @@ export class InvoiceTableComponent implements OnInit {
    * que la gente ya está acostumbrada a leer. 'Pedido' además coincide con
    * `GV_NumPedidoEx`, el nombre que usa Salesforce para `order_dms`.
    *
-   * Se declaran aparte de `extraLabels` porque no son lo mismo: aquí se está
-   * pisando a propósito el encabezado de la columna, y conviene que se vea.
-   * OJO: mientras esto exista, la tabla dice 'Número de orden' y el detalle
-   * 'No.Pedido' para el mismo campo.
+   * Aquí van SOLO los campos que además son columna de la tabla: se está
+   * pisando a propósito su encabezado, y conviene que se vea. Los que no salen
+   * en la tabla llevan su etiqueta en `extraLabels` y ya.
+   *
+   * OJO: mientras esto exista, para el mismo campo la tabla dice 'Número de
+   * orden' y el detalle 'No.Pedido'; 'Estado SF' y 'Resultado SF'; 'Envio SF' y
+   * 'Enviado a SalesForce'; 'Fecha SF' y 'Timestamp SalesForce'.
    */
   private readonly labelOverrides: Record<string, string> = {
     order_dms: 'No.Pedido',
-    ndClientDMS: 'No.Cliente',
-    invoice_reference: 'Referencia de Factura'
+    invoice_reference: 'Referencia de Factura',
+    billing_date: 'Fecha de Facturación',
+    sendedSalesForce: 'Enviado a SalesForce',
+    resultSF: 'Resultado SF',
+    timestamp_sales_force: 'Timestamp SalesForce'
   };
 
   /**
@@ -151,12 +158,22 @@ export class InvoiceTableComponent implements OnInit {
 
   /**
    * En la tabla estos dos se pintan como icono, pero el modal listaría el valor
-   * tal cual y se leería 'Envio SF: 1'.
+   * tal cual y se leería 'Enviado a SalesForce: 1'.
+   *
+   * Sí/No y no 'Enviado a Salesforce', que junto a su etiqueta se leía dos
+   * veces: 'Enviado a SalesForce: Enviado a Salesforce'. Es además la misma
+   * redacción que ya usa el Excel de este módulo para los dos campos.
+   *
+   * OJO al leerlos juntos: 'Enviado a SalesForce: Sí' NO quiere decir que haya
+   * entrado. Medido sobre 999 registros, de 747 marcados como enviados solo
+   * 185 traen 'Insert Correct'; los otros 562 los rechazó Salesforce. El que
+   * dice la verdad es 'Insertado Correctamente', que coincide exactamente con
+   * que 'Resultado SF' sea 'Insert Correct'.
    */
   readonly detailValueLabels: Record<string, Record<string, string>> = {
     sendedSalesForce: {
-      '1': 'Enviado a Salesforce',
-      '0': 'Pendiente de envío'
+      '1': 'Sí',
+      '0': 'No'
     },
     insertCorrect: {
       '1': 'Sí',

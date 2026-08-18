@@ -116,18 +116,43 @@ describe('InvoiceTableComponent', () => {
     });
 
     it('keeps the wording of the modal people already know', () => {
-      // Estas tres se llamaban asi en el modal anterior a esta rama
-      // (modal-generic en la rama clientDMS_in_Invoices) y se conservan a
-      // proposito, aunque el encabezado de la columna diga otra cosa.
-      expect(component.detailLabels['order_dms']).toBe('No.Pedido');
-      expect(component.detailLabels['ndClientDMS']).toBe('No.Cliente');
-      expect(component.detailLabels['invoice_reference']).toBe(
-        'Referencia de Factura'
+      // El detalle se lee palabra por palabra como el modal anterior a esta
+      // rama (modal-generic en la rama clientDMS_in_Invoices), aunque el
+      // encabezado de la columna diga otra cosa. Son las 10 etiquetas suyas.
+      expect(component.detailLabels).toEqual(
+        jasmine.objectContaining({
+          order_dms: 'No.Pedido',
+          ndClientDMS: 'No.Cliente',
+          invoice_reference: 'Referencia de Factura',
+          billing_date: 'Fecha de Facturación',
+          sendedSalesForce: 'Enviado a SalesForce',
+          resultSF: 'Resultado SF',
+          timestamp_sales_force: 'Timestamp SalesForce',
+          warranty_init_date: 'Fecha de Inicio de Garantía',
+          delivery_date: 'Fecha de Entrega',
+          idSalesForce: 'ID SalesForce'
+        })
       );
     });
 
+    it('only overrides columns, never fields the table does not show', () => {
+      // `labelOverrides` documenta que pisa encabezados; si entra ahi un campo
+      // que no es columna, el comentario deja de ser cierto
+      const visibles = component.columns
+        .filter((col) => col.type !== 'button')
+        .map((col) => String(col.property));
+
+      const overrides = component['labelOverrides'] as Record<string, string>;
+
+      Object.keys(overrides).forEach((field) => {
+        expect(visibles).toContain(field);
+      });
+    });
+
     it('reuses the label of every visible column it does not rename', () => {
-      const renombradas = ['order_dms', 'ndClientDMS', 'invoice_reference'];
+      const renombradas = Object.keys(
+        component['labelOverrides'] as Record<string, string>
+      );
 
       component.columns
         .filter((col) => col.type !== 'button')
@@ -149,15 +174,27 @@ describe('InvoiceTableComponent', () => {
     });
 
     it('translates the codes instead of showing the raw number', () => {
-      // En la tabla son iconos; en el modal se leería 'Envio SF: 1'
+      // En la tabla son iconos; en el modal se leería 'Enviado a SalesForce: 1'
       expect(component.detailValueLabels['sendedSalesForce']).toEqual({
-        '1': 'Enviado a Salesforce',
-        '0': 'Pendiente de envío'
+        '1': 'Sí',
+        '0': 'No'
       });
       expect(component.detailValueLabels['insertCorrect']).toEqual({
         '1': 'Sí',
         '0': 'No'
       });
+    });
+
+    it('does not repeat the label inside the value', () => {
+      // 'Enviado a SalesForce: Enviado a Salesforce' se leia dos veces
+      Object.entries(component.detailValueLabels).forEach(
+        ([field, valores]) => {
+          const etiqueta = component.detailLabels[field];
+          Object.values(valores).forEach((valor) => {
+            expect(valor.toLowerCase()).not.toBe(etiqueta.toLowerCase());
+          });
+        }
+      );
     });
 
     it('shows in the JSON modal exactly what the detail modal hides', () => {
