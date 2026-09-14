@@ -71,3 +71,39 @@ jobs:
           path: coverage/
           if-no-files-found: ignore
           retention-days: 7
+
+  # El portal es un proyecto npm aparte (carpeta portal/), con sus propias
+  # dependencias y su propio build. Va en un job separado para que un fallo suyo
+  # no se confunda con uno de la aplicación principal, y para que ambos corran
+  # en paralelo.
+  portal:
+    name: "Portal: formato, tipos y build"
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: portal
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: portal/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Verificar formato
+        run: npm run format:check
+
+      - name: Verificar tipos
+        run: npm run typecheck
+
+      # El build hace la revisión de tipos de las plantillas, que tsc no ve.
+      - name: Build de producción
+        run: npm run build
