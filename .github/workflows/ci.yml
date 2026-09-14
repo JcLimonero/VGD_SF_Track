@@ -107,3 +107,42 @@ jobs:
       # El build hace la revisión de tipos de las plantillas, que tsc no ve.
       - name: Build de producción
         run: npm run build
+
+  # El puente es el tercer proyecto npm del repositorio: guarda las credenciales
+  # y traduce cada API al modelo del portal. Va en su propio job por lo mismo que
+  # el portal: para que un fallo suyo no se confunda con los otros.
+  puente:
+    name: "Puente: formato, tipos, contrato y pruebas"
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: puente
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: puente/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Verificar formato
+        run: npm run format:check
+
+      - name: Verificar tipos
+        run: npm run typecheck
+
+      # Comprueba que los tipos del puente sigan siendo los mismos que los del
+      # portal. Si alguien cambia un campo de un solo lado, esto deja de compilar.
+      - name: Verificar el contrato con el portal
+        run: npm run check:contrato
+
+      - name: Pruebas
+        run: npm test
