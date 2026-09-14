@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   verify:
-    name: Typecheck, tests y build
+    name: "VGD SF Track: typecheck, tests y build"
     runs-on: ubuntu-latest
 
     steps:
@@ -77,7 +77,7 @@ jobs:
   # no se confunda con uno de la aplicación principal, y para que ambos corran
   # en paralelo.
   portal:
-    name: "Portal: formato, tipos y build"
+    name: "DS Monitor · portal: formato, tipos y build"
     runs-on: ubuntu-latest
 
     defaults:
@@ -112,7 +112,7 @@ jobs:
   # y traduce cada API al modelo del portal. Va en su propio job por lo mismo que
   # el portal: para que un fallo suyo no se confunda con los otros.
   puente:
-    name: "Puente: formato, tipos, contrato y pruebas"
+    name: "DS Monitor · puente: formato, tipos, contrato y pruebas"
     runs-on: ubuntu-latest
 
     defaults:
