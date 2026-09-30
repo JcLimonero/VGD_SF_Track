@@ -75,6 +75,7 @@ export class SalesforceFilterComponent {
         { emitEvent: false }
       );
     }
+    this.onFilter();
   }
 
   closeDropdown(event: Event): void {

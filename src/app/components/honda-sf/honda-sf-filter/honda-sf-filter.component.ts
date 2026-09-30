@@ -51,6 +51,9 @@ export class HondaSfFilterComponent implements OnInit, OnChanges {
   filterForm: FormGroup;
   agencies: any[] = [];
 
+  /** Texto del buscador de cada lista de agencias, por campo */
+  agencyQuery: Record<string, string> = {};
+
   /** Etiqueta elegida en cada lista, para mostrarla en el botón del desplegable */
   selected: Record<string, string> = {};
 
@@ -89,6 +92,26 @@ export class HondaSfFilterComponent implements OnInit, OnChanges {
     }));
   }
 
+  /** Opciones visibles: en el catálogo de agencias se filtran por el buscador. */
+  filteredOptions(field: HondaSfFilterField): FilterOption[] {
+    const options = this.optionsFor(field);
+    if (!field.fromAgencies) return options;
+
+    const query = this.normalizeText(this.agencyQuery[field.field]);
+    if (!query) return options;
+    return options.filter((option) =>
+      this.normalizeText(option.label).includes(query)
+    );
+  }
+
+  /** Al cerrar el menú de agencias se limpia su buscador. */
+  onMenuToggle(field: HondaSfFilterField, event: Event): void {
+    const details = event.target as HTMLDetailsElement | null;
+    if (field.fromAgencies && details && !details.open) {
+      this.agencyQuery[field.field] = '';
+    }
+  }
+
   isDropdown(field: HondaSfFilterField): boolean {
     return !!field.fromAgencies || !!field.options?.length;
   }
@@ -101,6 +124,14 @@ export class HondaSfFilterComponent implements OnInit, OnChanges {
     this.selected = {};
     this.filterForm.reset(this.emptyValues());
     this.filterChange.emit(this.emptyValues());
+  }
+
+  /** Elige una agencia del catálogo, sin casilla. Volver a pulsarla la quita. */
+  pickAgency(field: HondaSfFilterField, option: FilterOption): void {
+    const event = {
+      target: { checked: !this.isChecked(field, option) }
+    } as unknown as Event;
+    this.onOptionToggle(field, option, event);
   }
 
   onOptionToggle(
@@ -121,6 +152,7 @@ export class HondaSfFilterComponent implements OnInit, OnChanges {
       delete this.selected[field.field];
       this.filterForm.patchValue({ [field.field]: '' }, { emitEvent: false });
     }
+    this.onFilter();
   }
 
   isChecked(field: HondaSfFilterField, option: FilterOption): boolean {
@@ -160,12 +192,21 @@ export class HondaSfFilterComponent implements OnInit, OnChanges {
    */
   private buildForm(): void {
     this.selected = {};
+    this.agencyQuery = {};
     this.filterForm = this.fb.group(
       this.fields.reduce(
         (controls, field) => ({ ...controls, [field.field]: [''] }),
         {} as Record<string, any>
       )
     );
+  }
+
+  private normalizeText(value: unknown): string {
+    return String(value ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
   }
 
   private emptyValues(): Record<string, string> {

@@ -22,6 +22,7 @@ export class InvoiceTableComponent implements OnInit {
   error: string | null = null;
   total = 0;
   defaultPageSize = 10;
+  currentPageSize = 10;
   pageIndex = 0;
   currentFilters: {
     order_dms?: string;
@@ -207,6 +208,7 @@ export class InvoiceTableComponent implements OnInit {
    */
 
   loadPage(pageIndex: number, pageSize: number): void {
+    this.currentPageSize = pageSize;
     this.loading = true;
     this.error = null;
 
@@ -268,7 +270,7 @@ export class InvoiceTableComponent implements OnInit {
     // Guardar filtros y reiniciar a primera página
     this.currentFilters = { ...filters };
     this.pageIndex = 0;
-    this.loadPage(this.pageIndex, this.defaultPageSize);
+    this.loadPage(this.pageIndex, this.currentPageSize);
   }
 
   onSortChange(sort: { column: string; direction: 'asc' | 'desc' }): void {
@@ -281,7 +283,7 @@ export class InvoiceTableComponent implements OnInit {
     }
     // Siempre ir a página 1 al cambiar o resetear ordenamiento
     this.pageIndex = 0;
-    this.loadPage(this.pageIndex, this.defaultPageSize);
+    this.loadPage(this.pageIndex, this.currentPageSize);
   }
 
   resendToSalesForce(row: any): void {
@@ -300,7 +302,7 @@ export class InvoiceTableComponent implements OnInit {
         this.notifications.success(
           `Orden ${row.order_dms} marcada para reenvío a Salesforce`
         );
-        this.loadPage(this.pageIndex, this.defaultPageSize);
+        this.loadPage(this.pageIndex, this.currentPageSize);
       },
       error: (error) => {
         this.notifications.error(
@@ -328,7 +330,7 @@ export class InvoiceTableComponent implements OnInit {
    * Recarga los datos del inventario
    */
   refreshData(): void {
-    this.loadPage(this.pageIndex, this.defaultPageSize);
+    this.loadPage(this.pageIndex, this.currentPageSize);
   }
 
   /**

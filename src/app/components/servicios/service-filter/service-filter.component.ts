@@ -27,6 +27,34 @@ export class ServiceFilterComponent implements OnInit {
 
   filterForm: FormGroup;
   agencies: any[] = [];
+
+  /** Texto del buscador del menú de agencias */
+  agencyQuery = '';
+
+  /** Agencias cuyo nombre coincide con el buscador (sin mayúsculas ni acentos). */
+  get filteredAgencies(): any[] {
+    const query = this.normalizeText(this.agencyQuery);
+    if (!query) return this.agencies;
+    return this.agencies.filter((agency) =>
+      this.normalizeText(agency?.name).includes(query)
+    );
+  }
+
+  /** Al cerrar el menú de agencias se limpia el buscador. */
+  onAgencyMenuToggle(event: Event): void {
+    const details = event.target as HTMLDetailsElement | null;
+    if (details && !details.open) {
+      this.agencyQuery = '';
+    }
+  }
+
+  private normalizeText(value: unknown): string {
+    return String(value ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+  }
   selectedAgency: string = ''; // Nombre mostrado en UI
   selectedAgencyId: string = ''; // ID para enviar a la API
 
@@ -59,22 +87,20 @@ export class ServiceFilterComponent implements OnInit {
     });
   }
 
-  onAgencySelect(agency: any, event: Event): void {
-    const input = event.target as HTMLInputElement | null;
-    if (!input) return;
-
-    if (input.checked) {
+  onAgencySelect(agency: any): void {
+    if (this.selectedAgency === agency.name) {
+      this.selectedAgency = '';
+      this.selectedAgencyId = '';
+      this.filterForm.patchValue({ idAgency: '' }, { emitEvent: false });
+    } else {
       this.selectedAgency = agency.name;
       this.selectedAgencyId = agency.idAgency;
       this.filterForm.patchValue(
         { idAgency: agency.idAgency },
         { emitEvent: false }
       );
-    } else if (this.selectedAgency === agency.name) {
-      this.selectedAgency = '';
-      this.selectedAgencyId = '';
-      this.filterForm.patchValue({ idAgency: '' }, { emitEvent: false });
     }
+    this.onFilter();
   }
 
   onFilter(): void {
@@ -151,6 +177,7 @@ export class ServiceFilterComponent implements OnInit {
       { sendedSalesForce: next },
       { emitEvent: false }
     );
+    this.onFilter();
   }
 
   onInsertToggle(kind: 'insertado' | 'error', event: Event): void {
@@ -162,5 +189,6 @@ export class ServiceFilterComponent implements OnInit {
     if (kind === 'error' && input.checked) {
       this.filterForm.patchValue({ insertado: false }, { emitEvent: false });
     }
+    this.onFilter();
   }
 }

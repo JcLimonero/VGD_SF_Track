@@ -1,21 +1,33 @@
-<div class="filter-bar-wrapper px-[2rem] py-5">
+<div class="filter-bar-wrapper px-4 py-5">
   <form [formGroup]="filterForm" (ngSubmit)="onFilter()" >
     <div class="filter-bar">
 
     <!-- Dropdown: Agencias -->
-        <details class="dropdown">
+        <details class="dropdown" (toggle)="onAgencyMenuToggle($event)">
           <summary class="dropdown-trigger">
             {{ selectedAgency || 'Agencia' }} 
             <span class="material-symbols-outlined">keyboard_arrow_down</span>
           </summary>
-          <div class="dropdown-panel">
-            <label class="checkbox" *ngFor="let agency of agencies">
-              <input 
-                type="checkbox"
-                [checked]="selectedAgency === agency.name"
-                (change)="onAgencySelect(agency, $event); closeDropdown($event)" />
-              {{ agency.name }}
-            </label>
+          <div class="dropdown-panel dropdown-panel--search">
+            <input
+              class="dropdown-search"
+              type="search"
+              placeholder="Buscar agencia"
+              [value]="agencyQuery"
+              (input)="agencyQuery = $any($event.target).value"
+              (click)="$event.stopPropagation()"
+              (keydown.enter)="$event.preventDefault(); $event.stopPropagation()" />
+            <div class="dropdown-options">
+              <button
+                type="button"
+                class="dropdown-option"
+                *ngFor="let agency of filteredAgencies"
+                [class.is-selected]="selectedAgency === agency.name"
+                (click)="onAgencySelect(agency); closeDropdown($event)">
+                {{ agency.name }}
+              </button>
+              <p class="dropdown-empty" *ngIf="filteredAgencies.length === 0">Sin coincidencias</p>
+            </div>
           </div>
         </details>
 
@@ -26,6 +38,7 @@
             type="text"
             placeholder="VIN"
             formControlName="vin"
+            (change)="onFilter()"
           />
         </div>
 
@@ -100,7 +113,9 @@
 
         <!-- Dropdown: Salesforce status -->
         <details class="dropdown">
-          <summary class="dropdown-trigger">Salesforce <span class="material-symbols-outlined">keyboard_arrow_down</span>
+          <summary class="dropdown-trigger">
+            <span class="dropdown-value">{{ filterForm.get('sendedSalesForce')?.value === '1' ? 'Enviado' : filterForm.get('sendedSalesForce')?.value === '0' ? 'No enviado' : 'Salesforce' }}</span>
+            <span class="material-symbols-outlined">keyboard_arrow_down</span>
           </summary>
           <div class="dropdown-panel">
             <label class="checkbox">
@@ -120,7 +135,9 @@
 
         <!-- Dropdown: Inserción status -->
         <details class="dropdown">
-          <summary class="dropdown-trigger">Estado SF<span class="material-symbols-outlined">keyboard_arrow_down</span>
+          <summary class="dropdown-trigger">
+            <span class="dropdown-value">{{ filterForm.get('insertado')?.value ? 'Insertado' : filterForm.get('error')?.value ? 'Error' : 'Estado SF' }}</span>
+            <span class="material-symbols-outlined">keyboard_arrow_down</span>
           </summary>
           <div class="dropdown-panel">
             <label class="checkbox">
@@ -144,7 +161,7 @@
           </div>
         </details>
 
-        <div class=" flex gap-2">
+        <div class="filter-actions">
           <!-- Botón Buscar -->
           <button type="submit" class="filter-btn" title="Aplicar filtros">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

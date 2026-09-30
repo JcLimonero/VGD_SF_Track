@@ -158,7 +158,11 @@ describe('HondaSfFilterComponent', () => {
     component.onOptionToggle(FIELDS[2], { label: 'Nuevo', value: 'Nuevo' }, toggle(true));
     component.onClearFilters();
 
-    expect(emitted[0]).toEqual({ dealer_id: '', email: '', lead_stage: '' });
+    expect(emitted[emitted.length - 1]).toEqual({
+      dealer_id: '',
+      email: '',
+      lead_stage: ''
+    });
     expect(component.selected).toEqual({});
   });
 

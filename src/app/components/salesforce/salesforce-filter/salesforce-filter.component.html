@@ -1,17 +1,17 @@
-<div class="filter-bar-wrapper px-[2rem] py-5">
+<div class="filter-bar-wrapper px-4 py-5">
   <form [formGroup]="filterForm" (ngSubmit)="onFilter()">
     <div class="filter-bar">
 
       <!-- VIN -->
       <div class="filter-field">
         <label for="sf-vin">VIN</label>
-        <input id="sf-vin" type="text" formControlName="vin" placeholder="VIN" />
+        <input id="sf-vin" type="text" formControlName="vin" placeholder="VIN" (change)="onFilter()" />
       </div>
 
       <!-- Agencia -->
       <div class="filter-field">
         <label for="sf-agency">Agencia</label>
-        <input id="sf-agency" type="text" formControlName="agencyName" placeholder="Agencia" />
+        <input id="sf-agency" type="text" formControlName="agencyName" placeholder="Agencia" (change)="onFilter()" />
       </div>
 
       <!-- Dropdown: Envío a Salesforce -->
@@ -31,7 +31,7 @@
         </div>
       </details>
 
-      <div class="flex gap-2">
+      <div class="filter-actions">
         <!-- Botón Buscar -->
         <button type="submit" class="filter-btn" title="Aplicar filtros">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

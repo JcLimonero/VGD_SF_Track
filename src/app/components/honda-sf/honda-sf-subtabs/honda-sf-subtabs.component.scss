@@ -23,13 +23,13 @@
 
 .subtab:hover {
     color: #000;
-    border-color: #ff5c20;
+    border-color: #1a1a1a;
 }
 
 .subtab.active-subtab {
     background: #fff;
     color: #000;
     font-weight: 600;
-    border-color: #ff5c20;
-    box-shadow: 0 0 0 2px rgba(255, 92, 32, 0.15);
+    border-color: #1a1a1a;
+    box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.15);
 }

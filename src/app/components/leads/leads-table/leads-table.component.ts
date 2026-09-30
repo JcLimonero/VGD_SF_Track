@@ -95,6 +95,7 @@ export class LeadsTableComponent implements OnInit {
   }
 
   loadPage(pageIndex: number, pageSize: number): void {
+    this.currentPageSize = pageSize;
     this.loading = true;
     this.error = null;
 
@@ -149,7 +150,7 @@ export class LeadsTableComponent implements OnInit {
   }): void {
     this.currentFilters = { ...filters };
     this.pageIndex = 0;
-    this.loadPage(this.pageIndex, this.defaultPageSize);
+    this.loadPage(this.pageIndex, this.currentPageSize);
   }
 
   onSortChange(sort: { column: string; direction: 'asc' | 'desc' }): void {
@@ -160,7 +161,7 @@ export class LeadsTableComponent implements OnInit {
       this.currentSort = sort;
     }
     this.pageIndex = 0;
-    this.loadPage(this.pageIndex, this.defaultPageSize);
+    this.loadPage(this.pageIndex, this.currentPageSize);
   }
 
   resendToSalesForce(row: any): void {
