@@ -227,7 +227,7 @@ describe('CrabiTableComponent', () => {
     const req = flushOrders();
     expect(req.request.method).toBe('GET');
     expect(req.request.params.get('page')).toBe('1');
-    expect(req.request.params.get('perpage')).toBe('5');
+    expect(req.request.params.get('perpage')).toBe('10');
   });
 
   it('maps items and total from the API envelope', () => {
