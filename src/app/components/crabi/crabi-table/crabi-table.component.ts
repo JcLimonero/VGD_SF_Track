@@ -23,8 +23,8 @@ export class CrabiTableComponent implements OnInit {
 
   // Paginación - respetando el default de la API
   pageIndex = 0;
-  defaultPageSize = 5;
-  currentPageSize = 5;
+  defaultPageSize = 10;
+  currentPageSize = 10;
 
   // Filtros
   currentFilters: CrabiFilters = {};

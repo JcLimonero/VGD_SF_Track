@@ -81,7 +81,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
 
   // Paginación personalizada
   currentPage = 0;
-  pageSize = 5;
+  pageSize = 10;
   totalPages = 0;
   Math = Math; // Para usar Math.min en el template
   pageSizeOptions = [5, 10, 25, 50, 100];
@@ -504,7 +504,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
     `
       .title {
         text-decoration: underline;
-        text-decoration-color: #ff5c20;
+        text-decoration-color: #1a1a1a;
         text-decoration-thickness: 3px;
         align-self: center;
       }

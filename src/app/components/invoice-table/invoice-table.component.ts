@@ -21,7 +21,7 @@ export class InvoiceTableComponent implements OnInit {
   loading = false;
   error: string | null = null;
   total = 0;
-  defaultPageSize = 5; // Tamaño por defecto
+  defaultPageSize = 10;
   pageIndex = 0;
   currentFilters: {
     order_dms?: string;

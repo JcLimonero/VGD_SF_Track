@@ -41,8 +41,8 @@ export class HondaSfTableComponent implements OnInit, OnChanges {
 
   // Paginación
   pageIndex = 0;
-  defaultPageSize = 5;
-  currentPageSize = 5;
+  defaultPageSize = 10;
+  currentPageSize = 10;
 
   // Filtros
   currentFilters: Record<string, string> = {};

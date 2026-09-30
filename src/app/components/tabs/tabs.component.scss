@@ -1,72 +1,58 @@
-li {
-    // padding-left: 0.5rem;
-    // padding-right: 0.5rem;
-    margin-left: 0.25rem;
-    margin-right: 0.25rem;
-    padding-bottom: 0.3rem;
-    transition: all 0.3s ease;
+:host {
+  display: block;
+  min-width: 0;
 }
 
-@media (min-width: 640px) {
-    li {
-        margin-left: 0.5rem;
-        margin-right: 0.5rem;
-        padding-left: 0.4rem;
-        padding-right: 0.4rem;
-    }
+.tabs-wrap {
+  min-width: 0;
 }
 
-@media (min-width: 1280px) {
-    li {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
+.ui-tabs {
+  display: inline-flex;
+  max-width: 100%;
+  gap: 2px;
+  margin: 0;
+  padding: 4px;
+  box-sizing: border-box;
+  list-style: none;
+  overflow-x: auto;
+  border-radius: 8px;
+  background: #eef0f3;
+  scrollbar-width: thin;
+}
+
+.ui-tab {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  white-space: nowrap;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: #6c757d;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+
+  &:hover {
+    color: #1a1a1a;
+  }
+
+  &.active-tab {
+    background: #fff;
+    color: #1a1a1a;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+  }
 }
 
 .icon-tab {
-    font-size: 1.5rem;
-    color: #848484;
-    transition: color 0.3s ease;
-}
-
-@media (min-width: 640px) {
-    .icon-tab {
-        font-size: 2rem;
-    }
-}
-
-li:hover {
-    border-bottom: 3px solid #FF5C20;
-    cursor: pointer;
-}
-
-li:hover .icon-tab {
-    color: #FF5C20;
-}
-
-li:hover span:last-child {
-    color: black;
-}
-
-/* Estilos para tab activo */
-li.active-tab {
-    border-bottom: 3px solid #FF5C20;
-}
-
-li.active-tab .icon-tab {
-    color: #FF5C20;
-}
-
-li.active-tab span:last-child {
-    color: black;
-    font-weight: 600;
-}
-
-.tab {
-    border-bottom: 1px solid #888888;
-    border-right: 3px solid black;
-    border-left: 3px solid black;
-    border-top: 3px solid black;
-    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 1rem 1rem 0 0;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  color: inherit;
 }
