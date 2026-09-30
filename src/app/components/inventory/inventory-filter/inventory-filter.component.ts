@@ -28,6 +28,34 @@ export class InventoryFilterComponent implements OnInit {
 
   filterForm: FormGroup;
   agencies: any[] = [];
+
+  /** Texto del buscador del menú de agencias */
+  agencyQuery = '';
+
+  /** Agencias cuyo nombre coincide con el buscador (sin mayúsculas ni acentos). */
+  get filteredAgencies(): any[] {
+    const query = this.normalizeText(this.agencyQuery);
+    if (!query) return this.agencies;
+    return this.agencies.filter((agency) =>
+      this.normalizeText(agency?.name).includes(query)
+    );
+  }
+
+  /** Al cerrar el menú de agencias se limpia el buscador. */
+  onAgencyMenuToggle(event: Event): void {
+    const details = event.target as HTMLDetailsElement | null;
+    if (details && !details.open) {
+      this.agencyQuery = '';
+    }
+  }
+
+  private normalizeText(value: unknown): string {
+    return String(value ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+  }
   selectedAgency: string = ''; // Nombre mostrado en UI
   selectedAgencyId: string = ''; // ID para enviar a la API
   selectedStatus: string = ''; // Estado seleccionado
@@ -63,36 +91,20 @@ export class InventoryFilterComponent implements OnInit {
     });
   }
 
-  onAgencySelect(agency: any, event: Event): void {
-    const input = event.target as HTMLInputElement | null;
-    if (!input) return;
-
-    console.log(
-      'Agencia seleccionada:',
-      agency.name,
-      'ID:',
-      agency.idAgency,
-      'checked:',
-      input.checked
-    );
-
-    if (input.checked) {
+  onAgencySelect(agency: any): void {
+    if (this.selectedAgency === agency.name) {
+      this.selectedAgency = '';
+      this.selectedAgencyId = '';
+      this.filterForm.patchValue({ idAgency: '' }, { emitEvent: false });
+    } else {
       this.selectedAgency = agency.name;
       this.selectedAgencyId = agency.idAgency;
       this.filterForm.patchValue(
         { idAgency: agency.idAgency },
         { emitEvent: false }
       );
-      console.log(
-        'Agencia guardada en formulario - ID:',
-        this.filterForm.get('idAgency')?.value
-      );
-    } else if (this.selectedAgency === agency.name) {
-      this.selectedAgency = '';
-      this.selectedAgencyId = '';
-      this.filterForm.patchValue({ idAgency: '' }, { emitEvent: false });
-      console.log('Agencia deseleccionada');
     }
+    this.onFilter();
   }
 
   onFilter(): void {
@@ -182,6 +194,7 @@ export class InventoryFilterComponent implements OnInit {
       { sendedSalesForce: next },
       { emitEvent: false }
     );
+    this.onFilter();
   }
 
   onInsertToggle(kind: 'insertado' | 'error', event: Event): void {
@@ -193,6 +206,7 @@ export class InventoryFilterComponent implements OnInit {
     if (kind === 'error' && input.checked) {
       this.filterForm.patchValue({ insertado: false }, { emitEvent: false });
     }
+    this.onFilter();
   }
 
   onStatusToggle(statusValue: string, event: Event): void {
@@ -216,6 +230,7 @@ export class InventoryFilterComponent implements OnInit {
       );
       console.log('Estado deseleccionado');
     }
+    this.onFilter();
   }
 
   onTypeToggle(typeValue: string, event: Event): void {
@@ -236,5 +251,6 @@ export class InventoryFilterComponent implements OnInit {
       this.filterForm.patchValue({ typeDescription: '' }, { emitEvent: false });
       console.log('Tipo deseleccionado');
     }
+    this.onFilter();
   }
 }

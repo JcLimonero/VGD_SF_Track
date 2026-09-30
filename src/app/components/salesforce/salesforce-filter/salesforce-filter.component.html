@@ -5,13 +5,13 @@
       <!-- VIN -->
       <div class="filter-field">
         <label for="sf-vin">VIN</label>
-        <input id="sf-vin" type="text" formControlName="vin" placeholder="VIN" />
+        <input id="sf-vin" type="text" formControlName="vin" placeholder="VIN" (change)="onFilter()" />
       </div>
 
       <!-- Agencia -->
       <div class="filter-field">
         <label for="sf-agency">Agencia</label>
-        <input id="sf-agency" type="text" formControlName="agencyName" placeholder="Agencia" />
+        <input id="sf-agency" type="text" formControlName="agencyName" placeholder="Agencia" (change)="onFilter()" />
       </div>
 
       <!-- Dropdown: Envío a Salesforce -->

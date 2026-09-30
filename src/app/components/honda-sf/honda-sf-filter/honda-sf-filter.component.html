@@ -5,20 +5,49 @@
       <ng-container *ngFor="let field of fields">
 
         <!-- Lista de valores: la API compara exacto, escribirlos a mano no sirve -->
-        <details class="dropdown" *ngIf="isDropdown(field); else textField">
+        <details
+          class="dropdown"
+          *ngIf="isDropdown(field); else textField"
+          (toggle)="onMenuToggle(field, $event)">
           <summary class="dropdown-trigger">
             {{ selected[field.field] || field.label }}
             <span class="material-symbols-outlined">keyboard_arrow_down</span>
           </summary>
-          <div class="dropdown-panel">
-            <label class="checkbox" *ngFor="let option of optionsFor(field)">
-              <input
-                type="checkbox"
-                [checked]="isChecked(field, option)"
-                (change)="onOptionToggle(field, option, $event); closeDropdown($event)" />
-              {{ option.label }}
-            </label>
+          <!-- Catálogo de agencias: con buscador por nombre -->
+          <div class="dropdown-panel dropdown-panel--search" *ngIf="field.fromAgencies; else plainPanel">
+            <input
+              class="dropdown-search"
+              type="search"
+              placeholder="Buscar agencia"
+              [value]="agencyQuery[field.field] || ''"
+              (input)="agencyQuery[field.field] = $any($event.target).value"
+              (click)="$event.stopPropagation()"
+              (keydown.enter)="$event.preventDefault(); $event.stopPropagation()" />
+            <div class="dropdown-options">
+              <button
+                type="button"
+                class="dropdown-option"
+                *ngFor="let option of filteredOptions(field)"
+                [class.is-selected]="isChecked(field, option)"
+                (click)="pickAgency(field, option); closeDropdown($event)">
+                {{ option.label }}
+              </button>
+              <p class="dropdown-empty" *ngIf="filteredOptions(field).length === 0">Sin coincidencias</p>
+            </div>
           </div>
+
+          <!-- Listas cortas del catálogo: sin buscador -->
+          <ng-template #plainPanel>
+            <div class="dropdown-panel">
+              <label class="checkbox" *ngFor="let option of optionsFor(field)">
+                <input
+                  type="checkbox"
+                  [checked]="isChecked(field, option)"
+                  (change)="onOptionToggle(field, option, $event); closeDropdown($event)" />
+                {{ option.label }}
+              </label>
+            </div>
+          </ng-template>
         </details>
 
         <!-- Texto libre: solo para valores que se copian y pegan completos -->
@@ -29,7 +58,8 @@
               [id]="'honda-sf-' + field.field"
               type="text"
               [formControlName]="field.field"
-              [placeholder]="field.label + ' exacto'" />
+              [placeholder]="field.label + ' exacto'"
+              (change)="onFilter()" />
           </div>
         </ng-template>
 

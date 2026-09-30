@@ -28,6 +28,34 @@ export class InvoiceFilterComponent implements OnInit {
 
   filterForm: FormGroup;
   agencies: any[] = [];
+
+  /** Texto del buscador del menú de agencias */
+  agencyQuery = '';
+
+  /** Agencias cuyo nombre coincide con el buscador (sin mayúsculas ni acentos). */
+  get filteredAgencies(): any[] {
+    const query = this.normalizeText(this.agencyQuery);
+    if (!query) return this.agencies;
+    return this.agencies.filter((agency) =>
+      this.normalizeText(agency?.name).includes(query)
+    );
+  }
+
+  /** Al cerrar el menú de agencias se limpia el buscador. */
+  onAgencyMenuToggle(event: Event): void {
+    const details = event.target as HTMLDetailsElement | null;
+    if (details && !details.open) {
+      this.agencyQuery = '';
+    }
+  }
+
+  private normalizeText(value: unknown): string {
+    return String(value ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+  }
   selectedAgency: string = '';
 
   constructor(
@@ -60,24 +88,15 @@ export class InvoiceFilterComponent implements OnInit {
     });
   }
 
-  onAgencySelect(agencyName: string, event: Event): void {
-    const input = event.target as HTMLInputElement | null;
-    if (!input) return;
-
-    console.log('Agencia seleccionada:', agencyName, 'checked:', input.checked);
-
-    if (input.checked) {
-      this.selectedAgency = agencyName;
-      this.filterForm.patchValue({ agencyName }, { emitEvent: false });
-      console.log(
-        'Agencia guardada en formulario:',
-        this.filterForm.get('agencyName')?.value
-      );
-    } else if (this.selectedAgency === agencyName) {
+  onAgencySelect(agencyName: string): void {
+    if (this.selectedAgency === agencyName) {
       this.selectedAgency = '';
       this.filterForm.patchValue({ agencyName: '' }, { emitEvent: false });
-      console.log('Agencia deseleccionada');
+    } else {
+      this.selectedAgency = agencyName;
+      this.filterForm.patchValue({ agencyName }, { emitEvent: false });
     }
+    this.onFilter();
   }
 
   onFilter(): void {
@@ -178,6 +197,7 @@ export class InvoiceFilterComponent implements OnInit {
       { sendedSalesForce: next },
       { emitEvent: false }
     );
+    this.onFilter();
   }
 
   onInsertToggle(kind: 'insertado' | 'error', event: Event): void {
@@ -189,5 +209,6 @@ export class InvoiceFilterComponent implements OnInit {
     if (kind === 'error' && input.checked) {
       this.filterForm.patchValue({ insertado: false }, { emitEvent: false });
     }
+    this.onFilter();
   }
 }
