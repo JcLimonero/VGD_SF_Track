@@ -46,7 +46,7 @@ interface DetailEntry {
     `
       .title {
         text-decoration: underline;
-        text-decoration-color: #ff5c20;
+        text-decoration-color: #1a1a1a;
         text-decoration-thickness: 3px;
         align-self: center;
       }

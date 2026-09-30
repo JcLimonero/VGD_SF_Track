@@ -18,6 +18,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   isLoading = false;
   errorMessage = '';
+  showPassword = false;
 
   private readonly VALID_PASSWORD = 'Vanguardia123';
 
@@ -55,6 +56,10 @@ export class LoginComponent {
       }
       this.isLoading = false;
     }, 1000);
+  }
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
   }
 
   get passwordControl() {

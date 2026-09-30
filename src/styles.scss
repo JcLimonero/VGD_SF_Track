@@ -6,6 +6,50 @@
 @use "./@vex/styles/core";
 
 /*
+  Branding Grupo Vanguardia: Montserrat (cargada en index.html) y lienzo
+  claro #f4f5f7. --vex-font alimenta la tipografia de Material y de Vex;
+  body y los controles nativos se fijan aparte porque no la heredan.
+*/
+body {
+  --vex-font: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --vex-background-background: #f4f5f7;
+  font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+  color: #212529;
+  background-color: #f4f5f7;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+::selection {
+  background: rgba(26, 26, 26, 0.18);
+}
+
+.vanguardia-logo {
+  display: inline-block;
+  flex-shrink: 0;
+  background-color: #1a1a1a;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.vanguardia-logo--imagotipo {
+  aspect-ratio: 422 / 100;
+  -webkit-mask-image: url("/assets/brand/grupo-vanguardia-logo.png");
+  mask-image: url("/assets/brand/grupo-vanguardia-logo.png");
+}
+
+/*
   You can override any CSS Variable or style here
   Example:
 

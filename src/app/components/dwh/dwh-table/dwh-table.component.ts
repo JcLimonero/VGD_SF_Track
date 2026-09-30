@@ -20,8 +20,8 @@ export class DwhTableComponent implements OnInit {
 
   // Paginación - respetando el default de la API
   pageIndex = 0;
-  defaultPageSize = 5; // API devuelve 5 por defecto
-  currentPageSize = 5; // Mantenemos el pageSize actual
+  defaultPageSize = 10;
+  currentPageSize = 10;
 
   ///filtros
   currentFilters: {

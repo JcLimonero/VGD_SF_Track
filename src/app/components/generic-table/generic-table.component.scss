@@ -21,15 +21,25 @@ table.mat-table {
   }
 }
 
-th.mat-header-cell {
+tr.table-header-row {
+  background: #fff;
+}
+
+th.mat-header-cell,
+th.mat-mdc-header-cell {
+  font-size: 12px;
   font-weight: 600;
+  color: #6c757d;
+  background: #fff;
+  border-bottom: 1px solid #dee2e6;
   
   &.sortable {
     cursor: pointer;
     user-select: none;
     
     &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: #eef0f3;
+      color: #1a1a1a;
     }
   }
 }
@@ -145,7 +155,7 @@ th.mat-column-resend {
   transition: color 0.2s ease;
   
   &:hover {
-    color: #FF5C20;
+    color: #1a1a1a;
   }
   
   .material-symbols-outlined {
@@ -164,11 +174,11 @@ th.mat-column-resend {
   border: none;
   cursor: pointer;
   padding: 4px;
-  color: #1976d2;
+  color: #1a1a1a;
   transition: color 0.2s ease;
   
   &:hover:not(:disabled) {
-    color: #0d47a1;
+    color: #495057;
   }
   
   &:disabled {
@@ -187,11 +197,11 @@ th.mat-column-resend {
   border: none;
   cursor: pointer;
   padding: 4px;
-  color: #FF5C20;
+  color: #1a1a1a;
   transition: all 0.2s ease;
   
   &:hover {
-    color: #d94a15;
+    color: #495057;
   }
 
   &:disabled {
@@ -338,7 +348,7 @@ th.mat-column-OemLeadId {
   
   &:focus {
     outline: none;
-    border-color: #1976d2;
+    border-color: #1a1a1a;
     box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
   }
 }

@@ -116,7 +116,7 @@ describe('HondaSfTableComponent', () => {
     const req = flushRows();
     expect(req.request.method).toBe('GET');
     expect(req.request.params.get('page')).toBe('1');
-    expect(req.request.params.get('perpage')).toBe('5');
+    expect(req.request.params.get('perpage')).toBe('10');
     expect(req.request.params.get('orderby')).toBe('created_at');
     expect(req.request.params.get('ordertype')).toBe('desc');
   });
