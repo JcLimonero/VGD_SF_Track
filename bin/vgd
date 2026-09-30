@@ -1,0 +1,166 @@
+#!/usr/bin/env bash
+# Publicación del portal. El despliegue en Coolify (integration_monitor)
+# ocurre solo al mezclar un pull request en main. Este comando no llama a Coolify.
+set -euo pipefail
+
+APP_NAME="integration_monitor"
+BASE_BRANCH="main"
+
+usage() {
+  cat <<'EOF'
+Uso: vgd <comando>
+
+Comandos:
+  publish    Abre o reutiliza el pull request de la rama actual
+
+Ejecuta vgd <comando> --help para ver ejemplos.
+EOF
+}
+
+usage_publish() {
+  cat <<'EOF'
+Uso: vgd publish [opciones]
+
+Sube la rama actual y abre un pull request hacia main. Si el PR ya existe,
+imprime el mismo URL. Al mezclarlo, Coolify publica integration_monitor solo.
+
+No corre en main. No acepta un árbol con cambios sin commit.
+
+Opciones:
+  --title TEXTO   Título del PR. Por defecto, la primera línea del último commit
+  --body TEXTO    Cuerpo del PR. Por defecto, un resumen corto
+  --dry-run       Muestra lo que haría, sin push ni PR
+  --yes           Sin confirmaciones (el comando ya no pregunta)
+  --merge         Cuando el CI queda en verde, mezcla el PR con squash
+
+Examples:
+  vgd publish --dry-run
+  vgd publish --yes
+  vgd publish --title "feat(portal): ajuste de filtros" --yes
+  vgd publish --merge --yes
+EOF
+}
+
+die() {
+  echo "Error: $1" >&2
+  if [[ -n "${2:-}" ]]; then
+    echo "  $2" >&2
+  fi
+  exit 1
+}
+
+cmd_publish() {
+  local dry_run=0 merge=0 title="" body=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --help|-h) usage_publish; exit 0 ;;
+      --dry-run) dry_run=1 ;;
+      --yes) ;;
+      --merge) merge=1 ;;
+      --title)
+        [[ $# -ge 2 ]] || die "Falta el texto de --title." "vgd publish --title \"feat(portal): …\" --yes"
+        title=$2
+        shift
+        ;;
+      --body)
+        [[ $# -ge 2 ]] || die "Falta el texto de --body." "vgd publish --body \"Resumen\" --yes"
+        body=$2
+        shift
+        ;;
+      *)
+        die "Opción desconocida: $1" "vgd publish --help"
+        ;;
+    esac
+    shift
+  done
+
+  command -v git >/dev/null || die "git no está en el PATH."
+  command -v gh >/dev/null || die "gh no está en el PATH." "https://cli.github.com"
+
+  local branch
+  branch=$(git branch --show-current)
+  [[ -n "$branch" ]] || die "HEAD no está en una rama." "git switch -c feat/tema && vgd publish --yes"
+  if [[ "$branch" == "$BASE_BRANCH" || "$branch" == "master" ]]; then
+    die "No se publica desde ${branch}." "git switch -c feat/tema && vgd publish --yes"
+  fi
+  if [[ -n $(git status --porcelain) ]]; then
+    die "Hay cambios sin commit." "git add … && git commit && vgd publish --yes"
+  fi
+
+  git fetch origin "$BASE_BRANCH" --quiet
+  local ahead
+  ahead=$(git rev-list --count "origin/${BASE_BRANCH}..HEAD")
+  if [[ "$ahead" -eq 0 ]]; then
+    die "Esta rama no tiene commits por delante de ${BASE_BRANCH}." "git commit && vgd publish --yes"
+  fi
+
+  if [[ -z "$title" ]]; then
+    title=$(git log -1 --format=%s)
+  fi
+  if [[ -z "$body" ]]; then
+    body=$(cat <<EOF
+## Qué cambia
+- ${title}
+
+## Cómo se probó
+- Pendiente de anotar en el PR si hace falta.
+
+## Publicación
+Al mezclar en ${BASE_BRANCH}, Coolify despliega ${APP_NAME} solo.
+EOF
+)
+  fi
+
+  if [[ "$dry_run" -eq 1 ]]; then
+    echo "dry_run: true"
+    echo "branch: ${branch}"
+    echo "base: ${BASE_BRANCH}"
+    echo "commits: ${ahead}"
+    echo "title: ${title}"
+    echo "merge: $([[ "$merge" -eq 1 ]] && echo true || echo false)"
+    echo "app: ${APP_NAME}"
+    echo "note: al mezclar el PR, Coolify publica solo"
+    exit 0
+  fi
+
+  git push -u origin HEAD
+
+  local url
+  url=$(gh pr list --head "$branch" --base "$BASE_BRANCH" --state open --json url --jq '.[0].url // empty')
+  if [[ -z "$url" ]]; then
+    url=$(gh pr create --base "$BASE_BRANCH" --title "$title" --body "$body")
+  fi
+
+  echo "pr: ${url}"
+  echo "branch: ${branch}"
+  echo "base: ${BASE_BRANCH}"
+  echo "app: ${APP_NAME}"
+
+  if [[ "$merge" -eq 1 ]]; then
+    local number
+    number=$(gh pr view "$url" --json number --jq .number)
+    gh pr checks "$number" --watch
+    gh pr merge "$number" --squash --delete-branch
+    echo "merged: true"
+    echo "note: Coolify publica ${APP_NAME} al recibir main"
+  else
+    echo "merged: false"
+    echo "note: al mezclar el PR, Coolify publica ${APP_NAME} solo"
+  fi
+}
+
+main() {
+  local cmd=${1:-}
+  if [[ $# -gt 0 ]]; then
+    shift
+  fi
+  case "$cmd" in
+    ""|-h|--help|help) usage; exit 0 ;;
+    publish) cmd_publish "$@" ;;
+    *)
+      die "Comando desconocido: ${cmd}" "vgd --help"
+      ;;
+  esac
+}
+
+main "$@"
