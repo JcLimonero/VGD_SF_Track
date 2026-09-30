@@ -122,6 +122,7 @@ export class HondaSfTableComponent implements OnInit, OnChanges {
   }
 
   loadPage(pageIndex: number, pageSize: number): void {
+    this.currentPageSize = pageSize;
     this.loading = true;
     this.error = null;
 

@@ -101,6 +101,7 @@ export class InventoryTableComponent implements OnInit {
    * Carga los datos desde la API con server-side pagination
    */
   loadPage(pageIndex: number, pageSize: number): void {
+    this.currentPageSize = pageSize;
     this.loading = true;
     this.error = null;
 
@@ -169,7 +170,7 @@ export class InventoryTableComponent implements OnInit {
     // Guardar filtros y reiniciar a primera página
     this.currentFilters = { ...filters };
     this.pageIndex = 0;
-    this.loadPage(this.pageIndex, this.defaultPageSize);
+    this.loadPage(this.pageIndex, this.currentPageSize);
   }
 
   /**

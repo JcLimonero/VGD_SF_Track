@@ -193,6 +193,7 @@ export class CrabiTableComponent implements OnInit {
   }
 
   loadPage(pageIndex: number, pageSize: number): void {
+    this.currentPageSize = pageSize;
     this.loading = true;
     this.error = null;
 

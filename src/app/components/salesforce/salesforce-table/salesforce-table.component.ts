@@ -126,6 +126,7 @@ export class SalesforceTableComponent implements OnInit, OnChanges {
   }
 
   loadPage(pageIndex: number, pageSize: number): void {
+    this.currentPageSize = pageSize;
     if (!this.table) return;
 
     this.loading = true;

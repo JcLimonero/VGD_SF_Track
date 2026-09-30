@@ -79,6 +79,7 @@ export class DwhTableComponent implements OnInit {
   }
 
   loadPage(pageIndex: number, pageSize: number): void {
+    this.currentPageSize = pageSize;
     this.loading = true;
     this.error = null;
 
@@ -121,7 +122,7 @@ export class DwhTableComponent implements OnInit {
     //guardar filtros y reiniciar a primera página
     this.currentFilters = { ...filters };
     this.pageIndex = 0;
-    this.loadPage(this.pageIndex, this.defaultPageSize);
+    this.loadPage(this.pageIndex, this.currentPageSize);
   }
 
   onSortChange(sort: { column: string; direction: 'asc' | 'desc' }): void {
@@ -134,7 +135,7 @@ export class DwhTableComponent implements OnInit {
     }
     // Siempre ir a página 1 al cambiar o resetear ordenamiento
     this.pageIndex = 0;
-    this.loadPage(this.pageIndex, this.defaultPageSize);
+    this.loadPage(this.pageIndex, this.currentPageSize);
   }
 
   downloadExcel(): void {
