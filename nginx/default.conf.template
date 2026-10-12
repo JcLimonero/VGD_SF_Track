@@ -8,6 +8,16 @@
 # nginx/docker-entrypoint.d/10-validate-env.sh revisa esos valores antes de
 # sustituirlos: un valor con comillas, `;` o `$` rompería esta configuración.
 
+# Log de acceso: un archivo por día (access-AAAA-MM-DD.log) en un volumen que
+# sobrevive a los redespliegues. nginx/docker-entrypoint.d/05-logs.sh borra los
+# de más de LOG_RETENTION_DAYS (15). No se registran Authorization ni el token.
+map $time_iso8601 $log_date {
+  "~^(?<dia>\d{4}-\d{2}-\d{2})" $dia;
+  default sin-fecha;
+}
+log_format portal '$remote_addr - [$time_local] "$request" $status '
+                  '$body_bytes_sent "$http_referer" "$http_user_agent"';
+
 # Frena a quien prueba contraseñas en /auth/login (por IP real del cliente)
 limit_req_zone $binary_remote_addr zone=login:10m rate=10r/m;
 
@@ -16,6 +26,10 @@ server {
   server_name _;
   root /usr/share/nginx/html;
   index index.html;
+
+  access_log /var/log/nginx/portal/access-$log_date.log portal;
+  access_log /dev/stdout portal;
+  open_log_file_cache max=8 inactive=2m valid=1m min_uses=1;
 
   # Una ruta con `..`, `//` o %xx se normaliza antes de decidir quién entra.
   merge_slashes on;

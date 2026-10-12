@@ -4,7 +4,17 @@ services:
     restart: unless-stopped
     depends_on:
       - auth
+    volumes:
+      # Logs de acceso diarios; sobreviven a los redespliegues (15 días)
+      - portal-logs:/var/log/nginx/portal
+    logging:
+      # Lo que sale por stdout (`docker logs`): solo un respaldo corto
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     environment:
+      LOG_RETENTION_DAYS: ${LOG_RETENTION_DAYS:-15}
       # El token de la API vive solo aquí: nginx lo agrega a cada llamada a /api
       API_PROVIDER_TOKEN: ${API_PROVIDER_TOKEN:?falta API_PROVIDER_TOKEN}
       API_UPSTREAM: ${API_UPSTREAM:-https://apisvanguardia.com:400}
@@ -28,5 +38,13 @@ services:
       PASSWORD_CRABI: ${PASSWORD_CRABI:?falta PASSWORD_CRABI}
       PASSWORD_SALES_FORCE: ${PASSWORD_SALES_FORCE:?falta PASSWORD_SALES_FORCE}
       SESSION_HOURS: ${SESSION_HOURS:-8}
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     expose:
       - "3000"
+
+volumes:
+  portal-logs:

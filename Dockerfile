@@ -15,6 +15,8 @@ RUN apk add --no-cache wget
 
 # La imagen de nginx sustituye las ${VARIABLES} de esta plantilla al arrancar
 COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
+# Prepara los logs diarios y borra los de más de 15 días
+COPY nginx/docker-entrypoint.d/05-logs.sh /docker-entrypoint.d/05-logs.sh
 # Revisa API_PROVIDER_TOKEN y API_UPSTREAM antes de sustituir la plantilla
 COPY nginx/docker-entrypoint.d/10-validate-env.sh /docker-entrypoint.d/10-validate-env.sh
 COPY --from=build /app/dist/vex /usr/share/nginx/html

@@ -34,7 +34,7 @@ npm run build                            # producción, sale a dist/ (ignorado)
 - **Nunca push directo a `main`.** Rama corta → PR → CI en verde → merge con squash (skill `flujo-pr`). `main` exige rama al día: tras cada merge hay que `gh pr update-branch` en los demás y esperar su CI otra vez.
 - Si se cambia la base de un PR o se fuerza un push, el CI puede no dispararse: cerrar y reabrir el PR.
 - Commits en español con prefijo convencional (`feat(modulo): ...`). Un PR por tema.
-- El despliegue lo hace Coolify al mezclar; las variables de entorno se cargan en Coolify (`API_PROVIDER_TOKEN`, `AUTH_SECRET`, `PASSWORD_CRABI`, `PASSWORD_SALES_FORCE`, opcional `SESSION_HOURS`, `API_UPSTREAM`). Sin ellas `docker compose` falla a propósito. Ver skills `coolify-stage` y `despliegue-stage-seguro`.
+- El despliegue lo hace Coolify al mezclar; las variables de entorno se cargan en Coolify (`API_PROVIDER_TOKEN`, `AUTH_SECRET`, `PASSWORD_CRABI`, `PASSWORD_SALES_FORCE`, opcional `SESSION_HOURS`, `API_UPSTREAM`, `LOG_RETENTION_DAYS`). Sin ellas `docker compose` falla a propósito. Ver skills `coolify-stage` y `despliegue-stage-seguro`.
 
 ## Acceso (perfiles)
 - Dos perfiles **compartidos**, sin usuario por persona: **CRABI** (solo la pestaña Crabi) y **SALES FORCE** (todas las demás, sin Crabi). Definidos en `core/auth/profiles.ts`; la regla equivalente en la API vive en `auth/auth.js` (`canAccess`). **Si cambia uno, cambia el otro**, y se actualizan sus pruebas.
@@ -46,6 +46,7 @@ npm run build                            # producción, sale a dist/ (ignorado)
 - Crabi es de consulta y de marcar reenvío (`isSend=0`): **no hay POST ni DELETE** y no deben agregarse.
 - Honda SF muestra **solo Acura**: `lockedFilters` por tabla en `honda-sf.catalog.ts` (`brand=ACURA`; Clientes por `dealer_id=2003`). Las filas sin marca quedan fuera a propósito.
 - Reenviar a Salesforce solo se habilita cuando el envío falló (`sendedSalesForce=1` e `insertCorrect=0`); es una escritura real en la API.
+- Los logs de acceso de nginx se conservan **15 días** (un archivo por día en el volumen `portal-logs`); no registran `Authorization` ni el token y no se debe cambiar eso.
 - Los estilos de íconos de Salesforce viven en `shared/_sf-icons.scss`; no copiarlos.
 
 ## Trampas conocidas

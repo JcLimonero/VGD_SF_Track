@@ -19,6 +19,7 @@ fail=0
 cleanup() {
   docker rm -f ${NET}-nginx ${NET}-auth ${NET}-api >/dev/null 2>&1
   docker network rm $NET >/dev/null 2>&1
+  docker volume rm ${NET}-logs >/dev/null 2>&1
 }
 trap cleanup EXIT
 cleanup
@@ -38,6 +39,9 @@ docker run -d --name ${NET}-auth --network $NET --network-alias auth \
   ${NET}-auth >/dev/null || exit 1
 docker run -d --name ${NET}-nginx --network $NET -p $PORT:80 \
   -e API_PROVIDER_TOKEN=$TOKEN -e API_UPSTREAM=http://fakeapi:4000 \
+  -e LOG_RETENTION_DAYS=15 -e LOG_PURGE_INTERVAL_SECONDS=1 \
+  -v ${NET}-logs:/var/log/nginx/portal \
+  -v "$PWD/nginx/docker-entrypoint.d/05-logs.sh:/docker-entrypoint.d/05-logs.sh:ro" \
   -v "$PWD/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro" \
   -v "$PWD/nginx/docker-entrypoint.d/10-validate-env.sh:/docker-entrypoint.d/10-validate-env.sh:ro" \
   nginx:1.27-alpine >/dev/null || exit 1
@@ -153,6 +157,14 @@ valida no "upstream con ruta" "abc" "https://apisvanguardia.com:400/x"
 valida no "upstream con esquema raro" "abc" "ftp://apisvanguardia.com"
 valida no "upstream con punto y coma" "abc" "https://a.com;x"
 
+LOGS=nginx/docker-entrypoint.d/05-logs.sh
+echo "Validación de LOG_RETENTION_DAYS"
+for bad in 0 abc "-1" "1;rm" ""; do
+  out=$(LOG_RETENTION_DAYS=$bad sh -c ". /dev/null; sed 's|/var/log/nginx/portal|/tmp/vgd-logs-test|' $LOGS | sed 's|chown nginx:nginx.*||' > /tmp/05-test.sh; sh /tmp/05-test.sh" 2>&1); code=$?
+  if [ -z "$bad" ]; then continue; fi
+  case "$out" in *ERROR*) echo "  ok   rechaza LOG_RETENTION_DAYS='$bad'" ;; *) echo "  FALLA acepta LOG_RETENTION_DAYS='$bad'"; fail=1 ;; esac
+done
+
 echo "IP real del cliente (el límite de intentos no se salta con X-Forwarded-For)"
 login_ip() { # <XFF> <contraseña>
   curl -s -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' \
@@ -164,6 +176,29 @@ got=$(login_ip "10.9.9.9, 203.0.113.50" pc)
 [ "$got" = 429 ] && echo "  ok   mismo origen real con X-Forwarded-For distinto: bloqueado" || { echo "  FALLA el límite se saltó con X-Forwarded-For ($got)"; fail=1; }
 got=$(login_ip "10.9.9.9, 203.0.113.77" pc)
 [ "$got" = 200 ] && echo "  ok   otro origen real no se ve afectado" || { echo "  FALLA otro origen quedó bloqueado ($got)"; fail=1; }
+
+echo "Logs de acceso: un archivo por día y 15 días de retención"
+LOGDIR=/var/log/nginx/portal
+today=$(docker exec ${NET}-nginx date -u +%F)
+if docker exec ${NET}-nginx grep -q 'GET /api/vgd/dwh' $LOGDIR/access-$today.log 2>/dev/null; then
+  echo "  ok   las llamadas quedan en access-AAAA-MM-DD.log del día"
+else echo "  FALLA no hay log diario con las llamadas"; fail=1; fi
+logs=$(docker exec ${NET}-nginx cat $LOGDIR/access-$today.log 2>/dev/null)
+case "$logs" in *"Bearer"*|*"$TOKEN"*|*"ROBADO"*) echo "  FALLA el log contiene un token o la sesión"; fail=1 ;;
+  *) echo "  ok   el log no guarda Authorization ni el token" ;; esac
+ago() { date -u -d "$1 days ago" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date -u -v-"$1"d '+%Y-%m-%d %H:%M:%S'; }
+for spec in "2020-01-01:3000" "hace16:16" "hace14:14" "hace5:5"; do
+  name=${spec%%:*}; days=${spec##*:}
+  docker exec ${NET}-nginx touch -d "$(ago $days)" $LOGDIR/access-$name.log
+done
+sleep 4
+existe() { docker exec ${NET}-nginx test -e $LOGDIR/access-$1.log; }
+if existe 2020-01-01 || existe hace16; then
+  echo "  FALLA no se borró un log de más de 15 días"; fail=1
+else echo "  ok   se borra lo que pasa de 15 días (hace años y hace 16 días)"; fi
+if existe hace14 && existe hace5 && existe $today; then
+  echo "  ok   se conserva lo de 14 días, lo reciente y el log de hoy"
+else echo "  FALLA se borró un log que debía conservarse"; fail=1; fi
 
 echo "Rutas internas"
 esperado 404 "/auth/verify no se alcanza desde fuera" "$SALES" /auth/verify "X-Original-URI: /api/vgd/dwh"
