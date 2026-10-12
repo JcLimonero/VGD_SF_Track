@@ -23,6 +23,11 @@ import { InventoryModalComponent } from '../inventory/inventory-modal/inventory-
 import { CustomerModalComponent } from '../customer/customer-modal/customer-modal.component';
 import { ServiceModalComponent } from '../servicios/service-modal/service-modal.component';
 import { LeadsModalComponent } from '../leads/leads-modal/leads-modal.component';
+import {
+  canOpenSalesForce,
+  openInSalesForce,
+  salesForceStatus
+} from '../shared/salesforce-link';
 @Component({
   selector: 'vex-generic-table',
   imports: [
@@ -239,38 +244,11 @@ export class GenericTableComponent implements OnInit, OnChanges {
   }
 
   getResultSFStatus(element: any): 'success' | 'warning' | 'error' {
-    const sendedSalesForce = this.cellValue(element, 'sendedSalesForce');
-    const insertCorrectValue = this.cellValue(element, 'insertCorrect');
-
-    // Prioridad 1: Si no se ha enviado a Salesforce (sendedSalesForce = 0)
-    if (sendedSalesForce === '0' || sendedSalesForce === 0) {
-      return 'warning';
-    }
-
-    // Prioridad 2: Si se envió y fue exitoso (insertCorrect = 1)
-    if (insertCorrectValue === '1' || insertCorrectValue === 1) {
-      return 'success';
-    }
-
-    // Prioridad 3: Si se envió pero hubo error (insertCorrect = 0)
-    if (insertCorrectValue === '0' || insertCorrectValue === 0) {
-      return 'error';
-    }
-
-    // Fallback: warning si no hay información clara
-    return 'warning';
+    return salesForceStatus(element);
   }
 
   isSalesForceAvailable(element: any): boolean {
-    // Solo habilitado si insertCorrect = 1 y tiene idSalesForce
-    const insertCorrectValue = this.cellValue(element, 'insertCorrect');
-    const idSalesForce = this.cellValue(element, 'idSalesForce');
-
-    const isSuccess = insertCorrectValue === '1' || insertCorrectValue === 1;
-    const hasIdSalesForce =
-      idSalesForce && idSalesForce !== null && idSalesForce !== '';
-
-    return isSuccess && hasIdSalesForce;
+    return canOpenSalesForce(element);
   }
 
   isSendAvailable(element: any): boolean {
@@ -330,16 +308,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
   }
 
   openSalesForceLink(element: any): void {
-    if (!this.isSalesForceAvailable(element)) {
-      console.warn('Salesforce link not available for this element');
-      return;
-    }
-
-    const idSalesForce = this.cellValue(element, 'idSalesForce');
-    const url = `https://grupovanguardiamx.lightning.force.com/lightning/r/Opportunity/${idSalesForce}/view`;
-
-    console.log('Opening Salesforce URL:', url);
-    window.open(url, '_blank');
+    openInSalesForce(element);
   }
 
   openModal(rowData: any) {
