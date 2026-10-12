@@ -1,0 +1,137 @@
+<div class="demo-validation px-4 py-5">
+  <div class="demo-input">
+    <label for="demo-vins">VIN a validar</label>
+    <textarea
+      id="demo-vins"
+      rows="6"
+      placeholder="Pega o escribe los VIN, uno por línea (también sirven comas o espacios)"
+      [(ngModel)]="text"
+      [disabled]="running"></textarea>
+    <div class="demo-input-footer">
+      <span [class.demo-over-limit]="overLimit">
+        {{ vinCount }} de {{ maxVins }} VIN
+      </span>
+      <div class="demo-actions">
+        <button type="button" class="filter-btn" (click)="validate()"
+                [disabled]="running || vinCount === 0 || overLimit">
+          Validar
+        </button>
+        <button type="button" class="demo-btn-secondary" (click)="clear()"
+                [disabled]="!text && rows.length === 0">
+          Limpiar
+        </button>
+        <button type="button" class="demo-btn-secondary" (click)="downloadExcel()"
+                [disabled]="rows.length === 0">
+          Descargar Excel
+        </button>
+      </div>
+    </div>
+    <p class="demo-hint" *ngIf="overLimit">
+      El máximo por corrida es {{ maxVins }} VIN. Divide la lista.
+    </p>
+  </div>
+
+  <div *ngIf="running" class="demo-progress" role="status">
+    Validando {{ progress.done }} de {{ progress.total }}…
+  </div>
+
+  <ng-container *ngIf="rows.length > 0">
+    <div class="demo-summary">
+      <button type="button" class="demo-chip"
+              [class.is-active]="resultFilter === 'all'"
+              (click)="resultFilter = 'all'">
+        Todos · {{ rows.length }}
+      </button>
+      <button type="button" class="demo-chip demo-chip--{{ r }}"
+              *ngFor="let r of resultOptions"
+              [class.is-active]="resultFilter === r"
+              [disabled]="count(r) === 0"
+              (click)="resultFilter = r">
+        {{ labels[r] }} · {{ count(r) }}
+      </button>
+    </div>
+    <p class="demo-note" *ngIf="duplicatesRemoved > 0">
+      Se quitaron {{ duplicatesRemoved }} VIN repetido(s).
+    </p>
+
+    <div class="demo-table-wrap">
+      <table class="demo-table">
+        <thead>
+          <tr>
+            <th>VIN</th>
+            <th>Resultado</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Agencia</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Año</th>
+            <th>Envío SF</th>
+            <th>Estado SF</th>
+            <th>Ver SF</th>
+            <th>Reenviar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of filteredRows">
+            <td class="demo-vin">
+              {{ row.vin }}
+              <span *ngIf="row.invalidFormat" class="demo-warn"
+                    title="Un VIN estándar tiene 17 caracteres">
+                ⚠ formato
+              </span>
+            </td>
+            <td>
+              <span class="demo-badge demo-badge--{{ row.result }}">
+                {{ labels[row.result] }}
+              </span>
+              <button type="button" class="demo-retry" *ngIf="row.result === 'error'"
+                      (click)="retry(row)">
+                Reintentar
+              </button>
+            </td>
+            <td>{{ row.typeDescription || '—' }}</td>
+            <td>{{ row.statusDescription || '—' }}</td>
+            <td>{{ row.agencyName || '—' }}</td>
+            <td>{{ row.brand || '—' }}</td>
+            <td>{{ row.model || '—' }}</td>
+            <td>{{ row.year || '—' }}</td>
+            <td>
+              <span *ngIf="row.raw" class="status-badge"
+                    [class.sent]="wasSent(row)"
+                    [title]="wasSent(row) ? 'Enviado a Salesforce' : 'Aún no se envía a Salesforce'">
+                <span class="material-symbols-outlined">
+                  {{ wasSent(row) ? 'send' : 'cancel_schedule_send' }}
+                </span>
+              </span>
+            </td>
+            <td>
+              <span *ngIf="row.raw" class="status-badge {{ sfStatus(row) }}"
+                    [title]="row.resultSF || statusLabel(row)">
+                <span class="material-symbols-outlined">
+                  {{ sfStatus(row) === 'success' ? 'check_circle' : (sfStatus(row) === 'warning' ? 'warning' : 'error') }}
+                </span>
+              </span>
+            </td>
+            <td>
+              <button type="button" class="btn-sf-link demo-btn-open"
+                      [disabled]="!canOpenSf(row)"
+                      (click)="openSf(row)"
+                      [title]="canOpenSf(row) ? 'Ver en Salesforce' : 'No disponible en Salesforce'">
+                <span class="material-symbols-outlined">open_in_new</span>
+              </button>
+            </td>
+            <td>
+              <button type="button" class="btn-resend demo-btn-resend"
+                      [disabled]="!canResend(row)"
+                      (click)="resend(row)"
+                      [title]="canResend(row) ? 'Reenviar a Salesforce' : 'Reenvío no disponible'">
+                <span class="material-symbols-outlined">refresh</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+</div>

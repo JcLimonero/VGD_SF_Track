@@ -6,6 +6,7 @@ import { InvoiceTableComponent } from '../components/invoice-table/invoice-table
 import { InvoiceFilterComponent } from '../components/invoice-filter/invoice-filter.component';
 import { TabsComponent } from '../components/tabs/tabs.component';
 import { InventoryTableComponent } from '../components/inventory/inventory-table/inventory-table.component';
+import { DemoValidationComponent } from '../components/demo-validation/demo-validation.component';
 import { InventoryFilterComponent } from '../components/inventory/inventory-filter/inventory-filter.component';
 import { CustomerTableComponent } from '../components/customer/customer-table/customer-table.component';
 import { CustomerFilterComponent } from '../components/customer/customer-filter/customer-filter.component';
@@ -39,6 +40,7 @@ import { MockDataService } from '../services/mock-data.service';
     TabsComponent,
     InventoryTableComponent,
     InventoryFilterComponent,
+    DemoValidationComponent,
     CustomerTableComponent,
     CustomerFilterComponent,
     ServiceTableComponent,

@@ -30,6 +30,7 @@ describe('TabsComponent', () => {
     expect(component.tabs.map((t) => t.id)).toEqual([
       'orders',
       'inventory',
+      'demos',
       'services',
       'clients',
       'leads',

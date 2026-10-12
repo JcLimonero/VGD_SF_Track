@@ -23,6 +23,11 @@
     <vex-inventory-table #inventoryTable></vex-inventory-table>
   </div>
 
+  <!-- Validación de unidades demo -->
+  <div *ngIf="activeTab === 'demos'">
+    <vex-demo-validation></vex-demo-validation>
+  </div>
+
   <div *ngIf="activeTab === 'services'">
     <vex-service-filter (filterChange)="handleServiceFilter($event)"
                        (downloadRequested)="handleServiceDownload()"
