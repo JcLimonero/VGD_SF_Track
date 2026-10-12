@@ -6,6 +6,7 @@ const {
   signToken,
   verifyToken,
   checkPassword,
+  canAccess,
   RateLimiter
 } = require('./auth');
 
@@ -29,7 +30,14 @@ function readConfig(env) {
   return { env, secret: env.AUTH_SECRET, ttlSeconds: Math.round(hours * 3600) };
 }
 
-function createServer(config, limiter = new RateLimiter()) {
+/** Fallos de login por perfil sumando todos los orígenes: las claves son compartidas. */
+const PROFILE_MAX_FAILURES = 30;
+
+function createServer(
+  config,
+  limiter = new RateLimiter(),
+  profileLimiter = new RateLimiter(PROFILE_MAX_FAILURES)
+) {
   const send = (res, status, body, headers = {}) => {
     res.writeHead(status, {
       'Content-Type': 'application/json',
@@ -62,11 +70,13 @@ function createServer(config, limiter = new RateLimiter()) {
       req.on('error', reject);
     });
 
-  /** Detrás de nginx el cliente real viene en X-Forwarded-For. */
+  /**
+   * IP del cliente. nginx la fija en X-Real-IP (sobrescribiendo lo que mande el
+   * cliente, tras resolver la cadena de proxies de confianza). X-Forwarded-For
+   * NO se usa: el cliente puede escribirlo y así se saltaría el límite.
+   */
   const clientKey = (req) =>
-    String(req.headers['x-forwarded-for'] ?? req.socket.remoteAddress ?? '')
-      .split(',')[0]
-      .trim();
+    String(req.headers['x-real-ip'] ?? req.socket.remoteAddress ?? '').trim();
 
   return http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://localhost');
@@ -83,6 +93,27 @@ function createServer(config, limiter = new RateLimiter()) {
       const data = verifyToken(config.secret, bearer);
       if (!data) return send(res, 401, { error: 'invalid_token' });
       return send(res, 200, { profile: data.profile, expiresAt: data.exp * 1000 });
+    }
+
+    /**
+     * Lo consulta nginx (auth_request) antes de reenviar una llamada a la API.
+     * 401: sesión inválida o caducada. 403: sesión válida, pero ese perfil no
+     * puede usar ese recurso. 200: adelante.
+     */
+    if (req.method === 'GET' && url.pathname === '/auth/verify') {
+      const bearer = String(req.headers.authorization ?? '').replace(
+        /^Bearer /,
+        ''
+      );
+      const data = verifyToken(config.secret, bearer);
+      if (!data) return send(res, 401, { error: 'invalid_token' });
+
+      const original = String(req.headers['x-original-uri'] ?? '');
+      const method = String(req.headers['x-original-method'] ?? '');
+      if (!canAccess(data.profile, original, method)) {
+        return send(res, 403, { error: 'forbidden' });
+      }
+      return send(res, 200, { profile: data.profile });
     }
 
     if (req.method === 'POST' && url.pathname === '/auth/login') {
@@ -106,8 +137,24 @@ function createServer(config, limiter = new RateLimiter()) {
         });
       }
 
+      // Además del límite por origen, un tope por perfil: con contraseñas
+      // compartidas, probar desde muchas IP seguiría siendo adivinar la misma.
+      const profileKey = Object.hasOwn(PROFILES, body.profile)
+        ? `profile:${body.profile}`
+        : null;
+      const profileWait = profileKey ? profileLimiter.retryAfter(profileKey) : 0;
+      if (profileWait > 0) {
+        return send(
+          res,
+          429,
+          { error: 'too_many_attempts', retryAfter: profileWait },
+          { 'Retry-After': String(profileWait) }
+        );
+      }
+
       if (!checkPassword(config.env, body.profile, body.password)) {
         limiter.fail(key);
+        if (profileKey) profileLimiter.fail(profileKey);
         // Misma respuesta para perfil inexistente y contraseña errónea
         return send(res, 401, { error: 'invalid_credentials' });
       }

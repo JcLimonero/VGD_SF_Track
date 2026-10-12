@@ -30,31 +30,14 @@ export interface Agency {
   providedIn: 'root'
 })
 export class VanguardiaApiService {
-  // Configuración de la API basada en tu archivo Postman
+  /**
+   * Las llamadas van a `/api`, que nginx reenvía a la API de Vanguardia. El
+   * token de proveedor lo agrega nginx del lado del servidor: nunca viaja en el
+   * código del portal ni lo ve el navegador.
+   */
   private readonly baseUrl = environment.api.baseUrl;
-  private readonly providerTokenHeader = environment.api.providerTokenHeader;
-  private readonly providerTokenValue = environment.api.providerTokenValue;
-  
-  // Token de autenticación (se debe obtener del login)
-  private authToken: string | null = null;
 
   constructor(private http: HttpClient) {}
-
-  /**
-   * Crea los headers necesarios para las peticiones
-   */
-  private getHeaders(): HttpHeaders {
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      [this.providerTokenHeader]: this.providerTokenValue
-    });
-
-    if (this.authToken) {
-      headers = headers.set('Authorization', `Bearer ${this.authToken}`);
-    }
-
-    return headers;
-  }
 
   // INVENTARIO 
   // Método para paginación server-side con filtros dinámicos
@@ -62,8 +45,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/inventoryfilter`;
 
     const headers= new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+      .set('Content-Type', 'application/json');
 
     // Construir parámetros de consulta si se proporcionan
     let httpParams = new HttpParams();
@@ -95,8 +77,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/inventoryfilter/${id}`;
 
     const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', this.providerTokenValue);
+      .set('Content-Type', 'application/json');
 
     return this.http.put<any>(url, data, { headers }).pipe(
       map(res => {
@@ -111,8 +92,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/customerfilter?ordertype=desc&orderby=timestamp_sales_force`;
 
     const headers= new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+      .set('Content-Type', 'application/json');
 
     // Construir parámetros de consulta si se proporcionan
     let httpParams = new HttpParams();
@@ -142,8 +122,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/customerfilter/${id}`;
 
     const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', this.providerTokenValue);
+      .set('Content-Type', 'application/json');
 
     return this.http.put<any>(url, data, { headers }).pipe(
       map(res => {
@@ -157,8 +136,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/servicefilter`;
 
     const headers= new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+      .set('Content-Type', 'application/json');
 
     // Construir parámetros de consulta si se proporcionan
     let httpParams = new HttpParams();
@@ -188,8 +166,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/servicefilter/${id}`;
 
     const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', this.providerTokenValue);
+      .set('Content-Type', 'application/json');
 
     return this.http.put<any>(url, data, { headers }).pipe(
       map(res => {
@@ -203,8 +180,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/dwh`;
 
     const headers= new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+      .set('Content-Type', 'application/json');
 
     // Construir parámetros de consulta si se proporcionan
     let httpParams = new HttpParams();
@@ -230,8 +206,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/leadsfilter`;
 
     const headers= new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', this.providerTokenValue);
+      .set('Content-Type', 'application/json');
 
     // Construir parámetros de consulta si se proporcionan
     let httpParams = new HttpParams();
@@ -260,8 +235,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/leadsfilter/${id}`;
 
     const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', this.providerTokenValue);
+      .set('Content-Type', 'application/json');
 
     return this.http.put<any>(url, data, { headers }).pipe(
       map(res => {
@@ -282,8 +256,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/orderscrabi`;
 
     const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set(this.providerTokenHeader, this.providerTokenValue);
+      .set('Content-Type', 'application/json');
 
     let httpParams = new HttpParams();
     if (params) {
@@ -318,8 +291,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/orderscrabi/${id}`;
 
     const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set(this.providerTokenHeader, this.providerTokenValue);
+      .set('Content-Type', 'application/json');
 
     return this.http.put<any>(url, data, { headers }).pipe(
       map(res => {
@@ -348,8 +320,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/${endpoint}`;
 
     const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set(this.providerTokenHeader, this.providerTokenValue);
+      .set('Content-Type', 'application/json');
 
     let httpParams = new HttpParams();
     if (params) {
@@ -374,8 +345,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/invoice?ordertype=desc&orderby=billing_date`;
 
     const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+      .set('Content-Type', 'application/json');
 
     return this.http.get<any>(url, { headers }).pipe(
       map(res => {
@@ -392,8 +362,7 @@ export class VanguardiaApiService {
       const url = `${this.baseUrl}/vgd/invoice/${id}`;
 
       const headers = new HttpHeaders()
-        .set('Content-Type', 'application/json')
-        .set('X-Provider-Token', this.providerTokenValue);
+        .set('Content-Type', 'application/json');
 
       return this.http.put<any>(url, data, { headers }).pipe(
         map(res => {
@@ -406,8 +375,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/invoice?order_dms=${order_dms}`;
 
     const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+      .set('Content-Type', 'application/json');
 
     return this.http.get<any>(url, { headers }).pipe(
       map(res => {
@@ -420,8 +388,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/invoice?vin=${vin}`;
 
     const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+      .set('Content-Type', 'application/json');
 
     return this.http.get<any>(url, { headers }).pipe(
       map(res => {
@@ -435,8 +402,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/invoice?sendedSalesForce=${send}`;
 
     const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+      .set('Content-Type', 'application/json');
 
     return this.http.get<any>(url, { headers }).pipe(
       map(res => {
@@ -452,8 +418,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/invoice?insertCorrect=${insertCorrectValue}`;
 
     const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+      .set('Content-Type', 'application/json');
 
     return this.http.get<any>(url, { headers }).pipe(
       map(res => {
@@ -466,8 +431,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/invoice?invoice_reference=${reference}`;
 
     const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+      .set('Content-Type', 'application/json');
 
     return this.http.get<any>(url, { headers }).pipe(
       map(res => {
@@ -480,8 +444,7 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/invoice?agencyName=${agencie}`;
 
     const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+      .set('Content-Type', 'application/json');
 
     return this.http.get<any>(url, { headers }).pipe(
       map(res => {
@@ -532,8 +495,7 @@ export class VanguardiaApiService {
     }
 
     const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+      .set('Content-Type', 'application/json');
 
     
     return this.http.get<any>(url, { headers, params: httpParams }).pipe(
@@ -554,27 +516,12 @@ export class VanguardiaApiService {
     const url = `${this.baseUrl}/vgd/agenciesfilter?perpage=100`;
 
     const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('X-Provider-Token', 'b26e88c4-ddbe-4adb-a214-4667f454824a');
+      .set('Content-Type', 'application/json');
 
     return this.http.get<any>(url, { headers }).pipe(
       map(res => {
         return res?.data?.data ?? []; //devolver solo array
       })
     );
-  }
-
-
-
-  /**
-   * Refresca el token desde /auth/refresh
-   */
-  refreshToken(refreshToken: string): Observable<ApiResponse<{ token: string; refresh_token: string }>> {
-    const url = `${this.baseUrl}/auth/refresh`;
-    return this.http.post<ApiResponse<{ token: string; refresh_token: string }>>(url, {
-      refresh_token: refreshToken
-    }, {
-      headers: this.getHeaders()
-    });
   }
 }

@@ -4,6 +4,10 @@ services:
     restart: unless-stopped
     depends_on:
       - auth
+    environment:
+      # El token de la API vive solo aquí: nginx lo agrega a cada llamada a /api
+      API_PROVIDER_TOKEN: ${API_PROVIDER_TOKEN:?falta API_PROVIDER_TOKEN}
+      API_UPSTREAM: ${API_UPSTREAM:-https://apisvanguardia.com:400}
     expose:
       - "80"
     healthcheck:
