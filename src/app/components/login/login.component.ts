@@ -21,7 +21,8 @@ export class LoginComponent {
   readonly profiles = PROFILES;
 
   loginForm: FormGroup;
-  selectedProfile: ProfileId | null = null;
+  /** SALES FORCE (el primero de la lista) viene elegido */
+  selectedProfile: ProfileId | null = PROFILES[0].id;
   isLoading = false;
   errorMessage = '';
   showPassword = false;
@@ -34,11 +35,24 @@ export class LoginComponent {
     this.loginForm = this.fb.group({
       password: ['', [Validators.required]]
     });
+    if (!this.selectedProfile) this.loginForm.get('password')?.disable();
   }
 
+  /**
+   * Elige un perfil; pulsar el que ya está elegido lo quita. Sin perfil no se
+   * puede escribir la contraseña ni entrar.
+   */
   selectProfile(profile: Profile): void {
-    this.selectedProfile = profile.id;
+    this.selectedProfile =
+      this.selectedProfile === profile.id ? null : profile.id;
     this.errorMessage = '';
+
+    const password = this.loginForm.get('password');
+    if (this.selectedProfile) {
+      password?.enable();
+    } else {
+      password?.disable();
+    }
   }
 
   onSubmit(): void {
@@ -46,7 +60,7 @@ export class LoginComponent {
       this.errorMessage = 'Elige tu perfil';
       return;
     }
-    if (this.loginForm.invalid) {
+    if (this.loginForm.invalid || this.loginForm.get('password')?.disabled) {
       this.errorMessage = 'Por favor ingresa la contraseña';
       return;
     }

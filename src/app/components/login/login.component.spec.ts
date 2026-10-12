@@ -32,8 +32,11 @@ describe('LoginComponent', () => {
     clearSession();
   });
 
-  const submit = (profileIndex: number, password: string) => {
-    component.selectProfile(component.profiles[profileIndex]);
+  /** Elige el perfil (si no es el que ya está elegido) y envía la contraseña. */
+  const submit = (profile: 'sales_force' | 'crabi', password: string) => {
+    if (component.selectedProfile !== profile) {
+      component.selectProfile(component.profiles.find((p) => p.id === profile)!);
+    }
     component.loginForm.get('password')?.setValue(password);
     component.onSubmit();
   };
@@ -42,15 +45,49 @@ describe('LoginComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('ofrece los perfiles CRABI y SALES FORCE', () => {
+  it('ofrece SALES FORCE primero y luego CRABI', () => {
     const labels = Array.from(
       fixture.nativeElement.querySelectorAll('.profile-option')
     ).map((el) => (el as HTMLElement).textContent?.trim());
-    expect(labels).toEqual(['CRABI', 'SALES FORCE']);
+    expect(labels).toEqual(['SALES FORCE', 'CRABI']);
   });
 
-  it('pide elegir perfil antes de enviar', () => {
-    component.loginForm.get('password')?.setValue('x');
+  it('SALES FORCE viene elegido y se puede escribir la contraseña', () => {
+    expect(component.selectedProfile).toBe('sales_force');
+
+    const selected = fixture.nativeElement.querySelectorAll('.profile-option.selected');
+    expect(selected.length).toBe(1);
+    expect(selected[0].textContent.trim()).toBe('SALES FORCE');
+
+    expect(component.loginForm.get('password')?.disabled).toBeFalse();
+    expect(fixture.nativeElement.querySelector('input#password').disabled).toBeFalse();
+    expect(fixture.nativeElement.querySelector('.login-btn').disabled).toBeFalse();
+  });
+
+  it('pulsar el perfil elegido lo quita y deshabilita contraseña y Entrar', () => {
+    const sales = component.profiles[0];
+    component.selectProfile(sales);
+    fixture.detectChanges();
+
+    expect(component.selectedProfile).toBeNull();
+    expect(fixture.nativeElement.querySelectorAll('.profile-option.selected').length).toBe(0);
+    expect(fixture.nativeElement.querySelector('input#password').disabled).toBeTrue();
+    expect(fixture.nativeElement.querySelector('.login-btn').disabled).toBeTrue();
+    expect(fixture.nativeElement.querySelector('.toggle-password').disabled).toBeTrue();
+  });
+
+  it('elegir otro perfil cambia la selección y habilita de nuevo', () => {
+    component.selectProfile(component.profiles[0]); // quita SALES FORCE
+    component.selectProfile(component.profiles[1]); // elige CRABI
+    fixture.detectChanges();
+
+    expect(component.selectedProfile).toBe('crabi');
+    expect(fixture.nativeElement.querySelector('input#password').disabled).toBeFalse();
+    expect(fixture.nativeElement.querySelector('.login-btn').disabled).toBeFalse();
+  });
+
+  it('sin perfil elegido no envía nada aunque se fuerce el envío', () => {
+    component.selectProfile(component.profiles[0]); // quita SALES FORCE
     component.onSubmit();
 
     expect(component.errorMessage).toBe('Elige tu perfil');
@@ -58,7 +95,6 @@ describe('LoginComponent', () => {
   });
 
   it('pide la contraseña', () => {
-    component.selectProfile(component.profiles[0]);
     component.onSubmit();
 
     expect(component.errorMessage).toBe('Por favor ingresa la contraseña');
@@ -67,7 +103,7 @@ describe('LoginComponent', () => {
 
   it('con la contraseña correcta entra al home', () => {
     const navigate = spyOn(router, 'navigate');
-    submit(0, 'clave');
+    submit('crabi', 'clave');
 
     httpMock.expectOne('/auth/login').flush({
       token: 't',
@@ -80,7 +116,7 @@ describe('LoginComponent', () => {
   });
 
   it('manda el perfil elegido y no otro', () => {
-    submit(1, 'clave');
+    submit('sales_force', 'clave');
 
     const req = httpMock.expectOne('/auth/login');
     expect(req.request.body).toEqual({ profile: 'sales_force', password: 'clave' });
@@ -89,7 +125,7 @@ describe('LoginComponent', () => {
 
   it('contraseña incorrecta: avisa y limpia el campo', () => {
     const navigate = spyOn(router, 'navigate');
-    submit(0, 'mala');
+    submit('sales_force', 'mala');
 
     httpMock
       .expectOne('/auth/login')
@@ -101,7 +137,7 @@ describe('LoginComponent', () => {
   });
 
   it('demasiados intentos: avisa cuánto esperar', () => {
-    submit(0, 'mala');
+    submit('crabi', 'mala');
 
     httpMock
       .expectOne('/auth/login')
@@ -111,7 +147,7 @@ describe('LoginComponent', () => {
   });
 
   it('sin conexión con el servicio: mensaje claro', () => {
-    submit(0, 'x');
+    submit('sales_force', 'x');
 
     httpMock
       .expectOne('/auth/login')
