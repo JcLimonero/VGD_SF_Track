@@ -80,10 +80,12 @@ export class HondaSfFilterComponent implements OnInit, OnChanges {
   /** Opciones de un campo: del catálogo de agencias o de la lista declarada. */
   optionsFor(field: HondaSfFilterField): FilterOption[] {
     if (field.fromAgencies) {
-      return this.agencies.map((agency) => ({
-        label: agency.name,
-        value: agency.idAgency
-      }));
+      return this.agencies
+        .filter((agency) => /acura/i.test(agency.name ?? ''))
+        .map((agency) => ({
+          label: agency.name,
+          value: agency.idAgency
+        }));
     }
 
     return (field.options ?? []).map((option) => ({
