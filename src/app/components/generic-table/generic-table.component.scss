@@ -1,3 +1,4 @@
+@use '../shared/sf-icons' as *;
 table.mat-table {
   width: 100%;
 }
@@ -169,69 +170,7 @@ th.mat-column-resend {
   border: none;
 }
 
-.btn-sf-link {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  color: #1a1a1a;
-  transition: color 0.2s ease;
-  
-  &:hover:not(:disabled) {
-    color: #495057;
-  }
-  
-  &:disabled {
-    color: #ccc;
-    cursor: not-allowed;
-  }
-  
-  .material-symbols-outlined {
-    font-size: 20px;
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
-  }
-}
 
-.btn-resend {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  color: #1a1a1a;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    color: #495057;
-  }
-
-  &:disabled {
-    color: #ccc;
-    cursor: not-allowed;
-  }
-  
-  .material-symbols-outlined {
-    font-size: 25px;
-    // font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
-    transition: transform 0.2s ease;
-  }
-}
-
-/* Salesforce status badge icons */
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.status-badge .material-symbols-outlined {
-  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
-  font-size: 25px;
-  line-height: 1;
-}
-.status-badge.sent .material-symbols-outlined { color: #16a34a; } /* green - para EnvioSF */
-.status-badge.not-sent .material-symbols-outlined { color: #dc2626; } /* red - para EnvioSF */
-.status-badge.success .material-symbols-outlined { color: #16a34a; } /* green - para EstadoSF */
-.status-badge.warning .material-symbols-outlined { color: #f97316; } /* orange - para EstadoSF */
-.status-badge.error .material-symbols-outlined { color: #dc2626; } /* red - para EstadoSF */
 
 /* Update status icon - DWH table */
 .update-status-icon {

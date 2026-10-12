@@ -7,6 +7,7 @@ import { NotificationService } from '../../../services/notification.service';
 import { TableColumn } from '../../../../@vex/interfaces/table-column.interface';
 import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
+import { resendPayload } from '../../shared/salesforce-link';
 
 @Component({
   selector: 'vex-inventory-table',
@@ -197,15 +198,7 @@ export class InventoryTableComponent implements OnInit {
       return;
     }
 
-    const data = {
-      ...row,
-      sendedSalesForce: '0',
-      insertCorrect: '0',
-      resultSF: '',
-      idSalesForce: null
-    };
-
-    this.vanguardiaApi.updateInventory(row.id, data).subscribe({
+    this.vanguardiaApi.updateInventory(row.id, resendPayload(row)).subscribe({
       next: (response) => {
         this.notifications.success(
           `Vehículo ${row.vin} marcado para reenvío a Salesforce`
