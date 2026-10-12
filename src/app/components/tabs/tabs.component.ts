@@ -21,6 +21,7 @@ export class TabsComponent {
   tabs: TabItem[] = [
     { id: 'orders', label: 'Ordenes', icon: 'order_approve' },
     { id: 'inventory', label: 'Inventario', icon: 'inventory' },
+    { id: 'demos', label: 'Validar demos', icon: 'fact_check' },
     { id: 'services', label: 'Servicios', icon: 'car_repair' },
     { id: 'clients', label: 'Clientes', icon: 'group' },
     { id: 'leads', label: 'Leads', icon: 'database' },

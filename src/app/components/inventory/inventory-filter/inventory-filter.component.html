@@ -108,6 +108,13 @@
                 (change)="onTypeToggle('Seminuevo', $event); closeDropdown($event)" />
               Seminuevo
             </label>
+            <label class="checkbox">
+              <input 
+                type="checkbox"
+                [checked]="filterForm.get('typeDescription')?.value === 'Demo'"
+                (change)="onTypeToggle('Demo', $event); closeDropdown($event)" />
+              Demo
+            </label>
           </div>
         </details>
 

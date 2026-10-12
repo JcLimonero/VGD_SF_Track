@@ -1,0 +1,60 @@
+/**
+ * Íconos de Salesforce (envío, estado, ver y reenviar) de las tablas.
+ * Un solo estilo para la tabla genérica y para Validar demos. Cada componente
+ * lo importa con:
+ *
+ *   @use '../shared/sf-icons' as *;
+ *
+ * (ajustando los `../` según la carpeta). No copiar estas reglas en otro lado.
+ */
+
+/* Indicadores de envío y de estado: ícono de contorno, sin relleno */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #868e96; /* neutro: aún no enviado */
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+    font-size: 22px;
+    line-height: 1;
+    color: inherit;
+  }
+
+  &.sent,
+  &.success {
+    color: #2f9e44;
+  }
+  &.warning {
+    color: #f76707;
+  }
+  &.error {
+    color: #e03131;
+  }
+}
+
+/* Botones de acción: Ver SF y Reenviar */
+.btn-sf-link,
+.btn-resend {
+  padding: 4px;
+  border: none;
+  background-color: transparent;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    color: #495057;
+  }
+
+  &:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+    font-size: 20px;
+  }
+}
