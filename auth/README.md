@@ -88,8 +88,13 @@ API_PROVIDER_TOKEN=<token> npm start
   para este portal, y da de baja los anteriores. Los valores viejos siguen en el
   historial público del repositorio; reescribirlo no sustituye la revocación.
 - **Registros:** el log de acceso de nginx guarda las consultas (`vin=`,
-  `order_dms=`...). `Authorization` y el token no se registran. Define cuánto
-  tiempo se conservan los logs del servidor.
+  `order_dms=`...), pero no `Authorization` ni el token. Se escribe un archivo
+  por día (`access-AAAA-MM-DD.log`) en el volumen `portal-logs`, que sobrevive a
+  los redespliegues, y **se conservan 15 días**: el arranque de nginx
+  (`nginx/docker-entrypoint.d/05-logs.sh`) borra lo más viejo cada 6 horas.
+  `LOG_RETENTION_DAYS` cambia el plazo. Lo que sale por `docker logs` es solo un
+  respaldo corto (10 MB x 3 archivos). Para leerlos en el servidor:
+  `docker exec <contenedor web> cat /var/log/nginx/portal/access-AAAA-MM-DD.log`.
 
 ## Límite que hay que conocer
 
