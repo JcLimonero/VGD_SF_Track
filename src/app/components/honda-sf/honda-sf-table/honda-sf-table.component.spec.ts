@@ -181,14 +181,39 @@ describe('HondaSfTableComponent', () => {
     flushRows();
     expect(component.pageIndex).toBe(2);
 
-    component.applyFilter({ dealer_id: '10017', email: 'mayra@example.com' });
+    component.applyFilter({ email: 'mayra@example.com' });
     const req = flushRows();
 
-    expect(req.request.params.get('dealer_id')).toBe('10017');
     expect(req.request.params.get('email')).toBe('mayra@example.com');
     expect(req.request.params.get('page')).toBe('1');
     expect(component.pageIndex).toBe(0);
     expect(component.hasActiveFilters).toBeTrue();
+  });
+
+  it('siempre manda el filtro fijo de Acura y el usuario no lo puede cambiar', () => {
+    start();
+
+    // Clientes no trae marca: se limita por el distribuidor de Acura
+    component.applyFilter({ dealer_id: '10017' });
+    let req = flushRows();
+    expect(req.request.params.get('dealer_id')).toBe('2003');
+
+    // Las demás tablas se limitan por marca
+    component.table = 'portalhondaleads';
+    component.ngOnChanges({
+      table: new SimpleChange('portalhondacustomers', 'portalhondaleads', false)
+    });
+    req = flushRows(LEADS);
+    expect(req.request.params.get('brand')).toBe('ACURA');
+
+    component.applyFilter({ brand: 'HONDA' });
+    req = flushRows(LEADS);
+    expect(req.request.params.get('brand')).toBe('ACURA');
+  });
+
+  it('los filtros fijos no cuentan como filtros activos', () => {
+    start();
+    expect(component.hasActiveFilters).toBeFalse();
   });
 
   it('reports no active filters when every value is empty', () => {
@@ -347,7 +372,7 @@ describe('HondaSfTableComponent', () => {
       spyOn(console, 'error');
       start(2500);
 
-      component.applyFilter({ dealer_id: '10017' });
+      component.applyFilter({ email: 'mayra@example.com' });
       flushRows(CUSTOMERS, ROWS, 2500);
 
       component.downloadExcel();
@@ -362,9 +387,11 @@ describe('HondaSfTableComponent', () => {
       ]);
 
       // El filtro activo se respeta en todas las páginas
-      pages.forEach((p) =>
-        expect(p.request.params.get('dealer_id')).toBe('10017')
-      );
+      pages.forEach((p) => {
+        expect(p.request.params.get('email')).toBe('mayra@example.com');
+        // y el filtro fijo de Acura también
+        expect(p.request.params.get('dealer_id')).toBe('2003');
+      });
 
       // Sin ordenar: la API no desempata el ORDER BY, así que pedir las páginas
       // ordenadas devolvía filas repetidas y otras faltantes

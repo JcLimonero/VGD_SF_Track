@@ -184,7 +184,10 @@ export class HondaSfTableComponent implements OnInit, OnChanges {
     // el ORDER BY, así que ordenar aquí arriesga filas repetidas entre páginas.
     // El orden que ve el usuario se aplica en memoria, ya con todo descargado.
     const totalPages = Math.ceil(this.total / this.maxPerPage);
-    const baseParams = { ...this.currentFilters };
+    const baseParams = {
+      ...this.currentFilters,
+      ...this.config.lockedFilters
+    };
 
     const pageRequests = [];
     for (let page = 1; page <= totalPages; page++) {
@@ -284,7 +287,11 @@ export class HondaSfTableComponent implements OnInit, OnChanges {
 
   /** Parámetros de consulta; sin paginación cuando no se pasan índices. */
   private buildParams(pageIndex?: number, pageSize?: number): any {
-    const params: any = { ...this.currentFilters };
+    // Los filtros fijos van al final: el usuario no puede sobrescribirlos.
+    const params: any = {
+      ...this.currentFilters,
+      ...this.config.lockedFilters
+    };
 
     if (pageIndex !== undefined && pageSize !== undefined) {
       params.page = pageIndex + 1; // La API es 1-indexed

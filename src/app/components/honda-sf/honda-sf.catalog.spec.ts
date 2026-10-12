@@ -1,4 +1,6 @@
 import {
+  ACURA_BRAND,
+  ACURA_DEALER_ID,
   HONDA_SF_LABELS,
   HONDA_SF_TABLES,
   findHondaSfTable
@@ -95,5 +97,18 @@ describe('honda-sf.catalog', () => {
             .toBeGreaterThan(0);
         });
     });
+  });
+
+  it('toda tabla queda limitada a Acura y ninguna deja filtrar por marca', () => {
+    for (const table of HONDA_SF_TABLES) {
+      const locked = table.lockedFilters ?? {};
+      const acura =
+        locked['brand'] === ACURA_BRAND ||
+        locked['dealer_id'] === ACURA_DEALER_ID;
+      expect(acura).withContext(table.id).toBeTrue();
+      expect(table.filters.some((f) => f.field === 'brand'))
+        .withContext(table.id)
+        .toBeFalse();
+    }
   });
 });
