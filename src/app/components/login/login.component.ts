@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -7,6 +8,8 @@ import {
   Validators
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../core/auth/auth.service';
+import { PROFILES, Profile, ProfileId } from '../../core/auth/profiles';
 
 @Component({
   selector: 'vex-login',
@@ -15,47 +18,54 @@ import { Router } from '@angular/router';
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
+  readonly profiles = PROFILES;
+
   loginForm: FormGroup;
+  selectedProfile: ProfileId | null = null;
   isLoading = false;
   errorMessage = '';
   showPassword = false;
 
-  private readonly VALID_PASSWORD = 'Vanguardia123';
-
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private auth: AuthService
   ) {
     this.loginForm = this.fb.group({
       password: ['', [Validators.required]]
     });
   }
 
+  selectProfile(profile: Profile): void {
+    this.selectedProfile = profile.id;
+    this.errorMessage = '';
+  }
+
   onSubmit(): void {
+    if (!this.selectedProfile) {
+      this.errorMessage = 'Elige tu perfil';
+      return;
+    }
     if (this.loginForm.invalid) {
       this.errorMessage = 'Por favor ingresa la contraseña';
       return;
     }
 
     this.isLoading = true;
+    this.errorMessage = '';
     const password = this.loginForm.get('password')?.value;
 
-    // Simular delay de autenticación
-    setTimeout(() => {
-      if (password === this.VALID_PASSWORD) {
-        // Login exitoso - guardar estado en localStorage
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('loginTime', Date.now().toString());
-
-        // Redirigir a home
+    this.auth.login(this.selectedProfile, password).subscribe({
+      next: () => {
+        this.isLoading = false;
         this.router.navigate(['/home']);
-      } else {
-        // Login fallido
-        this.errorMessage = 'Contraseña incorrecta';
+      },
+      error: (error: HttpErrorResponse) => {
+        this.isLoading = false;
+        this.errorMessage = this.messageFor(error);
         this.loginForm.get('password')?.setValue('');
       }
-      this.isLoading = false;
-    }, 1000);
+    });
   }
 
   togglePassword(): void {
@@ -64,5 +74,15 @@ export class LoginComponent {
 
   get passwordControl() {
     return this.loginForm.get('password');
+  }
+
+  private messageFor(error: HttpErrorResponse): string {
+    if (error.status === 401) return 'Contraseña incorrecta';
+    if (error.status === 429) {
+      const seconds = Number(error.error?.retryAfter ?? 0);
+      const minutes = Math.max(1, Math.ceil(seconds / 60));
+      return `Demasiados intentos. Vuelve a intentar en ${minutes} min`;
+    }
+    return 'No se pudo conectar. Intenta de nuevo en un momento';
   }
 }

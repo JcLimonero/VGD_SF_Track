@@ -1,36 +1,19 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
+import { AuthService } from '../core/auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
-  
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private auth: AuthService
+  ) {}
 
   canActivate(): boolean {
-    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-    
-    if (isAuthenticated) {
-      // Verificar si la sesión no ha expirado (opcional: 24 horas)
-      const loginTime = localStorage.getItem('loginTime');
-      if (loginTime) {
-        const now = Date.now();
-        const sessionDuration = 24 * 60 * 60 * 1000; // 24 horas
-        
-        if (now - parseInt(loginTime) > sessionDuration) {
-          // Sesión expirada
-          localStorage.removeItem('isAuthenticated');
-          localStorage.removeItem('loginTime');
-          this.router.navigate(['/login']);
-          return false;
-        }
-      }
-      
-      return true;
-    }
-    
-    // No autenticado, redirigir a login
+    if (this.auth.isAuthenticated()) return true;
+
     this.router.navigate(['/login']);
     return false;
   }

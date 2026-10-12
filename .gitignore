@@ -47,3 +47,6 @@ testem.log
 Thumbs.db
 
 /ARCHIVE/*
+
+# Variables de entorno locales (contraseñas de los perfiles)
+.env
