@@ -7,6 +7,7 @@ import { HondaSfFilterComponent } from './honda-sf-filter.component';
 import { HONDA_SF_TABLES, HondaSfFilterField } from '../honda-sf.catalog';
 
 const AGENCIES = [
+  { idAgency: '2003', name: 'ACURA GUADALAJARA' },
   { idAgency: '10017', name: 'HONDA VANGUARDIA GALERIAS' },
   { idAgency: '10082', name: 'HONDA GONZALEZ GALLO' }
 ];
@@ -100,13 +101,12 @@ describe('HondaSfFilterComponent', () => {
     expect(el.querySelectorAll('input[type="text"]').length).toBe(1);
   });
 
-  it('takes the dealer options from the agency catalog', () => {
+  it('takes the dealer options from the agency catalog, only Acura', () => {
     fixture.detectChanges();
     flushAgencies();
 
     expect(component.optionsFor(FIELDS[0])).toEqual([
-      { label: 'HONDA VANGUARDIA GALERIAS', value: '10017' },
-      { label: 'HONDA GONZALEZ GALLO', value: '10082' }
+      { label: 'ACURA GUADALAJARA', value: '2003' }
     ]);
     // La lista declarada se usa tal cual: la API compara exacto
     expect(component.optionsFor(FIELDS[2])).toEqual([
@@ -124,13 +124,13 @@ describe('HondaSfFilterComponent', () => {
 
     component.onOptionToggle(
       FIELDS[0],
-      { label: 'HONDA GONZALEZ GALLO', value: '10082' },
+      { label: 'ACURA GUADALAJARA', value: '2003' },
       toggle(true)
     );
     component.onFilter();
 
-    expect(component.selected['dealer_id']).toBe('HONDA GONZALEZ GALLO');
-    expect(emitted[0].dealer_id).toBe('10082');
+    expect(component.selected['dealer_id']).toBe('ACURA GUADALAJARA');
+    expect(emitted[0].dealer_id).toBe('2003');
   });
 
   it('unselecting an option clears its value', () => {

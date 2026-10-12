@@ -57,7 +57,29 @@ export interface HondaSfTable {
   noSort?: string[];
   defaultSort: { column: string; direction: 'asc' | 'desc' };
   filters: HondaSfFilterField[];
+  /**
+   * Filtros fijos que se mandan siempre a la API y que el usuario no puede
+   * quitar ni sobrescribir. Hoy dejan solo lo de Acura.
+   */
+  lockedFilters?: Record<string, string>;
 }
+
+/** Marca y distribuidor de Acura: lo único que muestra este módulo. */
+export const ACURA_BRAND = 'ACURA';
+/** `idAgency` de ACURA GUADALAJARA en el catálogo de agencias. */
+export const ACURA_DEALER_ID = '2003';
+
+/**
+ * Filtros por marca. La API compara exacto: `brand=ACURA` trae solo Acura y
+ * deja fuera las filas sin marca (vacía o nula), a propósito.
+ */
+const ONLY_ACURA_BRAND = { brand: ACURA_BRAND };
+
+/**
+ * Clientes no trae marca (200,733 registros): lo más cercano es el
+ * distribuidor. No es exacto, pero es lo que acordó el dueño del producto.
+ */
+const ONLY_ACURA_DEALER = { dealer_id: ACURA_DEALER_ID };
 
 /**
  * Etiquetas de todos los campos que devuelven los siete endpoints.
@@ -147,6 +169,7 @@ const DEALER_FILTER: HondaSfFilterField = {
 export const HONDA_SF_TABLES: HondaSfTable[] = [
   {
     id: 'portalhondacustomers',
+    lockedFilters: ONLY_ACURA_DEALER,
     label: 'Clientes',
     sheet: 'Clientes',
     columns: [
@@ -178,6 +201,7 @@ export const HONDA_SF_TABLES: HondaSfTable[] = [
   },
   {
     id: 'portalhondaleads',
+    lockedFilters: ONLY_ACURA_BRAND,
     label: 'Leads',
     sheet: 'Leads',
     columns: [
@@ -223,6 +247,7 @@ export const HONDA_SF_TABLES: HondaSfTable[] = [
   },
   {
     id: 'portalhondaopportunities',
+    lockedFilters: ONLY_ACURA_BRAND,
     label: 'Oportunidades',
     sheet: 'Oportunidades',
     columns: [
@@ -262,6 +287,7 @@ export const HONDA_SF_TABLES: HondaSfTable[] = [
   },
   {
     id: 'portalhondademos',
+    lockedFilters: ONLY_ACURA_BRAND,
     label: 'Demos',
     sheet: 'Demos',
     columns: [
@@ -280,15 +306,15 @@ export const HONDA_SF_TABLES: HondaSfTable[] = [
       DEALER_FILTER,
       { field: 'customer_id', label: 'ID Cliente' },
       { field: 'vin', label: 'VIN' },
-      // Marca y modelo van como texto libre: la tabla trae 21 marcas y 47
-      // modelos distintos, muchos mal capturados ("VOLSWAGEN", "CRV"), así que
-      // una lista cerrada dejaría fuera registros reales.
-      { field: 'brand', label: 'Marca' },
+      // La marca ya no es filtrable: este módulo solo muestra Acura.
+      // El modelo va como texto libre porque la tabla trae 47 modelos distintos,
+      // muchos mal capturados ("CRV"), y una lista cerrada dejaría fuera registros.
       { field: 'model_name', label: 'Modelo' }
     ]
   },
   {
     id: 'portalhondasales',
+    lockedFilters: ONLY_ACURA_BRAND,
     label: 'Ventas',
     sheet: 'Ventas',
     columns: [
@@ -322,6 +348,7 @@ export const HONDA_SF_TABLES: HondaSfTable[] = [
   },
   {
     id: 'portalhondaquotes',
+    lockedFilters: ONLY_ACURA_BRAND,
     label: 'Cotizaciones',
     sheet: 'Cotizaciones',
     columns: [
@@ -349,6 +376,7 @@ export const HONDA_SF_TABLES: HondaSfTable[] = [
   },
   {
     id: 'portalhondafinances',
+    lockedFilters: ONLY_ACURA_BRAND,
     label: 'Financiamientos',
     sheet: 'Financiamientos',
     columns: [
