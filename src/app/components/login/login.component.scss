@@ -241,3 +241,14 @@ $input-bg-focus: #e7e9ed;
     color: #fff;
   }
 }
+
+.form-input:disabled {
+  background: #f1f3f5;
+  color: #adb5bd;
+  cursor: not-allowed;
+}
+
+.toggle-password:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

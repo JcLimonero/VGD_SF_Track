@@ -41,6 +41,7 @@
           <button
             type="button"
             class="toggle-password"
+            [disabled]="!selectedProfile"
             (click)="togglePassword()"
             [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
             [attr.aria-pressed]="showPassword"
@@ -69,7 +70,7 @@
       <button
         type="submit"
         class="login-btn"
-        [disabled]="isLoading"
+        [disabled]="isLoading || !selectedProfile"
         [class.loading]="isLoading"
       >
         <span *ngIf="!isLoading">Entrar</span>

@@ -15,12 +15,8 @@ export interface Profile {
   tabs: string[];
 }
 
+/** Orden en el que se ofrecen en el login: el primero es el que viene elegido. */
 export const PROFILES: Profile[] = [
-  {
-    id: 'crabi',
-    label: 'CRABI',
-    tabs: ['crabi']
-  },
   {
     id: 'sales_force',
     label: 'SALES FORCE',
@@ -36,6 +32,11 @@ export const PROFILES: Profile[] = [
       'salesforce',
       'hondasf'
     ]
+  },
+  {
+    id: 'crabi',
+    label: 'CRABI',
+    tabs: ['crabi']
   }
 ];
 
