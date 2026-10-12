@@ -22,4 +22,10 @@ describe('MenuComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('el logo lleva al home dentro del portal, no a una URL externa', () => {
+    const brand: HTMLAnchorElement =
+      fixture.nativeElement.querySelector('a.menu-brand');
+    expect(brand.getAttribute('href')).toBe('/home');
+  });
 });
