@@ -60,6 +60,12 @@ export class AuthService {
     return findProfile(session.profile) ?? null;
   }
 
+  /** Token de la sesión vigente, o null. Lo manda el interceptor a `/api`. */
+  token(): string | null {
+    if (!this.profile()) return null;
+    return this.read()?.token ?? null;
+  }
+
   /** Sin sesión no se ve ninguna pestaña. */
   canSee(tabId: string): boolean {
     return this.profile()?.tabs.includes(tabId) ?? false;

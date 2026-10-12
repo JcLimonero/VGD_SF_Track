@@ -82,3 +82,78 @@ test('un acceso correcto reinicia el contador', () => {
   limiter.fail('ip');
   assert.equal(limiter.retryAfter('ip'), 0);
 });
+
+const { canAccess } = require('../auth');
+
+test('CRABI solo llega a sus órdenes y a las agencias', () => {
+  assert.equal(canAccess('crabi', '/api/vgd/orderscrabi'), true);
+  assert.equal(canAccess('crabi', '/api/vgd/orderscrabi/15'), true);
+  assert.equal(canAccess('crabi', '/api/vgd/agenciesfilter'), true);
+  for (const resource of ['inventoryfilter', 'customerfilter', 'dwh', 'invoice',
+    'portalhondaleads', 'leadsfilter', 'servicefilter']) {
+    assert.equal(canAccess('crabi', `/api/vgd/${resource}`), false, resource);
+  }
+});
+
+test('SALES FORCE llega a todo menos a las órdenes de Crabi', () => {
+  for (const resource of ['inventoryfilter', 'customerfilter', 'dwh', 'invoice',
+    'portalhondaleads', 'agenciesfilter']) {
+    assert.equal(canAccess('sales_force', `/api/vgd/${resource}`), true, resource);
+  }
+  assert.equal(canAccess('sales_force', '/api/vgd/orderscrabi'), false);
+  assert.equal(canAccess('sales_force', '/api/vgd/orderscrabi/15'), false);
+});
+
+test('mayúsculas y variantes de ruta no esquivan la regla de Crabi', () => {
+  for (const path of [
+    '/api/vgd/OrdersCrabi',
+    '/api/vgd/ORDERSCRABI/1',
+    '/api/vgd/orderscrabi/',
+    '/api/vgd//orderscrabi',
+    '/api/vgd/./orderscrabi',
+    '/api/vgd/x/../orderscrabi',
+    '/api/vgd/orderscrabi%2f1',
+    '/api/vgd/orderscrabi;x',
+    '/api/vgd/orderscrabi\\x',
+    '/api/vgd/orderscrabi?x=1'
+  ]) {
+    assert.equal(canAccess('sales_force', path), false, path);
+  }
+});
+
+test('rutas fuera de /api/vgd, vacías o de perfiles desconocidos se rechazan', () => {
+  for (const path of ['', '/', '/api', '/api/', '/api/vgd', '/api/vgd/', '/auth/me',
+    '/api/auth/login', '/otra/vgd/dwh', undefined, null, 42]) {
+    assert.equal(canAccess('sales_force', path), false, String(path));
+    assert.equal(canAccess('crabi', path), false, String(path));
+  }
+  assert.equal(canAccess('admin', '/api/vgd/dwh'), false);
+  assert.equal(canAccess(undefined, '/api/vgd/dwh'), false);
+});
+
+test('canAccess: solo GET y PUT, y PUT únicamente en los recursos que el portal modifica', () => {
+  for (const resource of ['inventoryfilter', 'customerfilter', 'servicefilter',
+    'leadsfilter', 'invoice']) {
+    assert.equal(canAccess('sales_force', `/api/vgd/${resource}/1`, 'PUT'), true, resource);
+    assert.equal(canAccess('crabi', `/api/vgd/${resource}/1`, 'PUT'), false, resource);
+  }
+  assert.equal(canAccess('crabi', '/api/vgd/orderscrabi/1', 'PUT'), true);
+  assert.equal(canAccess('sales_force', '/api/vgd/orderscrabi/1', 'PUT'), false);
+
+  for (const resource of ['dwh', 'agenciesfilter', 'portalhondaleads', 'portalhondacustomers']) {
+    assert.equal(canAccess('sales_force', `/api/vgd/${resource}`, 'PUT'), false, resource);
+  }
+  for (const method of ['POST', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD', 'put', '', undefined, null]) {
+    assert.equal(
+      canAccess('sales_force', '/api/vgd/inventoryfilter/1', method === undefined ? 'X' : method),
+      false,
+      String(method)
+    );
+  }
+});
+
+test('el limitador no crece sin tope', () => {
+  const limiter = new RateLimiter(5, 60_000, 100);
+  for (let i = 0; i < 1000; i++) limiter.fail(`ip-${i}`, 1_000 + i);
+  assert.ok(limiter.failures.size <= 100);
+});

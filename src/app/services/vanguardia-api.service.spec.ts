@@ -27,9 +27,8 @@ describe('VanguardiaApiService', () => {
 
       const req = httpMock.expectOne(`${BASE}/vgd/portalhondaleads`);
       expect(req.request.method).toBe('GET');
-      expect(req.request.headers.get(environment.api.providerTokenHeader)).toBe(
-        environment.api.providerTokenValue
-      );
+      // El token de proveedor lo agrega nginx: el navegador no lo manda
+      expect(req.request.headers.has('X-Provider-Token')).toBeFalse();
       req.flush({});
     });
 
@@ -96,6 +95,32 @@ describe('VanguardiaApiService', () => {
       // Sin nombre la URL quedaría en `/vgd/`, que responde 401 y se leería
       // como un problema de credenciales
       expect(() => service.getHondaPortal('')).toThrowError(/endpoint/i);
+    });
+  });
+
+  describe('token de proveedor', () => {
+    it('ninguna llamada lo manda desde el navegador', () => {
+      service.getInventory({ vin: 'X' }).subscribe();
+      service.getCustomers().subscribe();
+      service.getServices().subscribe();
+      service.getDWH().subscribe();
+      service.getLeads().subscribe();
+      service.getCrabiOrders().subscribe();
+      service.getInvoices().subscribe();
+      service.updateInventory(1, {}).subscribe();
+      service.updateCrabiOrder(1, {}).subscribe();
+
+      const calls = httpMock.match(() => true);
+      expect(calls.length).toBe(9);
+      calls.forEach((call) => {
+        expect(call.request.headers.has('X-Provider-Token'))
+          .withContext(call.request.url)
+          .toBeFalse();
+        expect(call.request.url.startsWith('/api/vgd/'))
+          .withContext(call.request.url)
+          .toBeTrue();
+        call.flush({});
+      });
     });
   });
 });

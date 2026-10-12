@@ -57,6 +57,11 @@ jobs:
       - name: Pruebas del servicio de acceso
         run: npm test --prefix auth
 
+      # nginx real + servicio de acceso real + API falsa: el proxy /api valida
+      # la sesión y el perfil antes de agregar el token de proveedor.
+      - name: Pruebas del proxy de la API
+        run: bash nginx/test-proxy.sh
+
       - name: Verificar tipos
         run: npm run typecheck
 

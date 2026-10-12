@@ -1,0 +1,120 @@
+# Plantilla de nginx: la imagen oficial sustituye ${VARIABLES} de entorno al
+# arrancar (solo las que existen; $uri, $host... los resuelve nginx).
+#
+#   API_PROVIDER_TOKEN  token de proveedor de la API. Vive solo aquí, en el
+#                       servidor: el portal y el navegador nunca lo ven.
+#   API_UPSTREAM        URL base de la API, p. ej. https://apisvanguardia.com:400
+#
+# nginx/docker-entrypoint.d/10-validate-env.sh revisa esos valores antes de
+# sustituirlos: un valor con comillas, `;` o `$` rompería esta configuración.
+
+# Frena a quien prueba contraseñas en /auth/login (por IP real del cliente)
+limit_req_zone $binary_remote_addr zone=login:10m rate=10r/m;
+
+server {
+  listen 80;
+  server_name _;
+  root /usr/share/nginx/html;
+  index index.html;
+
+  # Una ruta con `..`, `//` o %xx se normaliza antes de decidir quién entra.
+  merge_slashes on;
+
+  # IP real del cliente. Delante de este nginx está el proxy de Coolify (Traefik),
+  # que agrega la IP que vio al final de X-Forwarded-For. Se confía solo en las
+  # redes privadas y se toma la primera dirección pública de derecha a izquierda:
+  # lo que el cliente escriba al principio de la cadena no cuenta.
+  set_real_ip_from 10.0.0.0/8;
+  set_real_ip_from 172.16.0.0/12;
+  set_real_ip_from 192.168.0.0/16;
+  real_ip_header X-Forwarded-For;
+  real_ip_recursive on;
+
+  add_header X-Content-Type-Options "nosniff" always;
+  add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+  # Servicio de acceso (contenedor `auth` del docker-compose). El nombre se
+  # resuelve al pedir, no al arrancar: si `auth` tarda o se reinicia, el portal
+  # sigue sirviendo y solo el login responde 502 mientras tanto.
+  location /auth/ {
+    resolver 127.0.0.11 valid=10s;
+    set $auth_upstream http://auth:3000;
+    proxy_pass $auth_upstream;
+    # El servicio toma la IP de X-Real-IP, que fijamos aquí: nunca la del cliente
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header Host $host;
+    add_header Cache-Control "no-store" always;
+    add_header X-Content-Type-Options "nosniff" always;
+  }
+
+  location = /auth/login {
+    limit_req zone=login burst=5 nodelay;
+    limit_req_status 429;
+    resolver 127.0.0.11 valid=10s;
+    set $auth_upstream http://auth:3000;
+    proxy_pass $auth_upstream;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header Host $host;
+    add_header Cache-Control "no-store" always;
+    add_header X-Content-Type-Options "nosniff" always;
+  }
+
+  # Verificación interna de cada llamada a /api. `internal` la hace inalcanzable
+  # desde fuera: solo la usa auth_request.
+  location = /auth/verify {
+    internal;
+    resolver 127.0.0.11 valid=10s;
+    set $auth_upstream http://auth:3000;
+    proxy_pass $auth_upstream;
+    proxy_pass_request_body off;
+    proxy_set_header Content-Length "";
+    # Ruta decodificada y método de la llamada original (aquí `$uri` y
+    # `$request_method` serían los de la subpetición)
+    proxy_set_header X-Original-URI $original_path;
+    proxy_set_header X-Original-Method $original_method;
+  }
+
+  # API de Vanguardia. Nada pasa sin una sesión válida cuyo perfil pueda hacer
+  # esa llamada; solo entonces nginx agrega el token de proveedor.
+  location /api/ {
+    set $original_path $uri;
+    set $original_method $request_method;
+    auth_request /auth/verify;
+
+    # El 401 lo genera nginx cuando la sesión no vale: se marca para que el
+    # portal sepa que debe pedir el login. Un 401 que venga de la API pasa tal
+    # cual (no se intercepta) y no cierra la sesión.
+    error_page 401 = @sesion_vencida;
+
+    proxy_pass ${API_UPSTREAM}/;
+
+    # Verifica el certificado de la API: el token viaja en cada llamada
+    proxy_ssl_server_name on;
+    proxy_ssl_verify on;
+    proxy_ssl_verify_depth 3;
+    proxy_ssl_trusted_certificate /etc/ssl/certs/ca-certificates.crt;
+
+    # El token lo pone el servidor; cualquier valor que mande el cliente se pisa
+    proxy_set_header X-Provider-Token "${API_PROVIDER_TOKEN}";
+    # La sesión del portal es nuestra: la API no tiene por qué recibirla
+    proxy_set_header Authorization "";
+    proxy_set_header X-Forwarded-For $remote_addr;
+
+    # Nada de lo que responda la API debe devolver el token ni quedar en caché
+    proxy_hide_header X-Provider-Token;
+    add_header Cache-Control "no-store" always;
+    add_header X-Content-Type-Options "nosniff" always;
+  }
+
+  location @sesion_vencida {
+    default_type application/json;
+    add_header Cache-Control "no-store" always;
+    return 401 '{"error":"session_expired"}';
+  }
+
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+}

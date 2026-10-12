@@ -12,9 +12,9 @@ Las configuraciones de la API están en `src/environments/environment.ts`:
 export const environment = {
   production: false,
   api: {
-    baseUrl: 'https://apisvanguardia.com:400',
-    providerTokenHeader: 'X-Provider-Token',
-    providerTokenValue: 'b26e88c4-ddbe-4adb-a214-4667f1509d4a'
+    // nginx reenvía /api a la API de Vanguardia y agrega el token de proveedor
+    // (variable de entorno API_PROVIDER_TOKEN del servidor). El portal no lo lleva.
+    baseUrl: '/api'
   }
 };
 ```

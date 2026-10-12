@@ -53,6 +53,50 @@ function verifyToken(secret, token, now = Date.now()) {
   return data;
 }
 
+/**
+ * Forma de ruta que se acepta hacia la API: `/api/vgd/<recurso>[/<id>...]`, solo
+ * con letras, números, guion y guion bajo. Todo lo demás se rechaza, así no hay
+ * `..`, `%`, `;`, `\\` ni mayúsculas/minúsculas que esquiven la regla de abajo.
+ */
+const API_PATH = /^\/api\/vgd\/[A-Za-z0-9_-]+(\/[A-Za-z0-9_-]+)*\/?$/;
+
+/** Recursos que puede usar CRABI: sus órdenes y el catálogo de agencias. */
+const CRABI_RESOURCES = new Set(['orderscrabi', 'agenciesfilter']);
+
+/** Recurso exclusivo de CRABI: SALES FORCE no lo ve. */
+const CRABI_ONLY = 'orderscrabi';
+
+/** Recursos que el portal modifica (PUT). El resto de la API es solo lectura. */
+const WRITABLE_RESOURCES = new Set([
+  'inventoryfilter',
+  'customerfilter',
+  'servicefilter',
+  'leadsfilter',
+  'invoice',
+  'orderscrabi'
+]);
+
+/**
+ * ¿Este perfil puede hacer esta llamada a la API? `path` debe ser la ruta ya
+ * decodificada y normalizada por nginx (`$uri`), sin parámetros de consulta.
+ * Solo se permiten GET y PUT, y PUT únicamente sobre los recursos que el portal
+ * modifica: el token de proveedor no debe servir para borrar ni crear nada.
+ */
+function canAccess(profile, path, method = 'GET') {
+  if (typeof path !== 'string' || !API_PATH.test(path)) return false;
+  const resource = path.split('/')[3].toLowerCase();
+
+  if (method === 'PUT') {
+    if (!WRITABLE_RESOURCES.has(resource)) return false;
+  } else if (method !== 'GET') {
+    return false;
+  }
+
+  if (profile === 'crabi') return CRABI_RESOURCES.has(resource);
+  if (profile === 'sales_force') return resource !== CRABI_ONLY;
+  return false;
+}
+
 /** Comparación en tiempo constante, aunque los textos midan distinto. */
 function safeEqual(a, b) {
   const hashA = crypto.createHash('sha256').update(String(a)).digest();
@@ -73,9 +117,10 @@ function checkPassword(env, profile, password) {
  * defensa contra adivinarlas probando una tras otra.
  */
 class RateLimiter {
-  constructor(maxFailures = 5, windowMs = 15 * 60 * 1000) {
+  constructor(maxFailures = 5, windowMs = 15 * 60 * 1000, maxKeys = 10000) {
     this.maxFailures = maxFailures;
     this.windowMs = windowMs;
+    this.maxKeys = maxKeys;
     this.failures = new Map();
   }
 
@@ -94,6 +139,7 @@ class RateLimiter {
   fail(key, now = Date.now()) {
     const entry = this.failures.get(key);
     if (!entry || now - entry.first >= this.windowMs) {
+      this.makeRoom(now);
       this.failures.set(key, { count: 1, first: now });
     } else {
       entry.count++;
@@ -103,6 +149,17 @@ class RateLimiter {
   succeed(key) {
     this.failures.delete(key);
   }
+
+  /** Tope de memoria: tira lo vencido y, si aún no cabe, lo más antiguo. */
+  makeRoom(now) {
+    if (this.failures.size < this.maxKeys) return;
+    for (const [key, entry] of this.failures) {
+      if (now - entry.first >= this.windowMs) this.failures.delete(key);
+    }
+    while (this.failures.size >= this.maxKeys) {
+      this.failures.delete(this.failures.keys().next().value);
+    }
+  }
 }
 
 module.exports = {
@@ -110,5 +167,6 @@ module.exports = {
   signToken,
   verifyToken,
   checkPassword,
+  canAccess,
   RateLimiter
 };

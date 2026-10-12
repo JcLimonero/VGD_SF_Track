@@ -13,7 +13,10 @@ FROM nginx:1.27-alpine
 
 RUN apk add --no-cache wget
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# La imagen de nginx sustituye las ${VARIABLES} de esta plantilla al arrancar
+COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
+# Revisa API_PROVIDER_TOKEN y API_UPSTREAM antes de sustituir la plantilla
+COPY nginx/docker-entrypoint.d/10-validate-env.sh /docker-entrypoint.d/10-validate-env.sh
 COPY --from=build /app/dist/vex /usr/share/nginx/html
 
 EXPOSE 80
