@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { httpTestProviders } from '@testing/test-providers';
+import { clearSession, loginAs } from '@testing/auth-testing';
 
 import { HomeComponent } from './home.component';
 import { HondaSfSubtabsComponent } from '../components/honda-sf/honda-sf-subtabs/honda-sf-subtabs.component';
@@ -14,6 +15,7 @@ describe('HomeComponent', () => {
   let fixture: ComponentFixture<HomeComponent>;
 
   beforeEach(async () => {
+    loginAs('sales_force');
     await TestBed.configureTestingModule({
       imports: [HomeComponent],
       // El menú del encabezado trae un routerLink (logo), que necesita el router
@@ -25,6 +27,8 @@ describe('HomeComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
+
+  afterEach(() => clearSession());
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -129,6 +133,24 @@ describe('HomeComponent', () => {
       fixture.detectChanges();
 
       expect(subtabsOf(SalesforceSubtabsComponent).activeTab).toBe(wanted);
+    });
+  });
+
+  describe('perfiles', () => {
+    it('SALES FORCE abre en Órdenes y no acepta la pestaña Crabi', () => {
+      expect(component.activeTab).toBe('orders');
+      component.onTabChanged('crabi');
+      expect(component.activeTab).toBe('orders');
+    });
+
+    it('CRABI abre directo en Crabi y no acepta otras pestañas', () => {
+      loginAs('crabi');
+      const crabi = TestBed.createComponent(HomeComponent).componentInstance;
+
+      expect(crabi.activeTab).toBe('crabi');
+      crabi.onTabChanged('orders');
+      crabi.onTabChanged('hondasf');
+      expect(crabi.activeTab).toBe('crabi');
     });
   });
 });

@@ -1,0 +1,10 @@
+{
+  "name": "vgd-auth",
+  "private": true,
+  "description": "Servicio de acceso del portal (dos perfiles compartidos)",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "engines": { "node": ">=22" }
+}

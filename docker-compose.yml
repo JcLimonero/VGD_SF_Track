@@ -2,6 +2,8 @@ services:
   web:
     build: .
     restart: unless-stopped
+    depends_on:
+      - auth
     expose:
       - "80"
     healthcheck:
@@ -10,3 +12,17 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
+
+  # Valida las contraseñas de los perfiles CRABI y SALES FORCE. Las contraseñas
+  # y la llave se cargan como variables de entorno del despliegue (Coolify);
+  # sin ellas el servicio no arranca.
+  auth:
+    build: ./auth
+    restart: unless-stopped
+    environment:
+      AUTH_SECRET: ${AUTH_SECRET:?falta AUTH_SECRET}
+      PASSWORD_CRABI: ${PASSWORD_CRABI:?falta PASSWORD_CRABI}
+      PASSWORD_SALES_FORCE: ${PASSWORD_SALES_FORCE:?falta PASSWORD_SALES_FORCE}
+      SESSION_HOURS: ${SESSION_HOURS:-8}
+    expose:
+      - "3000"

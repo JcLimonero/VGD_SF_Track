@@ -54,6 +54,9 @@ jobs:
       - name: Bloquear vulnerabilidades críticas
         run: npm audit --omit=dev --audit-level=critical
 
+      - name: Pruebas del servicio de acceso
+        run: npm test --prefix auth
+
       - name: Verificar tipos
         run: npm run typecheck
 

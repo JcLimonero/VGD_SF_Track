@@ -6,6 +6,7 @@ import { InvoiceTableComponent } from '../components/invoice-table/invoice-table
 import { InvoiceFilterComponent } from '../components/invoice-filter/invoice-filter.component';
 import { TabsComponent } from '../components/tabs/tabs.component';
 import { InventoryTableComponent } from '../components/inventory/inventory-table/inventory-table.component';
+import { AuthService } from '../core/auth/auth.service';
 import { DemoValidationComponent } from '../components/demo-validation/demo-validation.component';
 import { InventoryFilterComponent } from '../components/inventory/inventory-filter/inventory-filter.component';
 import { CustomerTableComponent } from '../components/customer/customer-table/customer-table.component';
@@ -72,7 +73,8 @@ export class HomeComponent {
   @ViewChild('salesforceTable') salesforceTable!: SalesforceTableComponent;
   @ViewChild('hondaSfTable') hondaSfTable!: HondaSfTableComponent;
 
-  activeTab = 'orders'; // Tab activo por defecto: Ordenes
+  /** Pestaña con la que abre el perfil de la sesión */
+  activeTab: string;
 
   /** Sub-pestaña activa dentro de Integración SF (datos de prueba) */
   activeSalesforceTable: string;
@@ -85,12 +87,17 @@ export class HomeComponent {
     return findHondaSfTable(this.activeHondaSfTable)?.filters ?? [];
   }
 
-  constructor(private mockData: MockDataService) {
+  constructor(
+    private mockData: MockDataService,
+    private auth: AuthService
+  ) {
+    this.activeTab = this.auth.defaultTab() ?? 'orders';
     // Misma tabla por defecto que muestra vex-salesforce-subtabs
     this.activeSalesforceTable = this.mockData.getSalesforceTables()[0] ?? '';
   }
 
   onTabChanged(tabId: string): void {
+    if (!this.auth.canSee(tabId)) return;
     this.activeTab = tabId;
   }
 
