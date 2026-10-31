@@ -1,8 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Observable, of, throwError } from 'rxjs';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
-import { GenericDetailModalComponent } from './generic-detail-modal.component';
+import {
+  DetailAction,
+  GenericDetailModalComponent
+} from './generic-detail-modal.component';
 
 function setup(data: unknown) {
   TestBed.resetTestingModule();
@@ -146,5 +150,105 @@ describe('GenericDetailModalComponent', () => {
     const fixture = setup({ row: { a: 1, b: 2 }, labels: {} });
     const rows = fixture.nativeElement.querySelectorAll('.detail-row');
     expect(rows.length).toBe(2);
+  });
+
+  describe('acciones junto a un campo', () => {
+    const row = { vin: 'VIN1', resultSF: 'falló' };
+    const action = (
+      run: (row: any) => Observable<unknown>,
+      when: (value: unknown) => boolean = () => true
+    ): DetailAction => ({
+      field: 'resultSF',
+      label: 'Reenviar VIN',
+      doneLabel: 'Listo el VIN',
+      when,
+      run
+    });
+    const buttons = (fixture: ComponentFixture<GenericDetailModalComponent>) =>
+      Array.from(
+        fixture.nativeElement.querySelectorAll('.detail-action-btn')
+      ) as HTMLButtonElement[];
+
+    it('muestra el botón solo junto al campo y cuando el valor lo amerita', () => {
+      const shown = setup({ row, labels: {}, actions: [action(() => of(true))] });
+      expect(buttons(shown).length).toBe(1);
+      // está dentro de la fila del campo, no de otra
+      const rowEl = buttons(shown)[0].closest('.detail-row') as HTMLElement;
+      expect(rowEl.textContent).toContain('falló');
+
+      const hidden = setup({
+        row,
+        labels: {},
+        actions: [action(() => of(true), () => false)]
+      });
+      expect(buttons(hidden).length).toBe(0);
+    });
+
+    it('sin acciones no cambia nada', () => {
+      expect(buttons(setup({ row, labels: {} })).length).toBe(0);
+      expect(buttons(setup({ row, labels: {}, actions: null })).length).toBe(0);
+    });
+
+    it('al pulsar corre la acción con el registro y queda en hecho', () => {
+      let received: unknown = null;
+      const fixture = setup({
+        row,
+        labels: {},
+        actions: [action((r) => { received = r; return of(true); })]
+      });
+
+      buttons(fixture)[0].click();
+      fixture.detectChanges();
+
+      expect(received).toEqual(row);
+      expect(buttons(fixture)[0].textContent?.trim()).toBe('Listo el VIN');
+      expect(buttons(fixture)[0].disabled).toBeTrue();
+    });
+
+    it('mientras corre se deshabilita y no se puede repetir', () => {
+      let calls = 0;
+      const fixture = setup({
+        row,
+        labels: {},
+        actions: [action(() => { calls++; return new Observable(() => undefined); })]
+      });
+
+      buttons(fixture)[0].click();
+      fixture.detectChanges();
+      expect(buttons(fixture)[0].disabled).toBeTrue();
+      expect(buttons(fixture)[0].textContent).toContain('Reenviando');
+
+      fixture.componentInstance.runAction(
+        fixture.componentInstance['actions'][0]
+      );
+      expect(calls).toBe(1);
+    });
+
+    it('si falla muestra el mensaje y deja reintentar', () => {
+      let attempt = 0;
+      const fixture = setup({
+        row,
+        labels: {},
+        actions: [
+          action(() =>
+            ++attempt === 1
+              ? throwError(() => new Error('El VIN no está en el inventario'))
+              : of(true)
+          )
+        ]
+      });
+
+      buttons(fixture)[0].click();
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('.detail-action-error').textContent).toContain(
+        'El VIN no está en el inventario'
+      );
+      expect(buttons(fixture)[0].disabled).toBeFalse();
+
+      buttons(fixture)[0].click();
+      fixture.detectChanges();
+      expect(buttons(fixture)[0].textContent?.trim()).toBe('Listo el VIN');
+      expect(fixture.nativeElement.querySelector('.detail-action-error')).toBeNull();
+    });
   });
 });

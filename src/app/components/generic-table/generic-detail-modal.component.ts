@@ -6,12 +6,37 @@ import {
   MatDialogModule,
   MatDialogRef
 } from '@angular/material/dialog';
+import { Observable } from 'rxjs';
 import { humanizeFieldName } from './dynamic-columns.util';
 
 interface DetailEntry {
+  /** Nombre del campo en el registro */
+  field: string;
   label: string;
   value: any;
 }
+
+/**
+ * Botón que el módulo puede poner junto a un campo del detalle, solo cuando el
+ * valor lo amerita (por ejemplo "Reenviar VIN" junto a un Resultado SF que dice
+ * que el VIN no existe en Salesforce).
+ */
+export interface DetailAction {
+  /** Campo del registro junto al que aparece el botón */
+  field: string;
+  label: string;
+  /** El botón sale solo si esto devuelve true (valor crudo del campo y registro) */
+  when: (value: unknown, row: any) => boolean;
+  /**
+   * Hace la acción. Si falla, el error debe llevar un `message` legible: es lo
+   * que se muestra junto al botón.
+   */
+  run: (row: any) => Observable<unknown>;
+  /** Texto del botón una vez hecha la acción */
+  doneLabel?: string;
+}
+
+type ActionState = { status: 'idle' | 'running' | 'done' | 'error'; message?: string };
 
 /**
  * Modal de detalles que recorre los campos del registro en lugar de tener una
@@ -31,6 +56,25 @@ interface DetailEntry {
       <div class="detail-list">
         <div class="detail-row" *ngFor="let entry of entries">
           <strong>{{ entry.label }}:</strong> {{ entry.value }}
+          <div class="detail-action" *ngFor="let action of actionsFor(entry)">
+            <button
+              type="button"
+              class="detail-action-btn"
+              [disabled]="state(action).status === 'running' || state(action).status === 'done'"
+              (click)="runAction(action)"
+            >
+              {{
+                state(action).status === 'running'
+                  ? 'Reenviando...'
+                  : state(action).status === 'done'
+                    ? action.doneLabel || 'Listo'
+                    : action.label
+              }}
+            </button>
+            <span class="detail-action-error" *ngIf="state(action).status === 'error'">
+              {{ state(action).message }}
+            </span>
+          </div>
         </div>
         <p *ngIf="entries.length === 0" class="empty">
           No hay información para mostrar.
@@ -75,6 +119,40 @@ interface DetailEntry {
         color: #848484;
       }
 
+      .detail-action {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin-top: 6px;
+      }
+
+      .detail-action-btn {
+        height: 30px;
+        padding: 0 12px;
+        border: 1px solid #1a1a1a;
+        background: #fff;
+        color: #1a1a1a;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .detail-action-btn:hover:not(:disabled) {
+        background: #f1f3f5;
+      }
+
+      .detail-action-btn:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      .detail-action-error {
+        font-size: 12px;
+        color: #c92a2a;
+      }
+
       /*
        * Único contenedor con scroll del modal, y en alto relativo.
        *
@@ -93,6 +171,9 @@ interface DetailEntry {
 export class GenericDetailModalComponent {
   title = 'Detalles del registro';
   entries: DetailEntry[] = [];
+  private row: any = null;
+  private actions: DetailAction[] = [];
+  private actionStates = new Map<DetailAction, ActionState>();
 
   constructor(
     public dialogRef: MatDialogRef<GenericDetailModalComponent>,
@@ -104,6 +185,8 @@ export class GenericDetailModalComponent {
     // nulo es válido y no debe hacer que se listen los campos del envoltorio.
     const isWrapped = !!data && typeof data === 'object' && 'row' in data;
     const row = isWrapped ? data.row : data;
+    this.row = row;
+    this.actions = (isWrapped ? data.actions : null) ?? [];
     const labels = (isWrapped ? data.labels : null) ?? {};
     const exclude = (isWrapped ? data.exclude : null) ?? [];
     const valueLabels = (isWrapped ? data.valueLabels : null) ?? {};
@@ -128,6 +211,7 @@ export class GenericDetailModalComponent {
     return Object.entries(row)
       .filter(([field]) => !exclude.includes(field))
       .map(([field, value]) => ({
+        field,
         label: labels[field] ?? humanizeFieldName(field),
         value: this.formatValue(value, valueLabels[field])
       }));
@@ -151,6 +235,35 @@ export class GenericDetailModalComponent {
 
     const raw = String(value);
     return valueLabels?.[raw] ?? raw;
+  }
+
+  /** Acciones que aplican a este campo con el valor que trae el registro. */
+  actionsFor(entry: DetailEntry): DetailAction[] {
+    return this.actions.filter(
+      (action) =>
+        action.field === entry.field &&
+        action.when(this.row?.[entry.field], this.row)
+    );
+  }
+
+  state(action: DetailAction): ActionState {
+    return this.actionStates.get(action) ?? { status: 'idle' };
+  }
+
+  runAction(action: DetailAction): void {
+    const current = this.state(action).status;
+    if (current === 'running' || current === 'done') return;
+
+    this.actionStates.set(action, { status: 'running' });
+    action.run(this.row).subscribe({
+      next: () => this.actionStates.set(action, { status: 'done' }),
+      error: (error: unknown) =>
+        this.actionStates.set(action, {
+          status: 'error',
+          message:
+            (error as Error)?.message || 'No se pudo completar la acción'
+        })
+    });
   }
 
   onClose(): void {

@@ -208,4 +208,90 @@ describe('InvoiceTableComponent', () => {
       expect(component.detailExclude).toEqual(['sf_jsonRequest']);
     });
   });
+
+  describe('reenviar VIN desde el detalle', () => {
+    const INVENTORY = `${BASE}/vgd/inventoryfilter`;
+    // VIN inventado: el repositorio es público
+    const VIN = 'VINPRUEBA00000001';
+    const ERROR = `No se encontró el vehículo correspondiente al vin: ${VIN}`;
+    const ORDER = { ...INVOICE, resultSF: ERROR, vin: VIN };
+    const unit = (id: number, vin = VIN) => ({
+      id,
+      vin,
+      sendedSalesForce: '1',
+      insertCorrect: '0',
+      resultSF: 'error de prueba',
+      idSalesForce: ''
+    });
+    const reply = (rows: any[]) => ({ data: { data: rows, total_rows: rows.length } });
+    const action = () => component.detailActions[0];
+
+    it('el botón solo aplica al Resultado SF de VIN no encontrado', () => {
+      expect(action().field).toBe('resultSF');
+      expect(action().when(ERROR, ORDER)).toBeTrue();
+      expect(action().when('No se encontró la oportunidad', ORDER)).toBeFalse();
+      expect(action().when('Insert Correct', ORDER)).toBeFalse();
+    });
+
+    it('busca la unidad por el VIN del mensaje y la marca para reenvío', () => {
+      const ok = spyOn(notifications, 'success');
+      let done = false;
+      action().run(ORDER).subscribe(() => (done = true));
+
+      httpMock
+        .expectOne((r) => r.url === INVENTORY && r.params.get('vin') === VIN)
+        .flush(reply([unit(5)]));
+      const put = httpMock.expectOne(`${INVENTORY}/5`);
+      expect(put.request.method).toBe('PUT');
+      expect(put.request.body).toEqual(
+        jasmine.objectContaining({
+          sendedSalesForce: '0',
+          insertCorrect: '0',
+          resultSF: '',
+          idSalesForce: null
+        })
+      );
+      put.flush({ status: 200 });
+
+      expect(done).toBeTrue();
+      expect(ok).toHaveBeenCalledWith(`VIN ${VIN} marcado para reenvío a Salesforce (Inventario)`);
+    });
+
+    it('usa el VIN del mensaje aunque la orden traiga otro', () => {
+      action()
+        .run({ ...ORDER, vin: 'OTROVIN' })
+        .subscribe({ error: () => undefined });
+
+      httpMock
+        .expectOne((r) => r.url === INVENTORY && r.params.get('vin') === VIN)
+        .flush(reply([]));
+      httpMock.expectNone((r) => r.params.get('vin') === 'OTROVIN');
+    });
+
+    it('si el VIN no está en el inventario lo dice y no escribe nada', () => {
+      let message = '';
+      action().run(ORDER).subscribe({ error: (e) => (message = e.message) });
+
+      httpMock
+        .expectOne((r) => r.url === INVENTORY && r.params.get('vin') === VIN)
+        .flush(reply([unit(9, 'OTRO00000000000X')]));
+
+      expect(message).toContain(`El VIN ${VIN} no está en el inventario`);
+      httpMock.expectNone((r) => r.method === 'PUT');
+    });
+
+    it('si la API falla al escribir devuelve un mensaje legible', () => {
+      let message = '';
+      action().run(ORDER).subscribe({ error: (e) => (message = e.message) });
+
+      httpMock
+        .expectOne((r) => r.url === INVENTORY && r.params.get('vin') === VIN)
+        .flush(reply([unit(5)]));
+      httpMock
+        .expectOne(`${INVENTORY}/5`)
+        .flush({ message: 'sin permisos' }, { status: 403, statusText: 'Forbidden' });
+
+      expect(message).toBe('No se pudo reenviar el VIN: sin permisos');
+    });
+  });
 });
