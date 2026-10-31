@@ -1,0 +1,50 @@
+.confirm-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.confirm-content {
+  min-width: min(420px, 80vw);
+
+  p {
+    margin: 0 0 8px;
+    font-size: 14px;
+    color: #343a40;
+  }
+}
+
+.confirm-actions {
+  padding: 8px 24px 16px;
+  gap: 8px;
+}
+
+.confirm-btn {
+  height: 36px;
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+
+  &--primary {
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+
+    &:hover {
+      background: #2a2a2a;
+    }
+  }
+
+  &--secondary {
+    background: #fff;
+    color: #1a1a1a;
+    border: 1px solid #1a1a1a;
+
+    &:hover {
+      background: #f1f3f5;
+    }
+  }
+}

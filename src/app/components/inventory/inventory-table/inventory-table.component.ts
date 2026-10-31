@@ -5,9 +5,18 @@ import { GenericTableComponent } from '../../generic-table/generic-table.compone
 import { VanguardiaApiService } from '../../../services/vanguardia-api.service';
 import { NotificationService } from '../../../services/notification.service';
 import { TableColumn } from '../../../../@vex/interfaces/table-column.interface';
-import { forkJoin } from 'rxjs';
+import { forkJoin, from, of } from 'rxjs';
+import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import * as XLSX from 'xlsx';
 import { resendPayload } from '../../shared/salesforce-link';
+
+/** Máximo de unidades que "Reenviar todos" procesa de una vez. */
+const MAX_RESEND_ALL = 1000;
+
+/** Escrituras simultáneas a la API en "Reenviar todos". */
+const RESEND_CONCURRENCY = 5;
 
 @Component({
   selector: 'vex-inventory-table',
@@ -91,7 +100,8 @@ export class InventoryTableComponent implements OnInit {
 
   constructor(
     private vanguardiaApi: VanguardiaApiService,
-    private notifications: NotificationService
+    private notifications: NotificationService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -342,5 +352,171 @@ export class InventoryTableComponent implements OnInit {
         this.isDownloadingExcel = false;
       }
     });
+  }
+
+  // ───────────── Reenviar todos los que no viajaron correctamente ─────────────
+
+  /** Hay un reenvío masivo en curso (el botón del filtro se deshabilita). */
+  isResendingAll = false;
+
+  /**
+   * Marca para reenvío a Salesforce todo lo que se envió y no entró (`sendedSalesForce`
+   * = 1 e `insertCorrect` = 0), respetando los filtros de agencia, VIN, estado
+   * y tipo que haya activos. Lo que aún está pendiente de envío ya está en cola y
+   * lo que entró bien no se toca. Pide confirmación mostrando cuántas son.
+   */
+  resendAllFailed(): void {
+    if (this.isResendingAll) return;
+    this.isResendingAll = true;
+
+    this.collectFailed().subscribe({
+      next: ({ rows, total }) => {
+        if (total > MAX_RESEND_ALL) {
+          this.isResendingAll = false;
+          this.notifications.warning(
+            `Son ${total} unidades y el máximo por vez es ${MAX_RESEND_ALL}. ` +
+              'Aplica un filtro (agencia, tipo o VIN) y vuelve a intentarlo.'
+          );
+        } else if (rows.length === 0) {
+          this.isResendingAll = false;
+          this.notifications.warning(
+            'No hay unidades con envío fallido con los filtros actuales.'
+          );
+        } else {
+          this.confirmResendAll(rows);
+        }
+      },
+      error: () => {
+        this.isResendingAll = false;
+        this.notifications.error(
+          'No se pudo consultar lo que falló. Intenta de nuevo.'
+        );
+      }
+    });
+  }
+
+  /** Parámetros de lo que falló, con los filtros de agencia, VIN, estado y tipo. */
+  private failedParams(): Record<string, string | number> {
+    const params: Record<string, string | number> = {
+      perpage: 100,
+      sendedSalesForce: '1',
+      insertCorrect: '0'
+    };
+    const f = this.currentFilters;
+    if (f.vin) params['vin'] = f.vin;
+    if (f.idAgency) params['idAgency'] = f.idAgency;
+    if (f.statusDescription) params['statusDescription'] = f.statusDescription;
+    if (f.typeDescription) params['typeDescription'] = f.typeDescription;
+    return params;
+  }
+
+  /** Trae todas las unidades con envío fallido (hasta el tope) y su total. */
+  private collectFailed() {
+    const base = this.failedParams();
+    return this.vanguardiaApi.getInventory({ ...base, page: 1 }).pipe(
+      switchMap((first) => {
+        const total = first.total;
+        if (total > MAX_RESEND_ALL || total <= first.items.length) {
+          return of({ items: first.items, total });
+        }
+        const pages = Math.ceil(total / 100);
+        const rest = Array.from({ length: pages - 1 }, (_, i) =>
+          this.vanguardiaApi.getInventory({ ...base, page: i + 2 })
+        );
+        return forkJoin(rest).pipe(
+          map((responses) => ({
+            items: [...first.items, ...responses.flatMap((r) => r.items)],
+            total
+          }))
+        );
+      }),
+      map(({ items, total }) => {
+        // Por si la API ignorara un filtro: solo lo que de verdad falló, sin repetir
+        const seen = new Set<string>();
+        const rows = items.filter((row) => {
+          const failed =
+            String(row?.sendedSalesForce) === '1' &&
+            String(row?.insertCorrect) === '0';
+          const key = String(row?.id);
+          if (!failed || seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+        return { rows, total };
+      })
+    );
+  }
+
+  private confirmResendAll(rows: any[]): void {
+    const filters = this.describeFilters();
+    this.dialog
+      .open(ConfirmDialogComponent, {
+        width: '480px',
+        maxWidth: '92vw',
+        data: {
+          title: 'Reenviar todos',
+          lines: [
+            `Se marcarán ${rows.length} unidades con envío fallido para reenviarlas a Salesforce.`,
+            filters
+              ? `Solo las que cumplen los filtros actuales: ${filters}.`
+              : 'Sin filtros: son todas las unidades con envío fallido.',
+            'Esta acción escribe en la API.'
+          ],
+          confirmLabel: `Reenviar ${rows.length}`
+        }
+      })
+      .afterClosed()
+      .subscribe((confirmed?: boolean) => {
+        if (confirmed) {
+          this.runResendAll(rows);
+        } else {
+          this.isResendingAll = false;
+        }
+      });
+  }
+
+  /** Los filtros activos en palabras, para el mensaje de confirmación. */
+  private describeFilters(): string {
+    const f = this.currentFilters;
+    const parts: string[] = [];
+    if (f.idAgency) parts.push(`agencia ${f.idAgency}`);
+    if (f.vin) parts.push(`VIN ${f.vin}`);
+    if (f.statusDescription) parts.push(`estado ${f.statusDescription}`);
+    if (f.typeDescription) parts.push(`tipo ${f.typeDescription}`);
+    return parts.join(', ');
+  }
+
+  private runResendAll(rows: any[]): void {
+    let marked = 0;
+    let failed = 0;
+
+    from(rows)
+      .pipe(
+        mergeMap((row) => {
+          if (!row?.id) return of(false);
+          return this.vanguardiaApi
+            .updateInventory(row.id, resendPayload(row))
+            .pipe(
+              map(() => true),
+              catchError(() => of(false))
+            );
+        }, RESEND_CONCURRENCY)
+      )
+      .subscribe({
+        next: (ok) => (ok ? marked++ : failed++),
+        complete: () => {
+          this.isResendingAll = false;
+          if (failed === 0) {
+            this.notifications.success(
+              `${marked} unidades marcadas para reenvío a Salesforce`
+            );
+          } else {
+            this.notifications.warning(
+              `${marked} unidades marcadas y ${failed} con error. Vuelve a pulsar "Reenviar todos" para reintentar las que faltan.`
+            );
+          }
+          this.loadPage(this.pageIndex, this.currentPageSize);
+        }
+      });
   }
 }
