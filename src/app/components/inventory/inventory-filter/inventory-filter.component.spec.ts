@@ -36,4 +36,19 @@ describe('InventoryFilterComponent', () => {
     expect(emitted.length).toBe(1);
     expect(emitted[0].typeDescription).toBe('Demo');
   });
+
+  it('el botón Reenviar todos avisa al padre y se deshabilita mientras corre', () => {
+    let emitted = 0;
+    component.resendAllRequested.subscribe(() => emitted++);
+
+    const button: HTMLButtonElement = fixture.nativeElement.querySelector('.resend-all-btn');
+    expect(button.textContent).toContain('Reenviar todos');
+    button.click();
+    expect(emitted).toBe(1);
+
+    component.isResendingAll = true;
+    fixture.detectChanges();
+    expect(button.disabled).toBeTrue();
+    expect(button.textContent).toContain('Reenviando');
+  });
 });

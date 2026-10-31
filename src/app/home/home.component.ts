@@ -136,6 +136,15 @@ export class HomeComponent {
     }
   }
 
+  /** Reenviar todo el inventario que no viajó correctamente (pide confirmación). */
+  handleInventoryResendAll(): void {
+    if (this.inventoryTable && this.inventoryTable.resendAllFailed) {
+      this.inventoryTable.resendAllFailed();
+    } else {
+      console.warn('inventoryTable no disponible aún o no tiene resendAllFailed');
+    }
+  }
+
   handleInventoryDownload(): void {
     if (this.inventoryTable && this.inventoryTable.downloadExcel) {
       this.inventoryTable.downloadExcel();
