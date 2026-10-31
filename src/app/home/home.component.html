@@ -17,6 +17,8 @@
   <!-- Contenido de Inventario -->
   <div *ngIf="activeTab === 'inventory'">
     <vex-inventory-filter (filterChange)="handleInventoryFilter($event)"
+                         (resendAllRequested)="handleInventoryResendAll()"
+                         [isResendingAll]="inventoryTable?.isResendingAll || false"
                          (downloadRequested)="handleInventoryDownload()"
                          [isDownloadingExcel]="inventoryTable?.isDownloadingExcel || false">
     </vex-inventory-filter>

@@ -23,6 +23,12 @@ export class InventoryFilterComponent implements OnInit {
   /** Emitted when the user requests to download the Excel file */
   @Output() downloadRequested = new EventEmitter<void>();
 
+  /** El usuario pidió reenviar todos los que no viajaron bien */
+  @Output() resendAllRequested = new EventEmitter<void>();
+
+  /** El padre indica si hay un reenvío masivo en curso */
+  @Input() isResendingAll = false;
+
   /** Parent can pass whether an Excel generation is in progress */
   @Input() isDownloadingExcel = false;
 
