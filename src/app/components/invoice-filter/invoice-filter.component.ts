@@ -1,4 +1,9 @@
 import { Component, EventEmitter, Output, OnInit, Input } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import {
+  BulkSearchDialogComponent,
+  BulkSearchRequest
+} from '../bulk-search-dialog/bulk-search-dialog.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { VanguardiaApiService } from '../../services/vanguardia-api.service';
@@ -19,6 +24,9 @@ export class InvoiceFilterComponent implements OnInit {
     insertado?: boolean;
     error?: boolean;
   }>();
+
+  /** El usuario pegó un listado de pedidos o VIN en el diálogo de "Buscar varios" */
+  @Output() bulkSearch = new EventEmitter<BulkSearchRequest>();
 
   /** Emitted when the user requests to download the Excel file */
   @Output() downloadRequested = new EventEmitter<void>();
@@ -56,11 +64,22 @@ export class InvoiceFilterComponent implements OnInit {
       .toLowerCase()
       .trim();
   }
+  /** Abre el diálogo para pegar varios pedidos o VIN; si hay listado, lo emite. */
+  openBulkSearch(): void {
+    this.dialog
+      .open(BulkSearchDialogComponent, { width: '560px', maxWidth: '92vw' })
+      .afterClosed()
+      .subscribe((request?: BulkSearchRequest) => {
+        if (request) this.bulkSearch.emit(request);
+      });
+  }
+
   selectedAgency: string = '';
 
   constructor(
     private fb: FormBuilder,
-    private vanguardiaApi: VanguardiaApiService
+    private vanguardiaApi: VanguardiaApiService,
+    private dialog: MatDialog
   ) {
     this.filterForm = this.fb.group({
       order_dms: [''],

@@ -1,0 +1,53 @@
+<h2 mat-dialog-title class="bulk-title">Buscar varios</h2>
+
+<mat-dialog-content class="bulk-content">
+  <p class="bulk-help">Elige por qué vas a buscar y pega el listado.</p>
+
+  <div class="bulk-field" role="radiogroup" aria-label="Buscar por">
+    <button
+      *ngFor="let option of options"
+      type="button"
+      role="radio"
+      class="bulk-option"
+      [class.selected]="field === option.field"
+      [attr.aria-checked]="field === option.field"
+      (click)="selectField(option.field)"
+    >
+      {{ option.field === 'order_dms' ? 'Número de pedido' : 'VIN' }}
+    </button>
+  </div>
+
+  <textarea
+    class="bulk-text"
+    rows="9"
+    [placeholder]="selected.placeholder + ' (también sirven comas o espacios)'"
+    [(ngModel)]="text"
+    aria-label="Listado"
+  ></textarea>
+
+  <div class="bulk-footer">
+    <span [class.bulk-over]="overLimit">
+      {{ count }} de {{ maxValues }} {{ selected.label }}
+    </span>
+    <span class="bulk-note" *ngIf="parsed.duplicates > 0">
+      · se quitan {{ parsed.duplicates }} repetido(s)
+    </span>
+  </div>
+  <p class="bulk-error" *ngIf="overLimit">
+    El máximo por búsqueda es {{ maxValues }}. Divide la lista.
+  </p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="bulk-actions">
+  <button type="button" class="bulk-btn bulk-btn--secondary" (click)="cancel()">
+    Cancelar
+  </button>
+  <button
+    type="button"
+    class="bulk-btn bulk-btn--primary"
+    [disabled]="!canSearch"
+    (click)="search()"
+  >
+    Buscar
+  </button>
+</mat-dialog-actions>
