@@ -79,6 +79,13 @@ En desarrollo, `proxy.conf.js` hace lo mismo sin validar la sesión:
 API_PROVIDER_TOKEN=<token> npm start
 ```
 
+Sin token ni servicio local, contra el portal publicado (se entra con la
+contraseña real de cada perfil; **lo que escribe afecta datos reales**):
+
+```bash
+PORTAL_REMOTE=https://integraciones.appsvanguardia.com npm start
+```
+
 ## Operación
 
 - **Si se filtra una contraseña:** cámbiala en Coolify **y rota también
