@@ -18,6 +18,7 @@ Producción: https://integraciones.appsvanguardia.com — app `integration_monit
 npm ci                                   # Node 22 (.nvmrc)
 API_PROVIDER_TOKEN=<token> npm start     # portal en :4200 (proxy.conf.js: /api y /auth)
 PORT=3100 AUTH_SECRET=$(openssl rand -hex 32) PASSWORD_CRABI=x PASSWORD_SALES_FORCE=y node auth/server.js   # login local
+PORTAL_REMOTE=https://integraciones.appsvanguardia.com npm start   # sin token ni servicio local: login y API del portal publicado (escribe en datos REALES)
 npm run typecheck                        # tsc --noEmit
 npm run test:ci                          # Karma, Chrome headless con cobertura
 npm test --prefix auth                   # servicio de acceso (node --test)
