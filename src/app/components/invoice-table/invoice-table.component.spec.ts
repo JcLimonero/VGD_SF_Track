@@ -209,6 +209,164 @@ describe('InvoiceTableComponent', () => {
     });
   });
 
+  describe('búsqueda múltiple', () => {
+    const INVOICES = `${BASE}/vgd/invoice`;
+    const row = (id: number, order: string, vin = 'VINPRUEBA00000001') => ({
+      ...INVOICE,
+      Id: String(id),
+      order_dms: order,
+      vin
+    });
+    const reply = (rows: any[]) => ({ data: { data: rows, total_rows: rows.length } });
+    const byParam = (field: string, value: string) =>
+      httpMock.expectOne(
+        (r) => r.url === INVOICES && r.params.get(field) === value
+      );
+    const request = (values: string[], field: 'order_dms' | 'vin' = 'order_dms') => ({
+      field,
+      label: field === 'order_dms' ? 'pedidos' : 'VIN',
+      values,
+      duplicates: 0
+    });
+
+    it('consulta cada pedido por separado y junta los renglones en el orden pegado', () => {
+      component.applyBulkSearch(request(['300', '100', '200']));
+
+      byParam('order_dms', '200').flush(reply([row(2, '200')]));
+      byParam('order_dms', '300').flush(reply([row(3, '300')]));
+      byParam('order_dms', '100').flush(reply([row(1, '100')]));
+
+      expect(component.bulk!.pending).toBe(0);
+      expect(component.bulkRows.map((r) => r.order_dms)).toEqual(['300', '100', '200']);
+      expect(component.data.length).toBe(3);
+      expect(component.total).toBe(3);
+      expect(component.hasActiveFilters).toBeTrue();
+    });
+
+    it('con 100 pedidos nunca hay más de 5 consultas abiertas a la vez', () => {
+      const values = Array.from({ length: 100 }, (_, i) => `P${i}`);
+      component.applyBulkSearch(request(values));
+
+      let answered = 0;
+      let wave = httpMock.match((r) => r.url === INVOICES && r.params.has('order_dms'));
+      while (wave.length > 0) {
+        expect(wave.length).toBeLessThanOrEqual(5);
+        wave.forEach((r) => r.flush(reply([])));
+        answered += wave.length;
+        wave = httpMock.match((r) => r.url === INVOICES && r.params.has('order_dms'));
+      }
+      expect(answered).toBe(100);
+    });
+
+    it('distingue lo que no existe de lo que falló', () => {
+      component.applyBulkSearch(request(['1', '2', '3']));
+
+      byParam('order_dms', '1').flush(reply([row(1, '1')]));
+      byParam('order_dms', '2').flush(reply([]));
+      byParam('order_dms', '3').flush('x', { status: 500, statusText: 'Error' });
+
+      expect(component.bulkFound).toBe(1);
+      expect(component.bulkNotFound).toEqual(['2']);
+      expect(component.bulkFailed).toEqual(['3']);
+    });
+
+    it('reintentar consulta solo los que fallaron', () => {
+      component.applyBulkSearch(request(['1', '2']));
+      byParam('order_dms', '1').flush(reply([row(1, '1')]));
+      byParam('order_dms', '2').flush('x', { status: 500, statusText: 'Error' });
+
+      component.retryBulkFailed();
+      httpMock.expectNone((r) => r.params.get('order_dms') === '1');
+      byParam('order_dms', '2').flush(reply([row(2, '2')]));
+
+      expect(component.bulkFailed).toEqual([]);
+      expect(component.bulkRows.length).toBe(2);
+    });
+
+    it('por VIN trae todas las órdenes del VIN y no repite renglones', () => {
+      component.applyBulkSearch(request(['VINA', 'VINB'], 'vin'));
+
+      byParam('vin', 'VINA').flush(reply([row(1, '100', 'VINA'), row(2, '101', 'VINA')]));
+      // La misma orden saliendo por dos valores no se duplica
+      byParam('vin', 'VINB').flush(reply([row(2, '101', 'VINA'), row(3, '102', 'VINB')]));
+
+      expect(component.bulkRows.map((r) => r.Id)).toEqual(['1', '2', '3']);
+    });
+
+    it('pagina y ordena en memoria, sin volver a la API', () => {
+      component.applyBulkSearch(request(['A', 'B', 'C']));
+      byParam('order_dms', 'A').flush(reply([row(1, '30')]));
+      byParam('order_dms', 'B').flush(reply([row(2, '10')]));
+      byParam('order_dms', 'C').flush(reply([row(3, '20')]));
+
+      component.onPageChanged({ pageIndex: 1, pageSize: 2 });
+      expect(component.data.map((r) => r.order_dms)).toEqual(['20']);
+
+      component.onSortChange({ column: 'order_dms', direction: 'asc' });
+      expect(component.pageIndex).toBe(0);
+      expect(component.data.map((r) => r.order_dms)).toEqual(['10', '20', '30'].slice(0, component.currentPageSize));
+      httpMock.expectNone((r) => r.url === INVOICES && r.params.get('page') === '2');
+    });
+
+    it('reenviar un renglón refresca solo ese pedido', () => {
+      component.applyBulkSearch(request(['100', '200']));
+      byParam('order_dms', '100').flush(reply([row(1, '100')]));
+      byParam('order_dms', '200').flush(reply([row(2, '200')]));
+
+      component.resendToSalesForce(component.bulkRows[0]);
+      httpMock.expectOne(`${INVOICES}/1`).flush({ status: 200 });
+
+      // Se vuelve a consultar el pedido 100 y no se recarga la página normal
+      byParam('order_dms', '100').flush(
+        reply([{ ...row(1, '100'), sendedSalesForce: '0' }])
+      );
+      httpMock.expectNone((r) => r.params.get('order_dms') === '200');
+      expect(component.bulkRows[0].sendedSalesForce).toBe('0');
+    });
+
+    it('salir regresa a la tabla normal con su orden por defecto', () => {
+      component.applyBulkSearch(request(['1']));
+      byParam('order_dms', '1').flush(reply([row(1, '1')]));
+
+      component.exitBulkSearch();
+
+      expect(component.bulk).toBeNull();
+      expect(component.currentSort).toEqual({ column: 'billing_date', direction: 'desc' });
+      // (la carga inicial de la tabla también sigue pendiente en esta prueba)
+      const pages = httpMock.match(
+        (r) => r.url === INVOICES && r.params.get('page') === '1' && !r.params.has('order_dms')
+      );
+      expect(pages.length).toBeGreaterThanOrEqual(1);
+      expect(pages[pages.length - 1].request.params.get('orderby')).toBe('billing_date');
+      pages.forEach((p) => p.flush(reply([])));
+    });
+
+    it('aplicar un filtro normal sale de la búsqueda múltiple', () => {
+      component.applyBulkSearch(request(['1']));
+      byParam('order_dms', '1').flush(reply([row(1, '1')]));
+
+      component.applyFilter({ vin: 'X' });
+
+      expect(component.bulk).toBeNull();
+      httpMock
+        .expectOne((r) => r.url === INVOICES && r.params.get('vin') === 'X')
+        .flush(reply([]));
+    });
+
+    it('muestra el aviso con los conteos y la lista de faltantes', () => {
+      component.applyBulkSearch(request(['1', '2']));
+      byParam('order_dms', '1').flush(reply([row(1, '1')]));
+      byParam('order_dms', '2').flush(reply([]));
+      component.showNotFound = true;
+      fixture.detectChanges();
+
+      const text: string = fixture.nativeElement.querySelector('.bulk-banner').textContent;
+      expect(text).toContain('Búsqueda de 2 pedidos');
+      expect(text).toContain('1 sin resultados');
+      expect(fixture.nativeElement.querySelector('.bulk-missing code').textContent).toContain('2');
+    });
+  });
+
   describe('reenviar VIN desde el detalle', () => {
     const INVENTORY = `${BASE}/vgd/inventoryfilter`;
     // VIN inventado: el repositorio es público

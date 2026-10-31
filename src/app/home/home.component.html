@@ -8,6 +8,7 @@
   <!-- Contenido de Ordenes (visible por defecto) -->
   <div *ngIf="activeTab === 'orders'">
   <vex-invoice-filter (filterChange)="handleFilter($event)"
+              (bulkSearch)="handleBulkSearch($event)"
               (downloadRequested)="handleDownload()"
               [isDownloadingExcel]="invoiceTable?.isDownloadingExcel || false">
   </vex-invoice-filter>
@@ -17,6 +18,8 @@
   <!-- Contenido de Inventario -->
   <div *ngIf="activeTab === 'inventory'">
     <vex-inventory-filter (filterChange)="handleInventoryFilter($event)"
+                         (resendAllRequested)="handleInventoryResendAll()"
+                         [isResendingAll]="inventoryTable?.isResendingAll || false"
                          (downloadRequested)="handleInventoryDownload()"
                          [isDownloadingExcel]="inventoryTable?.isDownloadingExcel || false">
     </vex-inventory-filter>
