@@ -6,11 +6,21 @@ import { TableColumn } from '../../../@vex/interfaces/table-column.interface';
 import { VanguardiaApiService } from '../../services/vanguardia-api.service';
 import { NotificationService } from '../../services/notification.service';
 import { catchError, map, mergeMap, tap, switchMap } from 'rxjs/operators';
-import { Subscription, forkJoin, from, of } from 'rxjs';
+import {
+  Observable,
+  Subscription,
+  forkJoin,
+  from,
+  of,
+  throwError
+} from 'rxjs';
 import {
   BulkSearchField,
   BulkSearchRequest
 } from '../bulk-search-dialog/bulk-search-dialog.component';
+import { DetailAction } from '../generic-table/generic-detail-modal.component';
+import { resendPayload } from '../shared/salesforce-link';
+import { isVinNotFoundError, vinFromError } from './vin-not-found';
 import * as XLSX from 'xlsx';
 
 /** Consultas simultáneas a la API en una búsqueda múltiple. */
@@ -203,6 +213,23 @@ export class InvoiceTableComponent implements OnInit {
       '0': 'No'
     }
   };
+
+  /**
+   * Botones que el detalle de la orden muestra junto a un campo.
+   *
+   * Si Salesforce rechazó la orden porque no tiene ese VIN, lo que hay que
+   * reenviar primero es la unidad (Inventario); la orden se reenvía después, ya
+   * que el vehículo exista en Salesforce.
+   */
+  readonly detailActions: DetailAction[] = [
+    {
+      field: 'resultSF',
+      label: 'Reenviar VIN',
+      when: (value) => isVinNotFoundError(value),
+      run: (row) => this.resendVin(row),
+      doneLabel: 'VIN marcado para reenvío'
+    }
+  ];
 
   constructor(
     private vanguardiaApi: VanguardiaApiService,
@@ -751,6 +778,54 @@ export class InvoiceTableComponent implements OnInit {
     XLSX.writeFile(
       workbook,
       `ordenes_busqueda_multiple_${rows.length}_registros_${stamp}.xlsx`
+    );
+  }
+
+  /**
+   * Marca para reenvío a Salesforce la unidad del inventario con el VIN que la
+   * orden no encontró (el que dice el mensaje; si no lo trae, el de la orden).
+   * Es el mismo cambio que el reenvío de Inventario.
+   */
+  private resendVin(row: any): Observable<unknown> {
+    const vin = vinFromError(row?.resultSF) ?? String(row?.vin ?? '').toUpperCase();
+    if (!vin) {
+      return throwError(() => new Error('La orden no trae VIN'));
+    }
+
+    return this.vanguardiaApi.getInventory({ vin, perpage: 5 }).pipe(
+      switchMap(({ items }) => {
+        const units = items.filter(
+          (unit) => unit?.id && String(unit.vin).toUpperCase() === vin
+        );
+        if (units.length === 0) {
+          return throwError(
+            () =>
+              new Error(
+                `El VIN ${vin} no está en el inventario del portal: no se puede reenviar desde aquí`
+              )
+          );
+        }
+        return forkJoin(
+          units.map((unit) =>
+            this.vanguardiaApi.updateInventory(unit.id, resendPayload(unit))
+          )
+        );
+      }),
+      tap(() =>
+        this.notifications.success(
+          `VIN ${vin} marcado para reenvío a Salesforce (Inventario)`
+        )
+      ),
+      catchError((error) =>
+        throwError(
+          () =>
+            new Error(
+              error?.message?.startsWith('El VIN') || error?.message?.startsWith('La orden')
+                ? error.message
+                : `No se pudo reenviar el VIN: ${error?.error?.message || 'error desconocido'}`
+            )
+        )
+      )
     );
   }
 }

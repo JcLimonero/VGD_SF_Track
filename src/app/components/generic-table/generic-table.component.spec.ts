@@ -62,8 +62,28 @@ describe('GenericTableComponent', () => {
         labels: { vin: 'VIN' },
         exclude: null,
         valueLabels: null,
-        title: null
+        title: null,
+        actions: null
       });
+    });
+
+    it('forwards the actions the module adds next to a field', () => {
+      const open = spyOn(component.dialog, 'open');
+      component.modalComponent = GenericDetailModalComponent;
+      const actions = [
+        {
+          field: 'resultSF',
+          label: 'Reenviar VIN',
+          when: () => true,
+          run: () => of(true)
+        }
+      ];
+      component.detailActions = actions;
+
+      component.openModal({ vin: 'VIN1' });
+
+      const [, config] = open.calls.mostRecent().args as any[];
+      expect(config.data.actions).toBe(actions);
     });
 
     it('forwards the coded value translations', () => {

@@ -23,6 +23,7 @@ import { InventoryModalComponent } from '../inventory/inventory-modal/inventory-
 import { CustomerModalComponent } from '../customer/customer-modal/customer-modal.component';
 import { ServiceModalComponent } from '../servicios/service-modal/service-modal.component';
 import { LeadsModalComponent } from '../leads/leads-modal/leads-modal.component';
+import { DetailAction } from './generic-detail-modal.component';
 import {
   canOpenSalesForce,
   openInSalesForce,
@@ -65,6 +66,7 @@ export class GenericTableComponent implements OnInit, OnChanges {
   // el generico dice 'Detalles del registro', que no es como el usuario llama
   // a lo que esta viendo.
   @Input() detailTitle: string | null = null;
+  @Input() detailActions: DetailAction[] | null = null; // Botones que el módulo agrega junto a un campo del detalle
 
   @Input() sortableColumns: string[] | null = null; // Columnas ordenables; si es null se usa la lista por defecto
   @Input() sendField: string = 'sendedSalesForce'; // Campo que indica si el registro ya se envió; Crabi usa 'isSend'
@@ -320,7 +322,8 @@ export class GenericTableComponent implements OnInit, OnChanges {
           labels: this.detailLabels,
           exclude: this.detailExclude,
           valueLabels: this.detailValueLabels,
-          title: this.detailTitle
+          title: this.detailTitle,
+          actions: this.detailActions
         },
         width: '80%',
         maxWidth: '800px'
