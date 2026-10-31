@@ -1,3 +1,38 @@
+<!-- Búsqueda múltiple (varios pedidos o VIN) -->
+<div *ngIf="bulk" class="bulk-banner" role="status">
+  <div class="bulk-banner-main">
+    <span class="material-symbols-outlined" aria-hidden="true">playlist_add_check</span>
+    <strong>Búsqueda de {{ bulk.values.length }} {{ bulk.label }}</strong>
+    <span *ngIf="bulk.pending > 0">
+      · consultando {{ bulk.values.length - bulk.pending }} de {{ bulk.values.length }}…
+    </span>
+    <span *ngIf="bulk.pending === 0">
+      · {{ bulkRows.length }} órdenes de {{ bulkFound }} {{ bulk.label }} encontrados
+    </span>
+    <span class="bulk-banner-note" *ngIf="bulk.duplicates > 0">
+      ({{ bulk.duplicates }} repetido(s) descartado(s))
+    </span>
+  </div>
+  <div class="bulk-banner-actions">
+    <button type="button" class="bulk-link" *ngIf="bulkNotFound.length > 0"
+            (click)="showNotFound = !showNotFound">
+      {{ bulkNotFound.length }} sin resultados
+    </button>
+    <button type="button" class="bulk-link bulk-link--error" *ngIf="bulkFailed.length > 0 && bulk.pending === 0"
+            (click)="retryBulkFailed()">
+      Reintentar {{ bulkFailed.length }} con error
+    </button>
+    <button type="button" class="bulk-exit" (click)="exitBulkSearch()">
+      Salir de la búsqueda
+    </button>
+  </div>
+  <div class="bulk-missing" *ngIf="showNotFound && bulkNotFound.length > 0">
+    <p>No se encontró ninguna orden para:</p>
+    <code>{{ bulkNotFound.join(', ') }}</code>
+    <button type="button" class="bulk-link" (click)="copyNotFound()">Copiar listado</button>
+  </div>
+</div>
+
 <!-- Mensaje de carga -->
 <div *ngIf="loading" class="flex justify-center items-center p-8">
   <div class="text-center">
@@ -35,6 +70,6 @@
 	[detailExclude]="detailExclude"
 	[detailValueLabels]="detailValueLabels"
 	[onResend]="resendToSalesForce.bind(this)"
-	(pageChanged)="loadPage($event.pageIndex, $event.pageSize)"
+	(pageChanged)="onPageChanged($event)"
 	(sortChanged)="onSortChange($event)"
 ></vex-generic-table>

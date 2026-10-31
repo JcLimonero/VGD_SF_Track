@@ -5,9 +5,31 @@ import { GenericDetailModalComponent } from '../generic-table/generic-detail-mod
 import { TableColumn } from '../../../@vex/interfaces/table-column.interface';
 import { VanguardiaApiService } from '../../services/vanguardia-api.service';
 import { NotificationService } from '../../services/notification.service';
-import { map, tap, switchMap } from 'rxjs/operators';
-import { forkJoin } from 'rxjs';
+import { catchError, map, mergeMap, tap, switchMap } from 'rxjs/operators';
+import { Subscription, forkJoin, from, of } from 'rxjs';
+import {
+  BulkSearchField,
+  BulkSearchRequest
+} from '../bulk-search-dialog/bulk-search-dialog.component';
 import * as XLSX from 'xlsx';
+
+/** Consultas simultáneas a la API en una búsqueda múltiple. */
+const BULK_CONCURRENCY = 5;
+
+/** Una búsqueda por listado de pedidos o VIN. */
+interface BulkState {
+  field: BulkSearchField;
+  /** "pedidos" o "VIN" */
+  label: string;
+  values: string[];
+  duplicates: number;
+  /** Renglones que devolvió la API por cada valor buscado. */
+  results: Map<string, any[]>;
+  /** Valores cuya consulta falló (red o API): se pueden reintentar. */
+  failed: Set<string>;
+  /** Consultas que faltan por responder. */
+  pending: number;
+}
 
 @Component({
   selector: 'vex-invoice-table',
@@ -189,6 +211,7 @@ export class InvoiceTableComponent implements OnInit {
 
   get hasActiveFilters(): boolean {
     return !!(
+      this.bulk ||
       this.currentFilters.order_dms ||
       this.currentFilters.vin ||
       this.currentFilters.reference ||
@@ -267,6 +290,7 @@ export class InvoiceTableComponent implements OnInit {
     error?: boolean;
   }): void {
     console.log('ApplyFilter recibido:', filters);
+    this.leaveBulkMode();
     // Guardar filtros y reiniciar a primera página
     this.currentFilters = { ...filters };
     this.pageIndex = 0;
@@ -275,6 +299,13 @@ export class InvoiceTableComponent implements OnInit {
 
   onSortChange(sort: { column: string; direction: 'asc' | 'desc' }): void {
     console.log('Ordenamiento cambiado:', sort);
+    if (this.bulk) {
+      // Con una búsqueda múltiple los renglones ya están en memoria
+      this.currentSort = sort.column ? sort : null;
+      this.pageIndex = 0;
+      this.refreshBulkPage();
+      return;
+    }
     // Si column está vacío, resetear ordenamiento
     if (!sort.column) {
       this.currentSort = null;
@@ -302,7 +333,13 @@ export class InvoiceTableComponent implements OnInit {
         this.notifications.success(
           `Orden ${row.order_dms} marcada para reenvío a Salesforce`
         );
-        this.loadPage(this.pageIndex, this.currentPageSize);
+        const value = this.bulk ? this.bulkValueOf(row) : null;
+        if (value) {
+          // En una búsqueda múltiple solo se refresca lo que se buscó
+          this.refreshBulkValue(value);
+        } else {
+          this.loadPage(this.pageIndex, this.currentPageSize);
+        }
       },
       error: (error) => {
         this.notifications.error(
@@ -346,6 +383,10 @@ export class InvoiceTableComponent implements OnInit {
    * Maneja paginación múltiple para obtener todos los registros
    */
   downloadExcel(): void {
+    if (this.bulk) {
+      this.downloadBulkExcel();
+      return;
+    }
     if (this.total === 0) {
       console.warn('No hay datos para descargar');
       return;
@@ -409,41 +450,7 @@ export class InvoiceTableComponent implements OnInit {
           );
 
           // Preparar los datos para Excel con TODOS los campos disponibles
-          const excelData = allData.map((item) => ({
-            // Campos básicos de identificación
-            Agencia: item.agencyName || '',
-            'Número de Orden': item.order_dms || '',
-            Estado: item.state || '',
-            VIN: item.vin || '',
-
-            // Fechas importantes
-            'Fecha Inicio Garantía': item.warranty_init_date || '',
-            'Fecha Facturación': item.billing_date || '',
-            'Fecha Entrega': item.delivery_date || '',
-
-            // Información del vehículo
-            Placas: item.plates || '',
-
-            // Información de pago
-            'Método de Pago': item.payment_method || '',
-            'Referencia de Venta': item.invoice_reference || '',
-
-            // Información de Salesforce
-            'Enviado a SF': item.sendedSalesForce === '1' ? 'Sí' : 'No',
-            'ID Salesforce': item.idSalesForce || '',
-            'Resultado SF': item.resultSF || '',
-            'Intentos SF': item.sf_attempts || '',
-            'Insertado Correctamente': item.insertCorrect === '1' ? 'Sí' : 'No',
-
-            // Timestamps
-            'Timestamp DMS': item.timestamp_dms || '',
-            Timestamp: item.timestamp || '',
-            'Timestamp SalesForce': item.timestamp_sales_force || '',
-
-            // JSON y datos técnicos (truncados para Excel)
-            'JSON Request SF': item.sf_jsonRequest || '',
-            'JSON Response SF': item.sf_jsonResponse || ''
-          }));
+          const excelData = allData.map((item) => this.toExcelRow(item));
 
           // Crear libro de Excel
           const worksheet = XLSX.utils.json_to_sheet(excelData);
@@ -480,5 +487,270 @@ export class InvoiceTableComponent implements OnInit {
         this.isDownloadingExcel = false;
       }
     });
+  }
+
+  /** Una fila del Excel de órdenes, con todos los campos disponibles. */
+  private toExcelRow(item: any): Record<string, string> {
+    return {
+    // Campos básicos de identificación
+    Agencia: item.agencyName || '',
+    'Número de Orden': item.order_dms || '',
+    Estado: item.state || '',
+    VIN: item.vin || '',
+
+    // Fechas importantes
+    'Fecha Inicio Garantía': item.warranty_init_date || '',
+    'Fecha Facturación': item.billing_date || '',
+    'Fecha Entrega': item.delivery_date || '',
+
+    // Información del vehículo
+    Placas: item.plates || '',
+
+    // Información de pago
+    'Método de Pago': item.payment_method || '',
+    'Referencia de Venta': item.invoice_reference || '',
+
+    // Información de Salesforce
+    'Enviado a SF': item.sendedSalesForce === '1' ? 'Sí' : 'No',
+    'ID Salesforce': item.idSalesForce || '',
+    'Resultado SF': item.resultSF || '',
+    'Intentos SF': item.sf_attempts || '',
+    'Insertado Correctamente': item.insertCorrect === '1' ? 'Sí' : 'No',
+
+    // Timestamps
+    'Timestamp DMS': item.timestamp_dms || '',
+    Timestamp: item.timestamp || '',
+    'Timestamp SalesForce': item.timestamp_sales_force || '',
+
+    // JSON y datos técnicos (truncados para Excel)
+    'JSON Request SF': item.sf_jsonRequest || '',
+    'JSON Response SF': item.sf_jsonResponse || ''
+    };
+  }
+
+  // ───────────── Búsqueda múltiple (varios pedidos o VIN) ─────────────
+
+  /** Búsqueda por listado en curso; null si la tabla muestra lo normal. */
+  bulk: BulkState | null = null;
+  /** Muestra la lista de valores que no devolvieron nada. */
+  showNotFound = false;
+  private bulkSub?: Subscription;
+
+  /** Renglones encontrados, en el orden en que se pegó el listado y sin repetir. */
+  get bulkRows(): any[] {
+    if (!this.bulk) return [];
+    const seen = new Set<string>();
+    const rows: any[] = [];
+    for (const value of this.bulk.values) {
+      for (const row of this.bulk.results.get(value) ?? []) {
+        const key = String(row?.Id ?? `${row?.order_dms}|${row?.vin}`);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        rows.push(row);
+      }
+    }
+    return rows;
+  }
+
+  /** Valores que se consultaron bien y no tienen ningún renglón. */
+  get bulkNotFound(): string[] {
+    if (!this.bulk) return [];
+    return this.bulk.values.filter(
+      (v) => this.bulk!.results.has(v) && !this.bulk!.results.get(v)!.length
+    );
+  }
+
+  /** Valores cuya consulta falló. */
+  get bulkFailed(): string[] {
+    return this.bulk ? [...this.bulk.failed] : [];
+  }
+
+  /** Valores que sí devolvieron al menos un renglón. */
+  get bulkFound(): number {
+    if (!this.bulk) return 0;
+    return this.bulk.values.filter(
+      (v) => !!this.bulk!.results.get(v)?.length
+    ).length;
+  }
+
+  /** Arranca una búsqueda por listado; reemplaza lo que hubiera en la tabla. */
+  applyBulkSearch(request: BulkSearchRequest): void {
+    this.bulkSub?.unsubscribe();
+    this.bulk = {
+      field: request.field,
+      label: request.label,
+      values: request.values,
+      duplicates: request.duplicates,
+      results: new Map(),
+      failed: new Set(),
+      pending: 0
+    };
+    this.showNotFound = false;
+    this.currentFilters = {};
+    this.currentSort = null;
+    this.pageIndex = 0;
+    this.loading = false;
+    this.error = null;
+    this.data = [];
+    this.total = 0;
+    this.runBulkQueries(request.values);
+  }
+
+  /** Vuelve a consultar los valores que fallaron. */
+  retryBulkFailed(): void {
+    const failed = this.bulkFailed;
+    if (!this.bulk || failed.length === 0 || this.bulk.pending > 0) return;
+    this.runBulkQueries(failed);
+  }
+
+  /** Sale de la búsqueda por listado y regresa a la tabla normal. */
+  exitBulkSearch(): void {
+    this.leaveBulkMode();
+    this.pageIndex = 0;
+    this.loadPage(this.pageIndex, this.currentPageSize);
+  }
+
+  onPageChanged(event: { pageIndex: number; pageSize: number }): void {
+    if (this.bulk) {
+      this.pageIndex = event.pageIndex;
+      this.currentPageSize = event.pageSize;
+      this.refreshBulkPage();
+    } else {
+      this.loadPage(event.pageIndex, event.pageSize);
+    }
+  }
+
+  /** Copia al portapapeles los valores sin resultados, uno por línea. */
+  copyNotFound(): void {
+    const text = this.bulkNotFound.join('\n');
+    navigator.clipboard?.writeText(text).then(
+      () => this.notifications.success('Listado copiado'),
+      () => this.notifications.error('No se pudo copiar el listado')
+    );
+  }
+
+  private leaveBulkMode(): void {
+    if (!this.bulk) return;
+    this.bulkSub?.unsubscribe();
+    this.bulk = null;
+    this.showNotFound = false;
+    this.currentSort = { column: 'billing_date', direction: 'desc' };
+  }
+
+  private runBulkQueries(values: string[]): void {
+    const bulk = this.bulk!;
+    bulk.pending += values.length;
+    this.bulkSub = from(values)
+      .pipe(
+        mergeMap(
+          (value) =>
+            this.queryBulkValue(bulk.field, value).pipe(
+              map((items) => ({ value, items, failed: false })),
+              catchError(() => of({ value, items: [] as any[], failed: true }))
+            ),
+          BULK_CONCURRENCY
+        )
+      )
+      .subscribe({
+        next: ({ value, items, failed }) => {
+          bulk.pending--;
+          if (failed) {
+            bulk.failed.add(value);
+          } else {
+            bulk.failed.delete(value);
+            bulk.results.set(value, items);
+          }
+          this.refreshBulkPage();
+        }
+      });
+  }
+
+  /** Todos los renglones de un pedido o VIN (la API entrega hasta 100 por página). */
+  private queryBulkValue(field: BulkSearchField, value: string) {
+    return this.vanguardiaApi
+      .getInvoicesPaged({ [field]: value, perpage: 100 })
+      .pipe(map((res) => res.items ?? []));
+  }
+
+  /** Vuelve a consultar un valor, por ejemplo tras reenviar uno de sus renglones. */
+  private refreshBulkValue(value: string): void {
+    const bulk = this.bulk;
+    if (!bulk) return;
+    this.queryBulkValue(bulk.field, value).subscribe({
+      next: (items) => {
+        bulk.results.set(value, items);
+        bulk.failed.delete(value);
+        this.refreshBulkPage();
+      },
+      error: () => {
+        this.notifications.warning(
+          `No se pudo refrescar ${value}; vuelve a buscarlo`
+        );
+      }
+    });
+  }
+
+  /** Valor del listado al que pertenece un renglón. */
+  private bulkValueOf(row: any): string | null {
+    if (!this.bulk) return null;
+    for (const [value, rows] of this.bulk.results) {
+      if (rows.some((r) => r === row || (r?.Id != null && r.Id === row?.Id))) {
+        return value;
+      }
+    }
+    return null;
+  }
+
+  /** Ordena en memoria (los renglones ya están todos) y corta la página actual. */
+  private refreshBulkPage(): void {
+    let rows = this.bulkRows;
+    const sort = this.currentSort;
+    if (sort?.column) {
+      const dir = sort.direction === 'desc' ? -1 : 1;
+      rows = [...rows].sort(
+        (a, b) =>
+          dir *
+          String(a?.[sort.column] ?? '').localeCompare(
+            String(b?.[sort.column] ?? ''),
+            undefined,
+            { numeric: true }
+          )
+      );
+    }
+    this.total = rows.length;
+    const start = this.pageIndex * this.currentPageSize;
+    this.data = rows.slice(start, start + this.currentPageSize);
+  }
+
+  /** Excel de la búsqueda múltiple: los renglones y los valores sin resultado. */
+  private downloadBulkExcel(): void {
+    const bulk = this.bulk;
+    if (!bulk) return;
+
+    const rows = this.bulkRows.map((item) => this.toExcelRow(item));
+    const workbook = XLSX.utils.book_new();
+    const sheet = XLSX.utils.json_to_sheet(rows);
+    sheet['!cols'] = rows.length
+      ? Object.keys(rows[0]).map(() => ({ wch: 15 }))
+      : [];
+    XLSX.utils.book_append_sheet(workbook, sheet, 'Órdenes');
+
+    const missing = [
+      ...this.bulkNotFound.map((v) => ({ Valor: v, Resultado: 'Sin resultados' })),
+      ...this.bulkFailed.map((v) => ({ Valor: v, Resultado: 'Error de consulta' }))
+    ];
+    if (missing.length) {
+      XLSX.utils.book_append_sheet(
+        workbook,
+        XLSX.utils.json_to_sheet(missing),
+        'Sin resultados'
+      );
+    }
+
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+    XLSX.writeFile(
+      workbook,
+      `ordenes_busqueda_multiple_${rows.length}_registros_${stamp}.xlsx`
+    );
   }
 }

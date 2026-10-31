@@ -7,6 +7,7 @@ import { InvoiceFilterComponent } from '../components/invoice-filter/invoice-fil
 import { TabsComponent } from '../components/tabs/tabs.component';
 import { InventoryTableComponent } from '../components/inventory/inventory-table/inventory-table.component';
 import { AuthService } from '../core/auth/auth.service';
+import { BulkSearchRequest } from '../components/bulk-search-dialog/bulk-search-dialog.component';
 import { DemoValidationComponent } from '../components/demo-validation/demo-validation.component';
 import { InventoryFilterComponent } from '../components/inventory/inventory-filter/inventory-filter.component';
 import { CustomerTableComponent } from '../components/customer/customer-table/customer-table.component';
@@ -115,6 +116,15 @@ export class HomeComponent {
       this.invoiceTable.applyFilter(filters);
     } else {
       console.warn('invoiceTable no disponible aún o no tiene applyFilter');
+    }
+  }
+
+  /** Búsqueda por listado de pedidos o VIN en Órdenes. */
+  handleBulkSearch(request: BulkSearchRequest): void {
+    if (this.invoiceTable && this.invoiceTable.applyBulkSearch) {
+      this.invoiceTable.applyBulkSearch(request);
+    } else {
+      console.warn('invoiceTable no disponible aún o no tiene applyBulkSearch');
     }
   }
 
