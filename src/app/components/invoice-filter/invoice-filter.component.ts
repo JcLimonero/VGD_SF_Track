@@ -67,7 +67,16 @@ export class InvoiceFilterComponent implements OnInit {
   /** Abre el diálogo para pegar varios pedidos o VIN; si hay listado, lo emite. */
   openBulkSearch(): void {
     this.dialog
-      .open(BulkSearchDialogComponent, { width: '560px', maxWidth: '92vw' })
+      .open(BulkSearchDialogComponent, {
+        width: '560px',
+        maxWidth: '92vw',
+        data: {
+          agencies: this.agencies
+            .map((agency) => agency?.name)
+            .filter((name): name is string => !!name),
+          agencyName: this.selectedAgency
+        }
+      })
       .afterClosed()
       .subscribe((request?: BulkSearchRequest) => {
         if (request) this.bulkSearch.emit(request);

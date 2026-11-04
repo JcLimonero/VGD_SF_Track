@@ -33,6 +33,8 @@ interface BulkState {
   label: string;
   values: string[];
   duplicates: number;
+  /** Agencia a la que se acotó la búsqueda, si se eligió una. */
+  agencyName?: string;
   /** Renglones que devolvió la API por cada valor buscado. */
   results: Map<string, any[]>;
   /** Valores cuya consulta falló (red o API): se pueden reintentar. */
@@ -608,6 +610,7 @@ export class InvoiceTableComponent implements OnInit {
       label: request.label,
       values: request.values,
       duplicates: request.duplicates,
+      agencyName: request.agencyName,
       results: new Map(),
       failed: new Set(),
       pending: 0
@@ -671,7 +674,7 @@ export class InvoiceTableComponent implements OnInit {
       .pipe(
         mergeMap(
           (value) =>
-            this.queryBulkValue(bulk.field, value).pipe(
+            this.queryBulkValue(bulk.field, value, bulk.agencyName).pipe(
               map((items) => ({ value, items, failed: false })),
               catchError(() => of({ value, items: [] as any[], failed: true }))
             ),
@@ -693,9 +696,17 @@ export class InvoiceTableComponent implements OnInit {
   }
 
   /** Todos los renglones de un pedido o VIN (la API entrega hasta 100 por página). */
-  private queryBulkValue(field: BulkSearchField, value: string) {
+  private queryBulkValue(
+    field: BulkSearchField,
+    value: string,
+    agencyName?: string
+  ) {
     return this.vanguardiaApi
-      .getInvoicesPaged({ [field]: value, perpage: 100 })
+      .getInvoicesPaged({
+        [field]: value,
+        ...(agencyName ? { agencyName } : {}),
+        perpage: 100
+      })
       .pipe(map((res) => res.items ?? []));
   }
 
@@ -703,7 +714,7 @@ export class InvoiceTableComponent implements OnInit {
   private refreshBulkValue(value: string): void {
     const bulk = this.bulk;
     if (!bulk) return;
-    this.queryBulkValue(bulk.field, value).subscribe({
+    this.queryBulkValue(bulk.field, value, bulk.agencyName).subscribe({
       next: (items) => {
         bulk.results.set(value, items);
         bulk.failed.delete(value);

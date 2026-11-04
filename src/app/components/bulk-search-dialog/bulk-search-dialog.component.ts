@@ -1,7 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+  MatDialogRef
+} from '@angular/material/dialog';
 import { MAX_LIST_VALUES, parseValueList } from '../shared/value-list';
 
 export type BulkSearchField = 'order_dms' | 'vin';
@@ -13,6 +17,16 @@ export interface BulkSearchRequest {
   label: string;
   values: string[];
   duplicates: number;
+  /** Agencia elegida para acotar la búsqueda; sin ella se busca en todas. */
+  agencyName?: string;
+}
+
+/** Datos con los que se abre el diálogo. */
+export interface BulkSearchDialogData {
+  /** Nombres de agencia disponibles. */
+  agencies?: string[];
+  /** Agencia que ya estaba elegida en el filtro. */
+  agencyName?: string;
 }
 
 interface FieldOption {
@@ -43,8 +57,15 @@ export class BulkSearchDialogComponent {
     }
   ];
 
+  private readonly data =
+    inject<BulkSearchDialogData | null>(MAT_DIALOG_DATA, { optional: true }) ??
+    {};
+
+  readonly agencies: string[] = this.data.agencies ?? [];
+
   field: BulkSearchField = 'order_dms';
   text = '';
+  agencyName = this.data.agencyName ?? '';
 
   constructor(private dialogRef: MatDialogRef<BulkSearchDialogComponent>) {}
 
@@ -81,6 +102,7 @@ export class BulkSearchDialogComponent {
       values,
       duplicates
     };
+    if (this.agencyName) request.agencyName = this.agencyName;
     this.dialogRef.close(request);
   }
 
