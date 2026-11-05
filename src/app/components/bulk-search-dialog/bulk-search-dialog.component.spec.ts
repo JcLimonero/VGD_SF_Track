@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import {
@@ -60,6 +60,10 @@ describe('BulkSearchDialogComponent', () => {
     ]);
   });
 
+  it('no muestra el selector de agencia si no hay agencias', () => {
+    expect(fixture.nativeElement.querySelector('.bulk-agency')).toBeNull();
+  });
+
   it('con VIN pasa a mayúsculas', () => {
     component.selectField('vin');
     component.text = 'kndpu3adxp7186704';
@@ -87,5 +91,52 @@ describe('BulkSearchDialogComponent', () => {
   it('cancelar cierra sin resultado', () => {
     component.cancel();
     expect(closed).toEqual([undefined]);
+  });
+
+  describe('con agencias', () => {
+    const open = (data: object) => {
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        imports: [BulkSearchDialogComponent],
+        providers: [
+          provideNoopAnimations(),
+          { provide: MAT_DIALOG_DATA, useValue: data },
+          {
+            provide: MatDialogRef,
+            useValue: { close: (value?: BulkSearchRequest) => closed.push(value) }
+          }
+        ]
+      });
+      fixture = TestBed.createComponent(BulkSearchDialogComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    };
+
+    it('ofrece las agencias y arranca con la que estaba elegida', () => {
+      open({ agencies: ['GEELY GALERIAS', 'KIA'], agencyName: 'KIA' });
+
+      const options = Array.from(
+        fixture.nativeElement.querySelectorAll('.bulk-agency option')
+      ).map((el) => (el as HTMLElement).textContent?.trim());
+      expect(options).toEqual(['Todas las agencias', 'GEELY GALERIAS', 'KIA']);
+      expect(component.agencyName).toBe('KIA');
+    });
+
+    it('devuelve la agencia elegida', () => {
+      open({ agencies: ['GEELY GALERIAS'] });
+      component.agencyName = 'GEELY GALERIAS';
+      component.text = '2762';
+      component.search();
+
+      expect(closed[0]?.agencyName).toBe('GEELY GALERIAS');
+    });
+
+    it('sin agencia no manda el campo', () => {
+      open({ agencies: ['GEELY GALERIAS'] });
+      component.text = '2762';
+      component.search();
+
+      expect('agencyName' in closed[0]!).toBeFalse();
+    });
   });
 });

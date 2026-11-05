@@ -9,6 +9,7 @@
     <span *ngIf="bulk.pending === 0">
       · {{ bulkRows.length }} órdenes de {{ bulkFound }} {{ bulk.label }} encontrados
     </span>
+    <span *ngIf="bulk.agencyName">· agencia {{ bulk.agencyName }}</span>
     <span class="bulk-banner-note" *ngIf="bulk.duplicates > 0">
       ({{ bulk.duplicates }} repetido(s) descartado(s))
     </span>

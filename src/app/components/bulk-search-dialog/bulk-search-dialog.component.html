@@ -17,6 +17,14 @@
     </button>
   </div>
 
+  <label class="bulk-agency" *ngIf="agencies.length > 0">
+    <span>Agencia</span>
+    <select [(ngModel)]="agencyName" aria-label="Agencia">
+      <option value="">Todas las agencias</option>
+      <option *ngFor="let name of agencies" [value]="name">{{ name }}</option>
+    </select>
+  </label>
+
   <textarea
     class="bulk-text"
     rows="9"

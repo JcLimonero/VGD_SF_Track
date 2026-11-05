@@ -229,6 +229,27 @@ describe('InvoiceTableComponent', () => {
       duplicates: 0
     });
 
+    it('con agencia la manda en cada consulta y la muestra en el aviso', () => {
+      component.applyBulkSearch({ ...request(['2762', '2763']), agencyName: 'GEELY GALERIAS' });
+      for (const value of ['2762', '2763']) {
+        const req = byParam('order_dms', value);
+        expect(req.request.params.get('agencyName')).toBe('GEELY GALERIAS');
+        req.flush(reply([]));
+      }
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelector('.bulk-banner').textContent).toContain(
+        'agencia GEELY GALERIAS'
+      );
+    });
+
+    it('sin agencia no manda agencyName', () => {
+      component.applyBulkSearch(request(['2762']));
+      const req = byParam('order_dms', '2762');
+      expect(req.request.params.has('agencyName')).toBeFalse();
+      req.flush(reply([]));
+    });
+
     it('consulta cada pedido por separado y junta los renglones en el orden pegado', () => {
       component.applyBulkSearch(request(['300', '100', '200']));
 
